@@ -1,0 +1,152 @@
+# REQUIREMENT:
+# echo -e "\n[ -r \${HOME}/.zshrc_custom ] && source \${HOME}/.zshrc_custom" >> ${HOME}/.zshrc
+
+# zsh
+ZSH_THEME="robbyrussell"
+DISABLE_UPDATE_PROMPT="true"
+DISABLE_MAGIC_FUNCTIONS="true"
+plugins=(aws docker docker-compose git kube-ps1 kubectl ripgrep rsync terraform minikube vagrant zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search)
+
+# zsh history
+HISTSIZE=100000
+SAVEHIST=100000
+HIST_STAMPS="yyyy-mm-dd"
+setopt EXTENDED_HISTORY          # Write the history file in the ':start:elapsed;command' format.
+setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY             # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire a duplicate event first when trimming history.
+setopt HIST_IGNORE_DUPS          # Do not record an event that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS      # Delete an old recorded event if a new event is a duplicate.
+setopt HIST_FIND_NO_DUPS         # Do not display a previously found event.
+setopt HIST_IGNORE_SPACE         # Do not record an event starting with a space.
+setopt HIST_SAVE_NO_DUPS         # Do not write a duplicate event to the history file.
+setopt HIST_VERIFY               # Do not execute immediately upon history expansion.
+setopt APPEND_HISTORY            # append to history file
+setopt HIST_NO_STORE             # Don't store history commands
+
+# export PATH=":$PATH"
+export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin"
+
+# Install iTerm2 Shell Integration
+# curl -L https://iterm2.com/shell_integration/zsh -o ${HOME}/.iterm2_shell_integration.zsh
+# [ -r "${HOME}/.iterm2_shell_integration.zsh" ] && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# You may need to manually set your MANPATH
+export MANPATH="/usr/local/man:${MANPATH}"
+
+# You may need to manually set your language environment
+export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+export EDITOR='vim'
+export VISUAL="${EDITOR}"
+
+# Compilation flags
+export ARCHFLAGS="-arch $(uname -m)"
+
+# fzf
+# https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
+# https://thevaluable.dev/fzf-shell-integration/
+# https://vitormv.github.io/fzf-themes/
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+  --color=fg:#d0d0d0,fg+:#d0d0d0,bg:-1,bg+:#262626
+  --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
+  --color=prompt:#d7005f,spinner:#af5fff,pointer:#af5fff,header:#87afaf
+  --color=border:#262626,label:#aeaeae,query:#d9d9d9
+  --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
+  --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
+export FZF_COMPLETION_OPTS='--border --info=inline'
+export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
+
+# homebrew stuff
+export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_NO_ANALYTICS=1
+
+# Docker stuff
+export BUILDKIT_COLORS="run=light-blue:error=light-red:cancel=light-magenta:warning=light-yellow"
+
+# .Net telemetry
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+######################################################################
+# vagrant completion
+# do the same as: vagrant autocomplete install
+# adds completion code to >>>> ~/.zshrc
+if ( command -v vagrant &>/dev/null ) ; then
+  VAGRANT_VERSION="$(vagrant version --no-tty --no-color | awk '/^Installed/ {print $NF}')"
+  fpath=(/opt/vagrant/embedded/gems/gems/vagrant-${VAGRANT_VERSION}/contrib/zsh $fpath)
+fi
+
+######################################################################
+# less tweaks
+scrtitle='\[\033k\033\\\]'  # ESC k ESC \ for titles in screen. advanced magic here.
+export LESS='-asrRix8'
+export LESSCHARSET='utf-8'
+
+# color manpage
+export LESS_TERMCAP_mb=$'\E[01;31m'         # begin blinking
+export LESS_TERMCAP_md=$'\E[01;38;5;208m'   # begin bold
+export LESS_TERMCAP_me=$'\E[0m'             # end mode
+export LESS_TERMCAP_se=$'\E[0m'             # end standout-mode
+export LESS_TERMCAP_so=$'\E[38;07;246m'     # begin standout-mode - info box
+export LESS_TERMCAP_ue=$'\E[0m'             # end underline
+export LESS_TERMCAP_us=$'\E[04;38;5;111m'   # begin underline
+# or use bat:
+# export MANPAGER="sh -c 'col -bx | bat -l man -p --style header --paging always'"
+
+######################################################################
+
+# zsh auto completion for lot of tools
+AUTO_COMPLETION=(awless colima docker helm kubectl minikube k9s)
+for app in ${AUTO_COMPLETION} ; do
+  ( command -v ${app} &>/dev/null ) && source <(${app} completion zsh)
+done ; unset app
+
+# stern has another syntax
+( command -v stern &>/dev/null ) && source <(stern --completion zsh)
+
+# gh has another syntax
+( command -v gh &>/dev/null ) && source <(gh completion -s zsh)
+
+# rg has another syntax
+# ( command -v rg &>/dev/null ) && source <(rg --generate=complete-zsh)
+# zsh
+
+fpath=($fpath ~/.zsh/completion)
+
+# https://kubernetes.io/es/docs/tasks/tools/included/optional-kubectl-configs-zsh/
+# # Make all kubectl completion fzf
+# command -v fzf >/dev/null 2>&1 && {
+# 	source <(kubectl completion zsh | sed 's#${requestComp} 2>/dev/null#${requestComp} 2>/dev/null | head -n -1 | fzf  --multi=0 #g')
+# }
+
+complete -o default -F __start_kubectl k
+compdef __start_kubectl k
+
+######################################################################
+
+compinit
+
+######################################################################
+# remove dangling aliases (which will be set up later)
+for i in ga ls ll md ; do
+  unalias ${i} &>/dev/null
+done
+
+######################################################################
+WORK_ALIAS_FILE="${HOME}/.aliases_work"
+SECRETS_FILE="${HOME}/.secrets"
+
+######################################################################
+# load custom aliases & functions
+for file in ~/.{fzf.zsh,aliases,functions} "${WORK_ALIAS_FILE}" "${SECRETS_FILE}" ; do
+  [ -r "${file}" ] && source "${file}"
+done ; unset file
+
+######################################################################
+# ssh-add
+ssh-add --apple-load-keychain &>/dev/null # && ssh-add -l
+
+######################################################################
+# random cookie
+cookie

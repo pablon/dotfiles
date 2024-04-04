@@ -1,0 +1,506 @@
+#===============================================================
+# Colors:
+export BOLD="\033[1;37m"
+export RED="\033[1;31m"
+export GREEN="\033[1;92m"
+export YELLOW="\033[1;93m"
+export BLUE="\033[1;94m"
+export MAGENTA="\033[1;95m"
+export CYAN="\033[1;96m"
+export NONE="\033[0m"
+#===============================================================
+_clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
+#===============================================================
+# multi purpose banners (brew-style)
+function _banner() {
+  echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
+}
+function _error() {
+  echo -e "${RED}❌ ${BOLD}${1}${NONE}\n"
+}
+#===============================================================
+# Create a new directory and enter it
+function md() {
+  mkdir -vp "${1}" && cd "${1}" && _banner "cd ${CYAN}$(pwd)/"
+}
+#===============================================================
+# find shorthand
+function f() {
+  find . -iname "*${1}*" 2>/dev/null | grep -i --color=never "${1}"
+}
+#===============================================================
+# Start an HTTP server from a directory, optionally specifying the port
+# https://appdividend.com/2023/03/20/modulenotfounderror-no-module-named-simplehttpserver/
+function server() {
+  local port="${1:-8000}"
+  open "http://localhost:${port}/"
+  # Set the default Content-Type to 'text/plain' instead of 'application/octet-stream'
+  # And serve everything as UTF-8 (although not technically correct, this doesn't break anything for binary files)
+  # python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
+  python3 -m http.server $port
+}
+#===============================================================
+# Copy w/ progress
+function cp_p () {
+  rsync -WavP -h --progress "${1}" "${2}"
+}
+#===============================================================
+# copy dir w/file hierarchies with tar
+function cp_tar() {
+  local SRC="${1}"
+  local DST="${2}"
+  [ -d "${SRC}" ] || _error "Source directory does not exist"
+  [ -d "${DST}" ] || mkdir -vp "${DST}"
+  ( cd "${SRC}/" && tar -cf - . | ( cd "${DST}/" && tar -xpf - ) )
+}
+#===============================================================
+# quick backup of files/dirs w/timestamp
+function bkp() {
+  for i in ${@} ; do
+    BKP="${i}.$(date +%Y%m%d.%H%M%S)"
+    if [ -d ${i} ] ; then
+      cp -rpf "${i}" "${BKP}"
+      # echo -e "'${i}' to '${BKP}' \t[dir]"
+      _banner "Copied [dir]  '${i}' ==> '${BKP}'"
+    elif [ -f ${i} ] ; then
+      cp -pf "${i}" "${BKP}"
+      chmod 600 ${BKP}
+      _banner "Copied [file] '${i}' ==> '${BKP}'"
+    else
+      echo "-- skipping [${i}] - not a file or folder"
+    fi
+  done
+}
+#===============================================================
+# Test if HTTP compression (RFC 2616 + SDCH) is enabled for a given URL.
+# Send a fake UA string for sites that sniff it instead of using the Accept-Encoding header. (Looking at you, ajax.googleapis.com!)
+function httpcompression() {
+  encoding="$(curl -LIs -H 'User-Agent: Mozilla/5 Gecko' -H 'Accept-Encoding: gzip,deflate,compress,sdch' "$1" | grep '^Content-Encoding:')" && echo "$1 is encoded using ${encoding#* }" || echo "$1 is not using any encoding"
+}
+#===============================================================
+# All the dig info
+function digga() {
+  dig +nocmd any +multiline +all +answer +authority "$1"
+}
+#===============================================================
+# Escape UTF-8 characters into their 3-byte format
+function escape() {
+  printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u)
+  echo # newline
+}
+#===============================================================
+# Decode \x{ABCD}-style Unicode escape sequences
+function unidecode() {
+  if ( command -v perl &>/dev/null ) ; then
+    perl -e "binmode(STDOUT, ':utf8'); print \"$@\""
+    echo # newline
+  fi
+}
+#===============================================================
+# flush dns
+function flushdns() {
+  if [[ "$(uname)" == "Darwin" ]] ; then
+    if [ -r "/etc/resolv.conf.bkp" ] ; then
+      sudo cp -f /etc/resolv.conf.bkp /etc/resolv.conf
+    fi
+    sudo dscacheutil -flushcache
+    sudo killall -HUP mDNSResponder
+  elif [[ "$(uname)" == "Linux" ]] ; then
+    if ( pidof nscd &>/dev/null ) ; then
+      sudo /etc/init.d/nscd restart &>/dev/null || \
+      sudo systemctl restart nscd &>/dev/null
+    elif ( pidof dnsmasq &>/dev/null ) ; then
+      sudo /etc/init.d/dnsmasq restart &>/dev/null || \
+      sudo systemctl dnsmasq nscd &>/dev/null
+    fi
+    sudo resolvectl flush-caches &>/dev/null || \
+    sudo systemd-resolve --flush-caches &>/dev/null
+  fi
+  _banner "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
+}
+#===============================================================
+# print random fortune with cowsay & fortune
+function cookie() {
+  for program in cowsay fortune ; do
+    if ! ( command -v ${program} &>/dev/null ) ; then
+        echo "YUCS!: Sorry, ${BOLD}${program}${NONE} is not installed :-/\n"
+        exit 1
+    fi
+  done
+  # get all possible figures with: cowsay -l
+  array=( $(cowsay -l | grep -v Cow | sed '$!N;s/\n/ /') )
+  size=${#array[@]}
+  index=$((${RANDOM} % ${size}))
+  echo -e "${CYAN}" ; fortune -s | cowsay -f "${array[${index}]}" | sed 's|^|  |' ; echo "${NONE}"
+}
+#===============================================================
+# listing with youtube-dl
+function ytd_list() {
+  if [ "${1}" ] ; then
+    if [ -f "${1}" ] ; then
+      cat "${1}" | while read link ; do youtube-dl -c --write-description --merge-output-format mp4 "${link}" ; done ; date
+    else
+      echo -e "ERROR: ${1} is not a file\n"
+    fi
+  else
+    echo -e "ERROR: ARGV1 should be a list with 1 youtube linke per-line\n"
+  fi
+}
+#===============================================================
+# left trim
+function ltrim() {
+  sed 's/^[ \t]*//'
+}
+# right trim
+function rtrim() {
+  sed 's/[ \t]*$//'
+}
+# both
+function trim() {
+  sed 's/^[ \t]*//;s/[ \t]*$//;s/^.$//;s/^$/d'
+}
+#===============================================================
+# find shell history with fzf
+function fh() {
+  eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history -i) | fzf +s --tac | sed 's/ *[0-9]* *//')
+}
+#===============================================================
+# get tls cert from URL
+function curl-cert() {
+  openssl s_client -showcerts -connect "${1}":443 -servername ${1}
+}
+#===============================================================
+# spawn subshell into an aws profile
+function awsprofile() {
+  if ( which zsh &>/dev/null ) ; then
+      local AWSSHELL='zsh'
+  else
+      local AWSSHELL='bash'
+  fi
+  local CREDENTIALS="${HOME}/.aws/credentials"
+  local PROFILES="$(grep '^\[' ${CREDENTIALS} | awk '{gsub(/\[|\]/,"")}1')"
+  [[ -z "${PROFILES}" ]] && _error "No profiles found in ${CREDENTIALS} :-("
+  ANSWER="$(echo "${PROFILES}" | fzf )"
+  if [[ -z "${ANSWER}" ]] ; then
+    echo -e "\t-- No profile selected --"
+  else
+    case "${AWSSHELL}" in
+      'zsh')  ( export AWS_PROFILE="${ANSWER}" && zsh -i ) ;;
+      'bash') ( export AWS_PROFILE="${ANSWER}" && bash --rcfile <(echo "PS1=\"[${YELLOW}aws${NONE}|${MAGENTA}${ANSWER}${NONE}] \W ${GREEN}→${NONE} \"") -i ) ;;
+    esac
+  fi
+}
+#===============================================================
+# ¯\_(ツ)_/¯
+function disappointed() { echo -n " ಠ_ಠ " | tee /dev/tty | $_clipboardApp; }
+function flip() { echo -n "（╯°□°）╯ ┻━┻" | tee /dev/tty | $_clipboardApp; }
+function shrug() { echo -n "¯\_(ツ)_/¯" | tee /dev/tty | $_clipboardApp; }
+#===============================================================
+# matrix
+function matrix() {
+  echo -e "\e[1;40m"
+  clear
+  while :; do
+    echo $LINES $COLUMNS $(( $RANDOM % $COLUMNS)) $(( $RANDOM % 72 )) ;sleep 0.05; done | \
+    awk '{ letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"; c=$4; letter=substr(letters,c,1);a[$3]=0;for (x in a) {o=a[x];a[x]=a[x]+1; printf "\033[%s;%sH\033[2;32m%s",o,x,letter; printf "\033[%s;%sH\033[1;37m%s\033[0;0H",a[x],x,letter;if (a[x] >= $1) { a[x]=0; } }}'
+}
+
+#===============================================================
+# vagrant
+#===============================================================
+
+#===============================================================
+# List all vagrant boxes available in the system including its
+# status, and try to access the selected one via ssh
+function vagrant_shell(){
+  if [ -r "${HOME}/.vagrant.d/data/machine-index/index" ] ; then
+    ( cd $(cat ${HOME}/.vagrant.d/data/machine-index/index | jq '.machines[] | {name, vagrantfile_path, state}' | jq '.name + "," + .state  + "," + .vagrantfile_path'| sed 's/^"\(.*\)"$/\1/'| column -s, -t | sort -rk 2 | fzf | awk '{print $3}'); vagrant ssh &>/dev/null )
+  fi
+}
+
+# list/save/restore vagrant snapshots
+function vagrant_snapshot() {
+  local VM_NAME="$(vagrant status --machine-readable | awk -F',' '/metadata/ {print $2}')"
+  case "${1}" in
+    list)
+      vagrant snapshot ${1}
+      ;;
+    save)
+      # normalize vm name for the snapshot
+      local VM_NAME="$(vagrant status --machine-readable | awk -F',' '/metadata/ {print $2}' | sed -e 's/[^A-Za-z0-9._-]/_/g')"
+      local VM_SNAPSHOT_NAME="${VM_NAME}-snapshot-$(date +%Y%m%d-%H%M%S)"
+      vagrant snapshot ${1} --no-tty "${VM_NAME}" "${VM_SNAPSHOT_NAME}"
+      ;;
+    restore)
+      if [[ "$(vagrant snapshot list | sed 1d &>/dev/null | wc -l)" -gt "0" ]] ; then
+        local SNAPSHOT="$(vagrant snapshot list | sed 1d | fzf --header='^-- Select snapshot to restore')"
+        vagrant snapshot ${1}  --no-tty --no-start "${VM_NAME}" "${SNAPSHOT}" 2>/dev/null
+      else
+        _banner "[${VM_NAME}] no snapshots to ${1}"
+      fi
+      ;;
+    delete)
+      if [[ "$(vagrant snapshot list | sed 1d &>/dev/null | wc -l)" -gt "0" ]] ; then
+        for i in $(vagrant snapshot list | sed 1d | fzf -m --header='^-- Select snapshot(s) to delete - use TAB for multiple selection' | xargs) ; do vagrant snapshot ${1} --no-tty  "${i}" ; done
+      else
+        _banner "[${VM_NAME}] no snapshots to ${1}"
+      fi
+      ;;
+    *) echo -e "Manage vagrant snapshots.\nUsage:\n $(basename ${0}) {list,save,restore,delete}\n"
+  esac
+}
+
+#===============================================================
+# docker
+#===============================================================
+
+#===============================================================
+# Select a docker container to start and attach to
+unalias da &>/dev/null
+function da() {
+  local cid=$(docker ps -a | sed 1d | fzf -1 -q "$1" | awk '{print $1}')
+  [ -n "$cid" ] && docker start "$cid" && docker attach "$cid"
+}
+#===============================================================
+# Select a running docker container to stop
+unalias ds &>/dev/null
+function ds() {
+  local cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
+  [ -n "$cid" ] && docker stop "$cid"
+}
+#===============================================================
+# Same as above, but allows multi selection
+unalias drm &>/dev/null
+function drm() {
+  docker ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $1}' | xargs -r docker rm
+}
+#===============================================================
+# Select a docker image or images to remove
+function drmi() {
+  docker images | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $3}' | xargs -r docker rmi
+}
+
+#===============================================================
+# git
+#===============================================================
+
+#===============================================================
+# take this repo and copy it to somewhere else minus the .git stuff
+function gitexport(){
+  if [ ! -d "${1}" ] ; then
+    mkdir -vp "${1}" && git archive HEAD | tar -x -C "${1}"
+  else
+    _banner "[dir] ${1} already exists"
+  fi
+}
+#===============================================================
+# gls - git commit browser with previews and vim integration
+# required aliases:
+alias glNoGraph='git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr% C(auto)%an" --graph "$@"'
+_gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+_viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | bat --style=numbers'"
+_viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
+
+# gls - git commit browser with previews and vim integration
+function gls() {
+  glNoGraph |
+    fzf --no-sort --reverse --tiebreak=index --no-multi \
+      --ansi --preview="$_viewGitLogLine" \
+      --header "enter: view, ctrl-y: copy hash, ctrl-e: edit" \
+      --bind "enter:execute:$_viewGitLogLine   | less -R" \
+      --bind "ctrl-e:execute:$_viewGitLogLineUnfancy | vim -" \
+      --bind "ctrl-y:execute:$_gitLogLineToHash | $_clipboardApp"
+}
+#===============================================================
+function stash-explore() {
+  while out=$(git stash list "$@" |
+    fzf --header="ctrl-a: apply | ctrl-b: branch | ctrl-p: pop | ESC" \
+      --ansi --no-sort --reverse --print-query --query="$query" \
+      --expect=ctrl-a,ctrl-b,ctrl-p \
+      --bind="ctrl-u:preview-page-up" \
+      --bind="ctrl-d:preview-page-down" \
+      --bind="ctrl-k:preview-up" \
+      --bind="ctrl-j:preview-down" \
+      --preview="echo {} | cut -d':' -f1 | xargs git stash show -p" \
+      --preview-window='down:85%') ;
+  do
+      # Tokenize selection by newline
+      selection=("${(f)out}")
+
+      # Keep the query accross fzf calls
+      query="${selection[1]}"
+
+      # Represents the stash, e.g. stash{1}
+      reflog_selector=$(echo "${selection[3]}" | cut -d ':' -f 1)
+
+      case "${selection[2]}" in
+          # ctrl-a applies the stash to the current tree
+          ctrl-a)
+            git stash apply "${reflog_selector}"
+            break
+            ;;
+          # ctrl-b checks out the stash as a branch
+          ctrl-b)
+            sha=$(echo "${selection[3]}" | grep -o '[a-f0-9]\{7\}')
+            git stash branch "stash-$sha" "${reflog_selector}"
+            break
+            ;;
+          # ctrl-p is like ctrl-a but it drops the stash. Uses stash pop.
+          ctrl-p)
+            git stash pop "${reflog_selector}"
+            break
+            ;;
+          # del will drop the stash
+          del)
+            git stash drop "${reflog_selector}"
+            ;;
+      esac
+  done
+}
+#===============================================================
+# use gh+fzf+bat to explore pull requests, and checkout the PR branch
+function pr-checkout() {
+  local jq_template pr_number
+  jq_template='"'\
+'#\(.number) - \(.title)'\
+'\t'\
+'Author: \(.user.login)\n'\
+'Created: \(.created_at)\n'\
+'Updated: \(.updated_at)\n\n'\
+'\(.body)'\
+'"'
+  pr_number=$(
+    gh api 'repos/:owner/:repo/pulls' |
+    jq ".[] | ${jq_template}" |
+    sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
+    fzf \
+      --with-nth=1 \
+      --delimiter='\t' \
+      --preview='echo -e {2} | bat -l md --style=numbers --color=always' \
+      --preview-window=top:wrap |
+    sed 's/^#\([0-9]\+\).*/\1/'
+  )
+  if [ -n "${pr_number}" ]; then
+    gh pr checkout "${pr_number}"
+  fi
+}
+#===============================================================
+# gh-watch -- watch the current github action
+function gh-watch() {
+  gh run list \
+    --branch $(git rev-parse --abbrev-ref HEAD) \
+    --json status,name,databaseId |
+    jq -r '.[] | select(.status != "completed") | (.databaseId | tostring) + "\t" + (.name)' |
+    fzf -1 -0 | awk '{print $1}' | xargs gh run watch
+}
+#===============================================================
+function is_in_git_repo() {
+  # git rev-parse HEAD 2>&1> /dev/null
+  git rev-parse HEAD > /dev/null
+}
+#===============================================================
+# Filter branches.
+function git-br-fzf() {
+    is_in_git_repo || return
+    local tags branches target
+    tags=$(
+	git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
+    branches=$(
+	git branch --all | grep -v HEAD |
+    sed "s/.* //" | sed "s#remotes/[^/]*/##" |
+    sort -u | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
+    target=$(
+	(echo "$tags"; echo "$branches") |
+    fzf --no-hscroll --no-multi --delimiter="\t" -n 2 \
+		--ansi --preview="git log -200 --pretty=format:%s $(echo {+2..} |  sed 's/$/../' )" ) || return
+    echo $(echo "$target" | awk -F "\t" '{print $2}')
+}
+#===============================================================
+# Filter branches and checkout the selected one with <enter> key,
+function git-co-fzf() {
+    is_in_git_repo || return
+    git checkout $(git-br-fzf)
+}
+#===============================================================
+# Filter commit logs. The diff is shown on the preview window.
+function git-log-fzf() { # fshow - git commit browser
+    is_in_git_repo || return
+
+    _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+    _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always %'"
+    git log --graph --color=always \
+	--format="%C(auto)%h%d [%an] %s %C(black)%C(bold)%cr" "$@" |
+    fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+	--preview="$_viewGitLogLine" \
+	--bind "ctrl-m:execute:
+		(grep -o '[a-f0-9]\{7\}' | head -1 |
+		xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+		{}
+FZF-EOF"
+}
+
+#===============================================================
+# devops misc
+#===============================================================
+
+#===============================================================
+# helm create function
+function helm_create() {
+  if [ -z "${1}" ] ; then
+    _banner "Usage:\n  helm_create my-chart\n"
+  elif [ ! -d "${1}" ] ; then
+    echo -en "${YELLOW}"
+    helm create "${1}"
+    echo -en "${NONE}"
+    _banner "cd ${CYAN}$(pwd)/"
+    cd "${1}/" && \rm -rf templates/tests templates/*.{txt,yaml}
+    cat << EOF > templates/NOTES.txt
+To verify that ${1} has started, run:
+
+  kubectl --namespace={{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ template "${1}.name" . }}"
+
+EOF
+    pwd ; tree
+  else
+    _banner "⚠️  ${1} already exists - nothing to do"
+    ls -ld "${1}" ; echo
+  fi
+}
+#===============================================================
+function search_image() {
+  if [ ! -r "${WORK_ALIAS_FILE}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
+    exit 0
+  else
+    source "${WORK_ALIAS_FILE}"
+    source "${SECRETS_FILE}"
+    local IMAGE="${1}"
+    local COUNT="${2:-5}"
+    if [ -z "${1}" ] ; then
+      echo -e "Usage: search_image foo\n"
+    else
+      _banner "latest [${COUNT}] versions for image: ${YELLOW}${IMAGE}"
+      curl -su "${DOCKER_REGISTRY_USERNAME}:${DOCKER_REGISTRY_PASSWORD}" \
+        -X GET ${DOCKER_REGISTRY_URI}/v2/${IMAGE}/tags/list \
+        | jq -r '.tags[]' | sort -nr | head -${COUNT}
+    fi
+  fi
+}
+#===============================================================
+function search_chart() {
+  if [ ! -r "${WORK_ALIAS_FILE}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
+    exit 0
+  else
+    source "${WORK_ALIAS_FILE}"
+    source "${SECRETS_FILE}"
+    local CHART="${1}"
+    local COUNT="${2:-5}"
+    if [ -z "${1}" ] ; then
+      echo -e "Usage: search_chart foo\n"
+    else
+      _banner "latest [${COUNT}] versions for chart: ${YELLOW}${CHART}"
+      curl -su "${CHARTMUSEM_USERNAME}:${CHARTMUSEM_PASSWORD}" ${CHARTMUSEM_URI}/${CHART} | \
+        jq -r '.[] | .version+" (appVersion: "+.appVersion+")"' | sort -nr | column -tx | head -${COUNT}
+    fi
+  fi
+}
+#===============================================================

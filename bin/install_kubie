@@ -1,0 +1,251 @@
+#!/usr/bin/env bash
+##########################################################
+# Description:  Install/update kubie and fzf
+# Author:       https://github.com/pablon
+##########################################################
+# kubie:
+# - an alternative to kubectx, kubens and the k on prompt modification script.
+# - https://github.com/sbstp/kubie
+##########################################################
+# fzf:
+# - a general-purpose command-line fuzzy finder.
+# - https://github.com/junegunn/fzf
+##########################################################
+# Requirements:
+#   1. sudo
+#   2. jq
+##########################################################
+
+GITHUB_PROJECT_KUBIE="sbstp/kubie"
+GITHUB_PROJECT_FZF="junegunn/fzf"
+
+INSTALL_TARGET='/usr/local/bin'
+INSTALL_OPTS='--owner=root --group=root --mode=0755'
+
+# yay colors
+BOLD="\033[1;37m"
+CYAN="\033[1;96m"
+GREEN="\033[1;92m"
+MAGENTA="\033[1;95m"
+YELLOW="\033[1;93m"
+RED="\033[1;31m"
+NONE="\033[0m"
+
+ME="$(basename ${0})"
+KUBIE_CONFIG="${HOME}/.kube/kubie.yaml"
+
+for program in curl jq; do
+  if ! ( command -v ${program} &>/dev/null ); then
+    echo -e "${RED}# program ${BOLD}${program}${RED} is needed to run this script.\n# Install it and try again.${NONE}\n"
+    exit 1
+  fi
+done
+
+function get_latest_ver() {
+  if [[ "${i}" == "kubie" ]]; then
+    PROJECT="${GITHUB_PROJECT_KUBIE}"
+  elif [[ "${i}" == "fzf" ]]; then
+    PROJECT="${GITHUB_PROJECT_FZF}"
+  fi
+  LATEST="$(curl -s "https://api.github.com/repos/${PROJECT}/releases/latest" | jq -r ".tag_name")"
+  echo "${LATEST}"
+}
+
+function get_system() {
+  if [[ "${OSTYPE}" =~ "linux" ]]; then
+    export THIS_OS='linux'
+  elif [[ "${OSTYPE}" =~ "darwin" ]]; then
+    export THIS_OS='darwin'
+    if ( ! command -v brew &>/dev/null ) ; then
+      echo -e "\n${YELLOW}Homebrew Package Manager for macOS is required to install kubie and fzf.${NONE}"
+      read -p "Install homebrew now? [Y/n]: " -s ANSWER
+      case "${ANSWER}" in
+        N|n)
+          echo "Bye" ; exit 0
+          ;;
+        *)
+          echo "Installing Homebrew from https://brew.sh/"
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          if [[ $? -ne 0 ]] ; then
+            echo -e "${RED}ERROR installing homebrew${NONE}" ; exit 1
+          fi
+          ;;
+      esac
+    fi
+  else
+    echo "${ME} only works on Linux and macOS. Bye."
+    exit 1
+  fi
+  if [ "$(uname -m)" != "x86_64" ]; then
+    echo "${ME} only works on x86_64. Bye."
+    exit 1
+  fi
+}
+
+function add_bash_completion() {
+  if [[ "$(echo $(basename ${SHELL}))" == "bash" ]] && [[ "${THIS_OS}" = "linux" ]] && [[ ! -f ~/.kube/kubie.bash ]] ; then
+    echo -e "==> ${YELLOW}Installing kubie's shell completion${NONE} as ${BOLD}~/.kube/kubie.bash${NONE}"
+    curl -fsSL -o ~/.kube/kubie.bash 'https://raw.githubusercontent.com/sbstp/kubie/master/completion/kubie.bash'
+    echo -e "\n# Load kubie's bash completion\n[[ -f ~/.kube/kubie.bash ]] && source ~/.kube/kubie.bash\n" >> ~/.bashrc
+  fi
+}
+
+function install_update() {
+  get_system
+  WORKDIR="$(mktemp -d)" && cd ${WORKDIR}/ || exit 1
+  ACTION="${4}"
+  (
+    VERSION_CONTROL=off
+    case "${THIS_OS}" in
+      linux)
+          if [[ "${1}" = "kubie" ]] ; then
+            curl -fSL --progress-bar -o ${1} "https://github.com/${GITHUB_PROJECT_KUBIE}/releases/download/${3}/${1}-${THIS_OS}-amd64"
+          elif [[ "${1}" = "fzf" ]] ; then
+            curl -fSL --progress-bar -o ${1}.tgz "https://github.com/${GITHUB_PROJECT_FZF}/releases/download/${2}/${1}-${2}-${THIS_OS}_amd64.tar.gz" && \
+            tar xfz ${1}.tgz || exit 1
+          fi
+          sudo install ${INSTALL_OPTS} ${1} ${INSTALL_TARGET}/
+          ;;
+      darwin)
+          VERB="${ACTION:-install}"
+          echo -e "==> (${MAGENTA}invoking brew for ${VERB}...${NONE})"
+          if [[ "${1}" = "kubie" ]] ; then
+            brew ${VERB} kubie
+          elif [[ "${1}" = "fzf" ]] ; then
+            brew ${VERB} fzf
+          fi
+          ;;
+    esac
+  )
+  [[ -d ${WORKDIR} ]] && rm -rf "${WORKDIR}"
+  echo -e "> ${1} --version\n${GREEN}$(${1} --version)${NONE}\n"
+}
+
+function create_kubie_yaml() {
+  if [[ ! -d ${HOME}/.kube ]] ; then  # JIC...
+    mkdir -vp ${HOME}/.kube
+  fi
+  if ( command -v zsh &>/dev/null ) ; then
+    local KUBIE_SHELL='zsh'
+  else
+    local KUBIE_SHELL='bash'
+    add_bash_completion
+  fi
+  if [ -f ${KUBIE_CONFIG} ] ; then
+    BACKUP_TS="$(date +%Y%m%d-%H%M%S)"
+    cp -vf ${KUBIE_CONFIG}{,.${BACKUP_TS}}
+    echo -e "==> ${YELLOW}Saving existing config file as${NONE} as ${MAGENTA}${KUBIE_CONFIG}.${BACKUP_TS}${NONE}"
+  fi
+  cat << EOF > ${KUBIE_CONFIG}
+# Force kubie to use a particular shell, if unset detect shell currently in use.
+# Possible values: bash, dash, fish, zsh
+# Default: unset
+shell: ${KUBIE_SHELL}
+
+configs:
+    # Include these globs.
+    # Default: values listed below.
+    include:
+        - ~/.kube/*.yml
+        - ~/.kube/*.yaml
+        - ~/.kube/configs/*.yml
+        - ~/.kube/configs/*.yaml
+        - ~/.kube/eksctl/clusters/*
+        - ~/.kube/kubie/*.yml
+        - ~/.kube/kubie/*.yaml
+        - ~/.kube/config
+    # Exclude these globs.
+    # Default: values listed below.
+    # Note: kubie's own config file is always excluded.
+    exclude:
+        - ~/.kube/kubie.yaml
+
+# Prompt settings.
+prompt:
+    # Disable kubie's custom prompt inside of a kubie shell. This is useful
+    # when you already have a prompt displaying kubernetes information.
+    # Default: false
+    disable: false
+
+    # When using recursive contexts, show depth when larger than 1.
+    # Default: true
+    show_depth: true
+
+    # When using zsh, show context and namespace on the right-hand side using RPS1.
+    # Default: false
+    zsh_use_rps1: false
+
+    # When using fish, show context and namespace on the right-hand side.
+    # Default: false
+    fish_use_rprompt: false
+
+    # When using xonsh, show context and namespace on the right-hand side.
+    # Default: false
+    xonsh_use_right_prompt: false
+
+# Behavior
+behavior:
+    # Make sure the namespace exists with \`kubectl get namespaces\` when switching
+    # namespaces. If you do not have the right to list namespaces, disable this.
+    # Default: true
+    validate_namespaces: true
+
+    # Enable or disable the printing of the 'CONTEXT => ...' headers when running
+    # \`kubie exec\`.
+    # Valid values:
+    #   auto:   Prints context headers only if stdout is a TTY. Piping/redirecting
+    #           kubie output will auto-disable context headers.
+    #   always: Always prints context headers, even if stdout is not a TTY.
+    #   never:  Never prints context headers.
+    # Default: auto
+    print_context_in_exec: auto
+EOF
+  if [ $? -eq 0 ] ; then
+    echo -e "==> Configuration file ${YELLOW}${KUBIE_CONFIG}${NONE} created :-)"
+  else
+    echo -e "${RED}==> ERROR creating configuration file ${YELLOW}${KUBIE_CONFIG}${NONE} "
+  fi
+
+  if [[ ! -d ${HOME}/.kube/configs ]] ; then
+    mkdir -vp ${HOME}/.kube/configs
+    echo -e "==> Now you can store every kubernetes context as a separate YAML file in \n\t${YELLOW}~/.kube/configs/${NONE} dir\n==> Then try running ${GREEN}kubie ctx${NONE}, then ${GREEN}kubie ns${NONE} and enjoy"
+  fi
+}
+
+# main
+for i in kubie fzf; do
+  [[ "${DEBUG}" -eq "1" ]] && echo -e " ${RED}==> Getting latest version of ${i}${NONE}"
+  LATEST_FULL="$(get_latest_ver ${i})"
+  LATEST="${LATEST_FULL/v/}"
+  [[ "${DEBUG}" -eq "1" ]] && echo -e " ${RED}==> LATEST_${i} =\t${LATEST}${NONE}"
+
+  if (which ${i} &>/dev/null); then
+    if [[ "${i}" = "kubie" ]]; then
+      CURRENT="$(kubie --version | awk '{print $2}')"
+    elif [[ "${i}" = "fzf" ]]; then
+      CURRENT="$(fzf --version | awk '{print $1}')"
+    fi
+    if [[ "${LATEST}" != "${CURRENT}" ]]; then
+      echo -e "==> ${YELLOW}${i} ${GREEN}needs to be updated${NONE}: ${BOLD}${CURRENT} => ${LATEST}${NONE}"
+      install_update ${i} ${LATEST} ${LATEST_FULL} upgrade
+    else
+      echo -e "==> ${YELLOW}${i}${NONE} already installed (${BOLD}${CURRENT} = latest${NONE})"
+    fi
+  else
+    echo -e "==> ${YELLOW}${i} ${BOLD}${LATEST}${GREEN} will be installed, hold on..${NONE}"
+    install_update ${i} ${LATEST} ${LATEST_FULL}
+  fi
+done
+
+if [ ! -r "${KUBIE_CONFIG}" ] ; then
+  create_kubie_yaml
+else
+  echo -e "==> ${YELLOW}${KUBIE_CONFIG}${NONE} exists."
+  read -p "    Do you wan to update kubie's config file? [Y/n]:  "
+  case "${REPLY}" in
+    N|n) true ;;
+    *)   create_kubie_yaml ;;
+  esac
+fi
+
+echo "==> All done ✅"

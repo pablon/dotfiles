@@ -1,0 +1,133 @@
+alias reload="reset ; clear ; source ~/.zshrc"
+
+#===============================================================
+# clipboard tool
+_clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
+
+#===============================================================
+# Navigation
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+#===============================================================
+# brew
+alias brew_update_all="brew update && brew upgrade && brew cleanup --prune=all -v"
+alias brew_prune="brew cleanup --prune=all -v"
+
+#===============================================================
+# OS metrics
+alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
+alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
+alias htop='sudo htop'
+alias top='bashtop'
+
+#===============================================================
+# Utilities
+alias cdate='echo -n "$(date +%F\ %T)" | $_clipboardApp'
+alias curl="curl --progress-bar --connect-timeout 3 -m 3 -s -H 'User-Agent: Mozilla/5 Gecko'"
+alias diff='colordiff'
+# ! disabling as this conflicts with bracketing within subshells !
+# alias grep="grep --color=always"
+unalias grep &>/dev/null
+unalias egrep &>/dev/null
+alias cgrep="grep --color=always"
+alias cegrep="egrep --color=always"
+alias history='history -i'
+alias ll="ls -Gahop"
+alias ls="ls -GFa"
+alias monitor="tail -f /var/log/{fsck_apfs_error.log,install.log,system.log,wifi.log}"
+alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
+alias python='/usr/local/bin/python3'
+alias sed="$(which gsed)"
+alias stat='stat -x'
+alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
+# https://yamllint.readthedocs.io/en/stable/configuration.html
+alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
+
+#===============================================================
+# fzf preview/edit
+alias pf="fzf --preview='less {}' --bind shift-up:preview-page-up,shift-down:preview-page-down"
+alias v='vim -o $(fzf -m --preview "bat --style=numbers --color=always --line-range :500 {}")'
+
+#===============================================================
+# youtube-dl
+alias ytd="youtube-dl -c --write-description  --merge-output-format mp4"
+alias ytdf="youtube-dl -c --write-description --write-auto-sub --write-sub --sub-format srt --sub-lang es --merge-output-format mp4"
+
+alias ytd_best="youtube-dl -c --write-description -f bestvideo+bestaudio --merge-output-format mp4"
+alias ytd_get_subs="youtube-dl -c --write-sub --sub-format srt --sub-lang es"
+alias ytd_list_subs="youtube-dl --list-subs"
+alias ytd_mp3="youtube-dl -c -x --audio-format mp3"
+
+#===============================================================
+# AWS
+alias aws_examples="code /usr/local/share/awscli/examples/"
+
+#===============================================================
+# git - see ~/.gitconfig
+alias g="git"
+alias ga='git a'
+alias gu='git u'
+alias gs='git status'
+alias gt="gitui"
+alias gll="git log --pretty=format:'%Cred%h%Creset %C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --graph --stat"
+alias cm="git cm"
+alias lp="git lp"
+alias st="git st"
+
+#===============================================================
+# docker
+alias c="colima"
+alias d="docker"
+alias db="docker buildx build --no-cache"
+alias dc="docker compose"
+alias de="docker exec -ti"
+alias dr="docker run -ti --rm"
+alias di='docker images'
+alias dils="docker image ls --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}'"
+alias dps="docker ps -a"
+# slim:
+alias slim='slim build --http-probe-off --continue-after 1 --include-cert-all --include-cert-dirs --include-cert-pk-all --include-cert-pk-dirs --include-shell'
+alias docker-slim='slim'
+# alpine
+alias alpine="docker run --rm -it -w /mnt -v $(pwd):/mnt:rw alpine:latest ash"
+
+#===============================================================
+# ACT - check ~/.actrc
+alias act="act --rm -b --use-new-action-cache --detect-event -s GITHUB_TOKEN=\"$(gh auth token)\""
+
+#===============================================================
+# kubernetes
+alias alpine_pod="kubectl run -it alpine --image alpine:latest -- ash"
+alias stern="stern --tail 20"
+alias k9s="k9s --headless --logoless"
+alias k9s-ro="k9s --readonly"
+alias kc='kubie ctx'
+alias kn='kubie ns'
+alias kubectl='kubecolor'
+alias k='kubecolor'
+alias kgn='k get node -o wide'
+alias kgnl='k get node -o wide --show-labels'
+alias ktn='k top node --use-protocol-buffers=true'
+alias ktnc='k top node --show-capacity=true --use-protocol-buffers=true'
+alias kgdl='k get deploy --show-labels'
+alias kge='k get event -w'
+alias kgea='k get event -Aw'
+# ARC
+alias runner_monitor="stern -n arc-runners -l app.kubernetes.io/component=runner"
+# helm
+alias helm-docs='helm-docs -b plastic -u'
+alias helmsman='helmsman -no-_banner -update-deps'
+# (brew install chart-testing)
+alias ct="$(find $(brew --cellar)/chart-testing/ -type f -name 'ct')"
+
+#===============================================================
+# incognito
+alias bi="/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser --incognito &"
+alias ci="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --incognito &"
+
+#===============================================================
+# clean MS Teams cache
+alias clean_msteams='rm -rvf ${HOME}/Library/Caches/com.microsoft.teams'

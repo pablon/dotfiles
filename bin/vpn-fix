@@ -1,0 +1,195 @@
+#!/usr/bin/env bash
+##########################################################
+# Description:
+#   Script to fix resolvers and routes after connecting to VPN.
+#   Adds routes for CIDRs in $VPN_CIDRS and detects
+#   API servers in your ~/.kube/config.
+#   It also reads all kubie YAMLs when available :-)
+#
+# Author: https://github.com/pablon
+##########################################################
+# Requirements:
+#   1. must be invoked with sudo
+#   2. programs 'host' and 'awk/gawk' must be present
+##########################################################
+# config section
+
+# your predefined VPN CIDRs (separated by spaces)
+VPN_CIDRS=""
+
+# nameservers to use while the VPN tunnel is running
+# (preferred order, separated by spaces)
+NAMESERVERS="8.8.8.8"
+
+# let's try to detect which one is up
+TUNNEL_INTERFACE="$(ip link show|awk -F: '/NOARP/ {print $2}'|xargs)"
+
+# If the above fails to detect the TUNNEL_INTERFACE, uncomment the line
+# below and set TUNNEL_INTERFACE to 'vpn', 'ppp0' or whatever interface-name your distro prefers:
+#TUNNEL_INTERFACE="name-of-interface"
+
+##########################################################
+
+# yay colors
+BLUE="\033[1;94m"
+BOLD="\033[1;37m"
+CYAN="\033[1;96m"
+GREEN="\033[1;92m"
+MAGENTA="\033[1;95m"
+YELLOW="\033[1;93m"
+RED="\033[1;31m"
+NONE="\033[0m"
+
+# sudo or GTFO
+if [[ $(id -u) -ne 0 ]]; then
+  echo -e "${RED}# you better run:${NONE} sudo ${0}\n"
+  exit 1
+fi
+
+for program in awk host ; do
+  if ! (which ${program} &>/dev/null); then
+    echo -e "${RED}# program ${BOLD}${program}${RED} is needed to run this script.\n# Install it and try again.${NONE}\n"
+    exit 1
+  fi
+done
+
+CALLER="${SUDO_USER}" # who invoked me?
+
+function in_subnet {
+  readonly cidr_subnet="${1}"
+  readonly ip_addr="${2}"
+  local subnet_ip cidr_mask netmask ip_addr_subnet subnet RC
+  subnet_ip=$(echo "${cidr_subnet}" | cut -d'/' -f1)
+  cidr_mask=$(echo "${cidr_subnet}" | cut -d'/' -f2)
+  netmask=$((0xFFFFFFFF << $((32 - ${cidr_mask}))))
+  ip_addr_subnet=$((netmask & $(ip_to_int ${ip_addr})))
+  subnet=$((netmask & $(ip_to_int ${subnet_ip})))
+  [ "${ip_addr_subnet}" == "${subnet}" ] && RC=0 || RC=1
+  return $RC
+}
+
+function ip_to_int {
+  readonly ip_addr="${1}"
+  local octet_1 octet_2 octet_3 octet_4
+  octet_1=$(echo "${ip_addr}" | cut -d'.' -f1)
+  octet_2=$(echo "${ip_addr}" | cut -d'.' -f2)
+  octet_3=$(echo "${ip_addr}" | cut -d'.' -f3)
+  octet_4=$(echo "${ip_addr}" | cut -d'.' -f4)
+  echo $((octet_1 * 256 ** 3 + octet_2 * 256 ** 2 + octet_3 * 256 + octet_4))
+}
+
+function get_kubeconfig_servers() {
+  declare -a OUTPUT
+  local LOCAL_USER_HOME="$(awk -F':' "/${CALLER}/ {print \$6}" /etc/passwd)"
+  local THIS_KUBECONFIG="${LOCAL_USER_HOME}/.kube/config"
+  # read all servers in ~/.kube/config
+  if [[ -f "${THIS_KUBECONFIG}" ]] && (grep 'server:' ${THIS_KUBECONFIG} &>/dev/null); then
+    for ip in $(awk -F'//' '/server:/ {print $2}' ${THIS_KUBECONFIG}); do
+      # add every server IP to OUTPUT array (lookup required)
+      OUTPUT+=("$(host -4 -c IN -t A ${ip} | awk '/address/ {print $4}' | xargs)")
+    done
+  fi
+  # if using kubie, read servers from every YAML file found
+  if [[ -f "${LOCAL_USER_HOME}/.kube/kubie.yaml" ]]; then
+    KUBIE_CONFIGS="$(find ${LOCAL_USER_HOME}/.kube/ -type f -name '*.y*ml' | xargs grep -l 'server:')"
+    for cfg in ${KUBIE_CONFIGS} ; do
+      # add every server IP to OUTPUT array (lookup required)
+      OUTPUT+=("$(host -4 -c IN -t A $(awk -F'//' '/server:/ {print $2}' ${cfg}) | awk '/address/ {print $4}' | xargs)")
+    done
+  fi
+  echo "${OUTPUT[@]}"
+}
+
+function fix_routes() {
+  echo -e "${BOLD}-- Searching for k8s API servers...${NONE}"
+  declare -a K8S_ENDPOINTS=($(get_kubeconfig_servers))
+  if [[ -n ${K8S_ENDPOINTS} ]]; then
+    echo -e "  [${GREEN}✔${NONE}] done, ${#K8S_ENDPOINTS[@]} IPs found"
+  else
+    echo -e "${RED}Yucs! No servers found in \$KUBECONFIG${NONE}\t(╯°□°)╯︵ ┻━┻"
+  fi
+  if [[ -n ${VPN_CIDRS} ]] || [[ -n ${K8S_ENDPOINTS} ]]; then
+    # remove default route on TUNNEL_INTERFACE
+    ip r del default dev ${TUNNEL_INTERFACE} 2>/dev/null &&
+      echo -e "  [${RED}-${NONE}] deleted default gw on ${TUNNEL_INTERFACE}" ||
+      echo -e "  [${BLUE}i${NONE}] default gw on ${TUNNEL_INTERFACE}\talready deleted\t(skipping)"
+    if [[ -n ${VPN_CIDRS} ]]; then
+      echo -e "${BOLD}-- Adding routes for VPN_CIDRS...${NONE}"
+      # add route for each CIDR in VPN_CIDRS
+      for cidr in ${VPN_CIDRS} ; do
+        ip r a ${cidr} dev ${TUNNEL_INTERFACE} 2>/dev/null &&
+          echo -e "  [${GREEN}✔${NONE}] ip route add ${cidr} dev ${TUNNEL_INTERFACE}" ||
+          echo -e "  [${BLUE}i${NONE}] ${cidr} \talready set (skipping)"
+      done
+    fi
+    if [[ -n ${K8S_ENDPOINTS} ]]; then
+      echo -e "${BOLD}-- Adding routes for k8s API servers...${NONE}"
+      # sweep all IPs found in KUBECONFIG & kubie YAMLs
+      # shellcheck disable=SC2068
+      for ip in ${K8S_ENDPOINTS[@]} ; do
+        declare -a OUTPUT
+        for cidr in ${VPN_CIDRS} ; do
+          # verify if ${ip} falls within any of the VPN_CIDRS
+          if ( in_subnet ${cidr} ${ip} ) ; then
+            # if true, this ${ip} dies here
+            [ "${DEBUG}" == "1" ] && echo -e "  [${YELLOW}i${NONE}] ${ip}\tis in ${cidr}\t(skipping)"
+            TAGGED=0
+            break
+          else
+            # yep, this ${ip} is candidate for a new route: tag it
+            [[ ${TAGGED} -eq 0 ]] && TAGGED=1
+          fi
+        done
+        # add tagged ${ip} to OUTPUT array
+        [[ ${TAGGED} -eq 1 ]] && OUTPUT+=("${ip}")
+      done
+      # add a route for each ${ip} in OUTPUT array
+      # shellcheck disable=SC2068
+      for ip in ${OUTPUT[@]} ; do
+        ip r a ${ip} dev ${TUNNEL_INTERFACE} 2>/dev/null &&
+          echo -e "  [${GREEN}✔${NONE}] ip route add ${ip} dev ${TUNNEL_INTERFACE}" ||
+          echo -e "  [${BLUE}i${NONE}] ${ip}\talready set (skipping)"
+      done
+    fi
+  else
+    echo -e "${RED}# No CIDRs defined in \$VPN_CIDRS and/or no API servers detected in your ~/.kube/config${NONE} (ノಠ益ಠ)ノ彡┻━┻" && exit 0
+  fi
+  echo -e "${BOLD}-- VPN routes on ${TUNNEL_INTERFACE}:${NONE}\n${CYAN}$(ip r | grep "${TUNNEL_INTERFACE}" | column -t | sed 's|^|  |')${NONE}"
+  echo -e "${BOLD}-- Your default gateway:${NONE}\n${GREEN}$(ip r | grep ^default | column -t | sed 's|^|  |')${NONE}"
+}
+
+function show_fortune {
+  for program in cowsay fortune; do
+    (! which ${program} &>/dev/null) && break
+    GO=1
+  done
+  if [[ ${GO} -eq 1 ]] ; then
+    array=($(cowsay -l | grep -v Cow | sed '$!N;s/\n/ /'))
+    size=${#array[@]}
+    index=$((${RANDOM} % ${size}))
+    echo -e "${BOLD}"
+    fortune -s | cowsay -f "${array[${index}]}" | sed 's|^|  |'
+    echo -e "${NONE}"
+  fi
+}
+
+function fix_resolvconf() {
+  echo -e "${BOLD}-- /etc/resolv.conf:${NONE}"
+  echo "# created $(date +%F\ %T) by $(basename ${0})" >/etc/resolv.conf
+  for ns in ${NAMESERVERS} ; do
+    echo "nameserver ${ns}" >>/etc/resolv.conf
+  done
+  echo -e "${CYAN}$(cat /etc/resolv.conf | sed 's|^|  |')${NONE}"
+}
+
+# main
+if (ip link show "${TUNNEL_INTERFACE}" &>/dev/null); then
+  fix_routes
+  fix_resolvconf
+  show_fortune
+  echo
+else
+  echo -e "${RED}-- Tunnel not stablished or ${BOLD}TUNNEL_INTERFACE${RED} not detected ¯\_(ツ)_/¯${NONE}\n"
+fi
+
+# EOF

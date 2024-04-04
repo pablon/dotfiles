@@ -1,0 +1,110 @@
+; =======================================================
+; ====== Requirements:
+; ======  * https://github.com/junegunn/fzf
+; ======  * https://github.com/sharkdp/bat
+; =======================================================
+
+[user]
+  ; -------------------------------------------------------
+  ; name = name
+  ; email = email
+  ; -------------------------------------------------------
+[core]
+  pager = less -IFX
+[color]
+  ui = always
+[color "branch"]
+  current = green bold
+  local   = yellow bold
+  remote  = magenta
+[color "diff"]
+  frag       = magenta bold
+  meta       = yellow bold
+  new        = green bold
+  old        = red bold
+  whitespace = red reverse
+[color "diff-highlight"]
+  newHighlight = green bold 22
+  newNormal    = green bold
+  oldHighlight = red bold 52
+  oldNormal    = red bold
+[color "status"]
+  added     = green bold
+  changed   = yellow bold
+  untracked = red bold
+[apply]
+  whitespace = fix
+[alias]
+  ; ---------- common
+  a         = "!git add $(git ls-files --exclude-standard -m | fzf -m --header='^-- Select file(s) to stage' --preview-window='right:60%' --preview 'git diff --color=always {-1}') && git status -uno -s"  ; (fzf) select modified files to add
+  aa        = "!git add $(git ls-files --exclude-standard -mo | fzf -m --header='^-- Select file(s) to stage' --preview-window='right:60%' --preview 'git diff --color=always {-1}') && git status -uno -s"  ; (fzf) select untracked + modified files to add
+  ad        = "!git ls-files -o --exclude-standard --directory | fzf -m --preview 'tree ${1}' --header='^-- Select dir(s) to add' | xargs -r git add && git status -s -uno" ; (fzf) select untracked directories to add
+  au        = "!git ls-files -o --exclude-standard | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='^-- Select file(s) to add' | xargs -r git add && git status -s -uno" ; (fzf) select untracked files to add
+  ca        = commit -am
+  cm        = commit -m
+  co        = checkout
+  cp        = cherry-pick
+  cpa       = cherry-pick --abort
+  cpc       = cherry-pick --continue
+  db        = "!git branch --color=never | grep -v '^[*+]' | awk '{print $1}' | fzf -0 -m --preview-window='right:80%' --preview 'git show --color=always {-1}' | xargs -r git branch -D" ; (fzf) interactively delete branches
+  default   = "!git checkout $(git symbolic-ref refs/remotes/origin/HEAD --short | awk -F'/' '{print $NF}') && echo '--> Updating default branch...' && git pull --stat --tags" ; switch to & pull default branch
+  dif       = diff
+  difc      = diff --color-words
+  fake      = commit --allow-empty -m 'empty commit' ; empty commit - sometimes useful for testing CI
+  fakeskip  = commit --allow-empty -m 'empty commit [skip ci]' ; empty commit skipping ci - sometimes useful for testing CI
+  la        = "!git config -l | grep alias | sort | cut -c 7- | bat --style=numbers -l sh"  ; list aliases
+  pr        = "!gh pr list"
+  pull      = pull --stat --tags --verbose
+  ss        = status -uno -s  ; short
+  st        = status -uno
+  trash     = "!git reset --hard && git default"  ; discard all changes & checkout default branch
+  nuke      = "!git branch -D $@ && git push origin :$@" ; nukes a branch locally and on the origin remote
+  ; ---------- log
+  ; lx        = "!git log --graph --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' \"$@\" | fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` --bind 'ctrl-m:execute: echo '{}' | grep -o '[a-f0-9]\{7\}' | head -1 | xargs -I % sh -c \'git show --color=always % | less -R\''"
+  ld        = log --pretty=format:'%Cred%h%Creset %C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --graph --stat
+  ll        = log --pretty=format:'%C(bold yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]' --decorate --date=short
+  lp        = log --pretty=format:'%Cred%h%Creset %C(yellow)%d%Creset %s %Cgreen(%cd)%Creset' --abbrev-commit --date=rfc
+  lpu       = log --pretty=format:'%Cred%h%Creset %C(yellow)%d%Creset %s %Cgreen(%cr)%Creset - %C(magenta)%cn%Creset' --abbrev-commit --date=relative
+  lpn       = log --pretty=format:'%Cred%h%Creset %C(yellow)%d%Creset %s %Cgreen(%cr)%Creset - %C(magenta)%cn%Creset' --abbrev-commit --date=relative -n
+  lpd       = log --pretty=format:'%Cgreen%cd%Creset %Cred%h%Creset %C(yellow)%d%Creset %s' --abbrev-commit --date=short
+  logg      = log --grep
+  log-tree  = log --graph --oneline --decorate --all
+  ; ---------- find/grep/list
+  find      = "!git ls-files | grep -i"
+  grep      = grep -Ii
+  lt        = describe --tags --abbrev=0 ; get last tag
+  ; ---------- resetting/rebasing/merging
+  ra        = rebase --abort
+  rc        = rebase --continue
+  ri        = rebase --interactive
+  rq        = rebase --quit
+  rs        = rebase --skip
+  resetfull = reset HEAD~        ; reset branch
+  resetlast = reset HEAD^ --soft ; undo last (local) commit
+  resetm    = "!git diff --name-only -m | fzf -m --header='^-- Select file(s) to reset' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
+  send      = "!f() { git add -A && git commit -m \"$1\" && git push ; }; f"  ; all-in-one (add/commit/push all)
+  unstage   = "!git restore --staged $(git diff --name-only --cached | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='^-- Select file(s) to unstage') && git status -uno" ; (fzf) select files to un-stage
+  up        = "!git pull --rebase --prune $@ && git submodule update --init --recursive" ; rebase!
+  ; ---------- merge ours/theirs
+  ours      = "!f() { git co --ours $@ && git add $@; }; f"   ; merge our changes
+  theirs    = "!f() { git co --theirs $@ && git add $@; }; f" ; merge their changes
+  ; ---------- save/restore WIP changes
+  amend     = commit -a --amend
+  undo      = reset HEAD~1 --mixed
+  wip       = commit -am "WIP"
+  ; ---------- configuration
+  ec        = "!vim ${HOME}/.gitconfig"                 ; edit this config file
+  vc        = "!bat --style=numbers ${HOME}/.gitconfig" ; view this config file
+[filter "lfs"]
+  clean    = git-lfs clean -- %f
+  process  = git-lfs filter-process
+  required = true
+  smudge   = git-lfs smudge -- %f
+[pull]
+  ff = only
+[init]
+  defaultBranch = develop
+[rebase]
+  autoStash = true
+[advice]
+  addEmptyPathspec = false
