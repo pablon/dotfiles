@@ -6,12 +6,14 @@
 # Requirements: curl
 ##########################################################
 
+BREW_TAPS="warrensbox/tap"
+BREW_CASKS="homebrew/cask-fonts/font-powerline-symbols homebrew/cask-fonts/font-meslo-for-powerline"
+
 BREW_COMMON="act ansible bash bash-completion bat checkmake colordiff coreutils cowsay dos2unix drawio ffmpeg figlet findutils fontconfig fortune fzf gawk git gitui gnu-sed grep htop ipcalc jq keycastr lynx md5sha1sum netcat pngcheck pre-commit python3 ripgrep sizeup socat stern tree vagrant watch wget yamllint yq"
 BREW_AWS="awscli s3cmd"
 BREW_DOCKER="docker-buildx docker-completion docker-compose docker-slim hadolint"
 BREW_KUBERNETES="kubernetes-cli helm k9s kompose krew kube-linter kubecolor kubeconform kubie minikube helm-docs stern cmctl"
-BREW_TERRAFORM="terraform-docs warrensbox/tap/tfswitch"
-BREW_CASKS="homebrew/cask-fonts/font-powerline-symbols homebrew/cask-fonts/font-meslo-for-powerline"
+BREW_TERRAFORM="terraform terraform-docs terrascan tflint tfsec infracost warrensbox/tap/tfswitch"
 
 # Colors:
 BOLD="\033[1;37m"
@@ -103,6 +105,20 @@ fi
 brew analytics off
 
 #===============================================================
+# Install TAPS
+[ "${BREW_TAPS}" ] && for TAP in ${BREW_CASKS} ; do
+  _banner "tap ${TAP}"
+  brew tap "${tap}"
+done
+
+#===============================================================
+# Install cascs
+[ "${BREW_CASKS}" ] && for cask in ${BREW_CASKS} ; do
+  _banner "cask ${cask}"
+  brew install --cask "${cask}"
+done
+
+#===============================================================
 # Install packages
 _banner "Apps"
 for app in ${BREW_COMMON} ${BREW_AWS} ${BREW_DOCKER} ${BREW_KUBERNETES} ${BREW_TERRAFORM} ; do
@@ -116,13 +132,6 @@ if [[ "${BREW_DOCKER}" =~ "docker-buildx" ]] ; then
     ln -sfn /usr/local/opt/docker-buildx/bin/docker-buildx "${HOME}/.docker/cli-plugins/docker-buildx"
   fi
 fi
-
-#===============================================================
-# Install cascs
-[ "${BREW_CASKS}" ] && for cask in ${BREW_CASKS} ; do
-  _banner "cask ${cask}"
-  brew install --cask "${cask}"
-done
 
 #===============================================================
 # Install extra stuff
