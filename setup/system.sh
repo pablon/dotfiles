@@ -8,12 +8,15 @@ if  [[ "$(uname -s)" != "Darwin" ]] ; then
   echo "This script is for macOS only" ; exit 0
 fi
 
+# Ask for the administrator password upfront
+sudo -v
+
+# Disable Apple School Manager
+sudo launchctl disable system/studentd
+
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we're about to change
 osascript -e 'tell application "System Preferences" to quit'
-
-# Ask for the administrator password upfront
-sudo -v
 
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
