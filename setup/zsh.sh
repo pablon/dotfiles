@@ -5,8 +5,9 @@
 ##########################################################
 
 # check for oh-my-zsh, or install it
-if [ ! -d "${HOME}/.oh-my-zsh/" ] ; then
+if [ ! -d "${ZSH}" ] ; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  export ZSH="${HOME}/.oh-my-zsh"
 fi
 
 # install plugins
@@ -15,7 +16,7 @@ fi
 # https://github.com/zsh-users/zsh-history-substring-search
 for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search ; do
   git clone https://github.com/zsh-users/${plugin} \
-    ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/${plugin}
+    ${ZSH_CUSTOM:-${ZSH}/custom}/plugins/${plugin}
 done
 
 # make sure ~/.zshrc calls ~/.zshrc_custom
