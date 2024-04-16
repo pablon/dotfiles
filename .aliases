@@ -119,7 +119,7 @@ alias kgea='k get event -Aw'
 alias runner_monitor="stern -n arc-runners -l app.kubernetes.io/component=runner"
 # helm
 alias helm-docs='helm-docs -b plastic -u'
-alias helmsman='helmsman -no-_banner -update-deps'
+alias helmsman='helmsman -no-banner -update-deps'
 # (brew install chart-testing)
 alias ct="$(find $(brew --cellar)/chart-testing/ -type f -name 'ct')"
 
