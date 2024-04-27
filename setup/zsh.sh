@@ -23,11 +23,12 @@ done
 
 # make sure ~/.zshrc calls ~/.zshrc_custom
 if ( ! grep '${HOME}/.zshrc_custom' "${HOME}/.zshrc" &>/dev/null ) ; then
-  echo -e "\n[ -r \"\${HOME}/.zshrc_custom\" ] && source \"\${HOME}/.zshrc_custom\"" >> "${HOME}/.zshrc"
+  echo -e "\n# load .zshrc_custom\n[ -r \"\${HOME}/.zshrc_custom\" ] && source \"\${HOME}/.zshrc_custom\"\n" >> "${HOME}/.zshrc"
 fi
 
 # reload
 echo -e "🔄 reloading shell configuration"
-reset ; source "${HOME}/.zshrc"
+omz reload
 
 echo "✅ Done"
+exit
