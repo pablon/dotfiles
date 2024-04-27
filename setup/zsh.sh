@@ -6,8 +6,10 @@
 
 # check for oh-my-zsh, or install it
 if [ ! -d "${ZSH}" ] ; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  export ZSH="${HOME}/.oh-my-zsh"
+  (
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    export ZSH="${HOME}/.oh-my-zsh"
+  )
 fi
 
 # install plugins
