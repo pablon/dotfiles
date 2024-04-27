@@ -4,7 +4,7 @@
 # Author: https://github.com/pablon
 ##########################################################
 
-FILE_LIST=".actrc .aliases .functions .gitconfig .vimrc .zshrc_custom"
+FILE_LIST=".actrc .aliases .functions .gitconfig .tmux.conf .vimrc .zshrc_custom"
 FILES_DIR="$(dirname ${0})/../"
 
 for file in ${FILE_LIST} ; do
