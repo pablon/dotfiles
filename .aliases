@@ -42,6 +42,9 @@ alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netsta
 alias python='/usr/local/bin/python3'
 alias sed="$(which gsed)"
 alias stat='stat -x'
+alias tm='tmux'
+alias tma='tmux a'
+alias tmls='tmux ls'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
 # https://yamllint.readthedocs.io/en/stable/configuration.html
 alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
