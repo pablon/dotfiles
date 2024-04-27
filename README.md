@@ -20,13 +20,13 @@
 ├── bin/
 │   ├── install_kubie  # script to install/configure https://github.com/sbstp/kubie
 │   └── vpn-fix        # script to fix routes when using corporate vpn
-|
+│
 ├── setup/             # --> read: [setup] below
 │   ├── brew.sh
 │   ├── files.sh
 │   ├── system.sh
-|   └── zsh.sh
-|
+│   └── zsh.sh
+│
 ├── .actrc             # https://github.com/nektos/act config
 ├── .aliases           # shell aliases
 ├── .functions         # --> read: [zsh customization] below
