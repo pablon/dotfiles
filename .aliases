@@ -125,6 +125,7 @@ alias helm-docs='helm-docs -b plastic -u'
 alias helmsman='helmsman -no-banner -update-deps'
 # (brew install chart-testing)
 alias ct="$(find $(brew --cellar)/chart-testing/ -type f -name 'ct')"
+alias mk='minikube'
 
 #===============================================================
 # incognito
