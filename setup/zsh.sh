@@ -61,10 +61,6 @@ curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubuserc
 # install plugins
 vim -E -s -u "${HOME}/.vimrc" +PlugInstall -qall
 
-# reload
-# shellcheck disable=SC1091
-omz reload || source "${HOME}/.oh-my-zsh/oh-my-zsh.sh"
-
 echo "✅ Done"
 echo "🔄 Close and reopen your terminal to reload all new configurations"
 exit
