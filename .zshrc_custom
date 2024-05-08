@@ -20,7 +20,7 @@ setopt HIST_NO_STORE             # Don't store history commands
 prompt_context(){}
 
 # export PATH
-export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin"
+export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin:${HOME}/.powerline/bin"
 
 # Load iTerm2 Shell Integration
 [ -r "${HOME}/.config/iterm2/shell_integration.zsh" ] && source "${HOME}/.config/iterm2/shell_integration.zsh"
