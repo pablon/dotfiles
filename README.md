@@ -46,7 +46,7 @@ Run the scripts in folder `setup/`, in this order:
     ├── brew.sh        # installs homebrew & tools with brew
     ├── files.sh       # installs dotfiles from this repo (backing up existing files)
     ├── system.sh      # tweaks the OS (macOS only)
-    └── zsh.sh         # installs plugins, calls ~/.zshrc_custom and reloads zsh
+    └── zsh.sh         # installs plugins, tmux tweaks, call ~/.zshrc_custom
 ```
 
 ---
