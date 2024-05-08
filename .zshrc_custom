@@ -2,15 +2,8 @@
 # echo -e "\n[ -r \${HOME}/.zshrc_custom ] && source \${HOME}/.zshrc_custom" >> ${HOME}/.zshrc
 
 # zsh
-ZSH_THEME="robbyrussell"
-DISABLE_UPDATE_PROMPT="true"
-DISABLE_MAGIC_FUNCTIONS="true"
-plugins=(aws docker docker-compose git kube-ps1 kubectl ripgrep rsync terraform minikube vagrant zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search)
-
-# zsh history
-HISTSIZE=100000
-SAVEHIST=100000
-HIST_STAMPS="yyyy-mm-dd"
+export HISTSIZE=100000
+export SAVEHIST=100000
 setopt EXTENDED_HISTORY          # Write the history file in the ':start:elapsed;command' format.
 setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
 setopt SHARE_HISTORY             # Share history between all sessions.
@@ -24,12 +17,13 @@ setopt HIST_VERIFY               # Do not execute immediately upon history expan
 setopt APPEND_HISTORY            # append to history file
 setopt HIST_NO_STORE             # Don't store history commands
 
-# export PATH=":$PATH"
+prompt_context(){}
+
+# export PATH
 export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin"
 
-# Install iTerm2 Shell Integration
-# curl -L https://iterm2.com/shell_integration/zsh -o ${HOME}/.iterm2_shell_integration.zsh
-# [ -r "${HOME}/.iterm2_shell_integration.zsh" ] && source "${HOME}/.iterm2_shell_integration.zsh"
+# Load iTerm2 Shell Integration
+[ -r "${HOME}/.config/iterm2/shell_integration.zsh" ] && source "${HOME}/.config/iterm2/shell_integration.zsh"
 
 # You may need to manually set your MANPATH
 export MANPATH="/usr/local/man:${MANPATH}"
@@ -40,9 +34,6 @@ export LANG=en_US.UTF-8
 # Preferred editor for local and remote sessions
 export EDITOR='vim'
 export VISUAL="${EDITOR}"
-
-# Compilation flags
-export ARCHFLAGS="-arch $(uname -m)"
 
 # fzf
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
@@ -65,17 +56,17 @@ export HOMEBREW_NO_ANALYTICS=1
 # Docker stuff
 export BUILDKIT_COLORS="run=light-blue:error=light-red:cancel=light-magenta:warning=light-yellow"
 
-# .Net telemetry
+# .Net stuff
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 ######################################################################
 # vagrant completion
 # do the same as: vagrant autocomplete install
 # adds completion code to >>>> ~/.zshrc
-if ( command -v vagrant &>/dev/null ) ; then
-  VAGRANT_VERSION="$(vagrant version --no-tty --no-color | awk '/^Installed/ {print $NF}')"
-  fpath=(/opt/vagrant/embedded/gems/gems/vagrant-${VAGRANT_VERSION}/contrib/zsh $fpath)
-fi
+# if ( command -v vagrant &>/dev/null ) ; then
+#   VAGRANT_VERSION="$(vagrant version --no-tty --no-color | awk '/^Installed/ {print $NF}')"
+#   fpath=(/opt/vagrant/embedded/gems/gems/vagrant-${VAGRANT_VERSION}/contrib/zsh $fpath)
+# fi
 
 ######################################################################
 # less tweaks
@@ -108,24 +99,15 @@ done ; unset app
 # gh has another syntax
 ( command -v gh &>/dev/null ) && source <(gh completion -s zsh)
 
-# rg has another syntax
-# ( command -v rg &>/dev/null ) && source <(rg --generate=complete-zsh)
-# zsh
-
-fpath=($fpath ~/.zsh/completion)
-
 # https://kubernetes.io/es/docs/tasks/tools/included/optional-kubectl-configs-zsh/
 # # Make all kubectl completion fzf
 # command -v fzf >/dev/null 2>&1 && {
-# 	source <(kubectl completion zsh | sed 's#${requestComp} 2>/dev/null#${requestComp} 2>/dev/null | head -n -1 | fzf  --multi=0 #g')
+#   source <(kubectl completion zsh | sed 's#${requestComp} 2>/dev/null#${requestComp} 2>/dev/null | head -n -1 | fzf  --multi=0 #g')
 # }
 
-complete -o default -F __start_kubectl k
-compdef __start_kubectl k
-
 ######################################################################
-
-compinit
+# load fzf keybindings
+( command -v fzf &>/dev/null ) && source <(fzf --zsh)
 
 ######################################################################
 # remove dangling aliases (which will be set up later)
@@ -139,14 +121,25 @@ SECRETS_FILE="${HOME}/.secrets"
 
 ######################################################################
 # load custom aliases & functions
-for file in ~/.{fzf.zsh,aliases,functions} "${WORK_ALIAS_FILE}" "${SECRETS_FILE}" ; do
+for file in ${HOME}/.{aliases,functions} "${WORK_ALIAS_FILE}" "${SECRETS_FILE}" ; do
   [ -r "${file}" ] && source "${file}"
 done ; unset file
 
 ######################################################################
-# ssh-add
-ssh-add --apple-load-keychain &>/dev/null # && ssh-add -l
+# k=kubectl
+complete -o default -F __start_kubectl k
+compdef __start_kubectl k
+# mk=minikube
+complete -o default -F __start_minikube mk
+compdef __start_minikube mk
+
+autoload -Uz compinit
+compinit
 
 ######################################################################
-# random cookie
+# ssh-add
+ssh-add --apple-load-keychain &>/dev/null
+
+######################################################################
+# random fortune cookie
 cookie
