@@ -5,7 +5,7 @@
 ##########################################################
 
 # check for oh-my-zsh, or install it
-if [ ! -d "${ZSH}" ] ; then
+if [ ! -d "${HOME}/.oh-my-zsh" ] ; then
   (
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   )
@@ -32,6 +32,7 @@ PLUGINS="aws brew docker docker-compose git kube-ps1 kubectl ripgrep terraform m
 # shellcheck disable=SC2086
 sed -i -e "s|$(awk -F'"' '/^ZSH_THEME/ {print $2}' ${HOME}/.zshrc)|${MY_ZSH_THEME}|" \
   -e "/DISABLE_UPDATE_PROMPT/ s|^#\ ||" \
+  -e "/zstyle ':omz:update' mode auto/ s|^#\ ||" \
   -e "/DISABLE_MAGIC_FUNCTIONS/ s|^#\ ||" \
   -e "/HIST_STAMPS/ s|^.*$|HIST_STAMPS=\"yyyy-mm-dd\"|" \
   -e "/^plugins/ s|^.*$|plugins=(${PLUGINS})|" "${HOME}/.zshrc"
