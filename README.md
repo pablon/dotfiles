@@ -31,6 +31,7 @@
 ├── .aliases           # shell aliases
 ├── .functions         # --> read: [zsh customization] below
 ├── .gitconfig         # git configuration & aliases
+├── .tmux.conf         # tmux configuration
 ├── .vimrc             # vim FTW
 └── .zshrc_custom      # --> read: [zsh customization] below
 ```
