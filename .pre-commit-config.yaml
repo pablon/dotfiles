@@ -47,7 +47,7 @@ repos:
       - id: mixed-line-ending
         args:
           - --fix=auto
-      - id: trailing-whitespace
+            #- id: trailing-whitespace
       - id: check-json
       - id: pretty-format-json
         args:

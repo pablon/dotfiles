@@ -198,8 +198,8 @@ set smarttab
 set tabstop=2 softtabstop=2 shiftwidth=2 " use 2 spaces for tabs
 " Show indentation guides
 set list
-set list listchars=tab:\ ┊,trail:·,extends:»,precedes:«,nbsp:× " display indentation guides
-set listchars=multispace:\ ┊
+set list listchars=tab:┊\ ,trail:·,extends:»,precedes:«,nbsp:× " display indentation guides
+set listchars=multispace:┊\ 
 " Linebreak on 500 characters
 set lbr
 set tw=500
