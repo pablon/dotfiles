@@ -102,7 +102,7 @@ fi
 # Install Homebrew
 if ( ! command -v brew &>/dev/null ) ; then
   _banner "homebrew"
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || exit 1
+  NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || exit 1
 fi
 # verify
 if ! ( command -v brew config &>/dev/null ) ; then
