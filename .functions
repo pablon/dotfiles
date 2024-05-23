@@ -504,7 +504,20 @@ function search_chart() {
   fi
 }
 #===============================================================
-
+function yaml2json() {
+  if ( command -v yq &>/dev/null ) && [ ! -z "${1}" ] && [ -f "${1}" ] ; then
+    local OUTPUT="${1%.y*ml}.json"
+    yq -p yaml -o json "${1}" > "${OUTPUT}" && _banner "created: ${OUTPUT}"
+  fi
+}
+#===============================================================
+function json2yaml() {
+  if ( command -v yq &>/dev/null ) && [ ! -z "${1}" ] && [ -f "${1}" ] ; then
+    local OUTPUT="${1%.json}.yaml"
+    yq -p json -o yaml "${1}" > "${OUTPUT}" && _banner "created: ${OUTPUT}"
+  fi
+}
+#===============================================================
 
 
 ################################################################
