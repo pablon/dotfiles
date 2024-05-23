@@ -120,10 +120,12 @@ done
 
 #===============================================================
 # Install cascs
-[ "${BREW_CASKS}" ] && for cask in ${BREW_CASKS} ; do
-  _banner "cask ${cask}"
-  brew install --cask "${cask}"
-done
+if  [[ "$(uname -s)" == "Darwin" ]] ; then
+  [ "${BREW_CASKS}" ] && for cask in ${BREW_CASKS} ; do
+    _banner "cask ${cask}"
+    brew install --cask "${cask}"
+  done
+fi
 
 #===============================================================
 # Install packages
