@@ -45,7 +45,7 @@ nmap <leader>q :q!<cr>
 nmap <leader>Q :qall!<cr>
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
-command W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
+command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
 " basic stuff
 set nocompatible                    " yup
 set showcmd                         " show command in bottom bar
@@ -81,7 +81,7 @@ endif
 nmap <F3> i<C-R>=strftime("\n# %Y-%m-%d %T \t\t")<CR>
 imap <F3> <C-R>=strftime("\n# %Y-%m-%d %T \t\t")<CR>
 " <F10> toggles wrap on/off
-function ToggleWrap()
+function! ToggleWrap()
   if (&wrap == 1)
     set nowrap
   else
