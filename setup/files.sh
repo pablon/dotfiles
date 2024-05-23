@@ -8,7 +8,7 @@ FILE_LIST=".actrc .aliases .functions .gitconfig .tmux.conf .vimrc .zshrc_custom
 FILES_DIR="$(dirname "${0}")/../"
 
 if  [[ "$(uname -s)" == "Darwin" ]] ; then
-  INSTALL_OPTS="-b -B \".$(date +%Y%m%d.%H%M%S)\" -C -v -m 600 -S"
+  INSTALL_OPTS="-b -B .$(date +%Y%m%d.%H%M%S) -C -v -m 600 -S"
 elif  [[ "$(uname -s)" == "Linux" ]] ; then
   INSTALL_OPTS="--backup --suffix=.$(date +%Y%m%d.%H%M%S) -C -v -m 600"
 fi
