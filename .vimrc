@@ -438,6 +438,7 @@ let g:fzf_colors =
 set rtp+=/usr/local/opt/fzf
 " highlight trailing spaces
 highlight ExtraWhiteSpace ctermbg=red guibg=red
+match ExtraWhiteSpace /\s\+$/
 
 "===============================================================
 " => Plugins
