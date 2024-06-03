@@ -47,7 +47,8 @@ repos:
       - id: mixed-line-ending
         args:
           - --fix=auto
-      # - id: trailing-whitespace
+      - id: trailing-whitespace
+        exclude: .vimrc
       - id: check-json
       - id: pretty-format-json
         args:
