@@ -22,7 +22,8 @@ curl --create-dirs -o "${HOME}/.config/iterm2/shell_integration.zsh" -L https://
 # https://github.com/zsh-users/zsh-history-substring-search
 for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search ; do
   # shellcheck disable=SC2086
-  git clone https://github.com/zsh-users/${plugin} ${ZSH_CUSTOM:-${ZSH}/custom}/plugins/${plugin}
+  git clone https://github.com/zsh-users/${plugin} ${ZSH_CUSTOM:-${ZSH}/custom}/plugins/${plugin} 2>/dev/null || \
+  ( cd ${ZSH_CUSTOM:-${ZSH}/custom}/plugins/${plugin}/ && git pull --stat --tags )
 done
 
 # tweaks
