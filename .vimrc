@@ -77,6 +77,16 @@ endif
 "===============================================================
 " => Custom mappings
 "===============================================================
+" <F2> toggles paste mode on and off
+function! TogglePaste()
+  if (&paste == 1)
+    set nopaste
+  else
+    set paste
+  endif
+endfunction
+map <F2> :call TogglePaste()<CR> " wrap
+map! <F2> ^[:call TogglePaste()<CR> " un-wrap
 " <F3> prints current timestamp as a comment (for quick notes)
 nmap <F3> i<C-R>=strftime("\n# %Y-%m-%d %T \t\t")<CR>
 imap <F3> <C-R>=strftime("\n# %Y-%m-%d %T \t\t")<CR>
@@ -161,8 +171,8 @@ try
 catch
 endtry
 
-set background=dark                 " my eyes say thank you
-set cursorline                      " highlight current line
+set background=dark         " my eyes say thank you
+set cursorline cursorcolumn " highlight current line & column
 "hi CursorLine cterm=BOLD ctermbg=gray
 
 " Set extra options when running in GUI mode
