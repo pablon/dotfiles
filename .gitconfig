@@ -10,7 +10,7 @@
   ; email = email
   ; -------------------------------------------------------
 [core]
-  pager = less -IFX
+  pager = diff-so-fancy | less --tabs=2 -RF ; pager = less -IFX
 [color]
   ui = always
 [color "branch"]
@@ -101,7 +101,7 @@
   required = true
   smudge   = git-lfs smudge -- %f
 [pull]
-  ff = only
+  rebase = true
 [init]
   defaultBranch = develop
 [rebase]
