@@ -13,7 +13,7 @@ BREW_COMMON="act ansible bash bash-completion bat checkmake colordiff coreutils 
 BREW_AWS="awscli s3cmd"
 BREW_DOCKER="docker-buildx docker-completion docker-compose docker-slim hadolint"
 BREW_KUBERNETES="kubernetes-cli helm k9s kompose krew kube-linter kubecolor kubeconform kubie minikube helm-docs stern cmctl"
-BREW_TERRAFORM="terraform terraform-docs terrascan tflint tfsec infracost" # warrensbox/tap/tfswitch
+BREW_TERRAFORM="warrensbox/tap/tfswitch terraform-docs terrascan tflint tfsec infracost"
 
 # Colors:
 BOLD="\033[1;37m"
