@@ -28,7 +28,7 @@ done
 
 # tweaks
 MY_ZSH_THEME='sorin'
-PLUGINS="aws brew docker docker-compose git kube-ps1 kubectl ripgrep terraform minikube zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search"
+PLUGINS="aws brew docker docker-compose git kube-ps1 kubectl terraform minikube zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search"
 
 # shellcheck disable=SC2086
 sed -i -e "s|$(awk -F'"' '/^ZSH_THEME/ {print $2}' ${HOME}/.zshrc)|${MY_ZSH_THEME}|" \
