@@ -1,10 +1,6 @@
 alias reload="reset ; clear ; source ~/.zshrc"
 
 #===============================================================
-# clipboard tool
-_clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
-
-#===============================================================
 # Navigation
 alias ..="cd .."
 alias ...="cd ../.."
@@ -13,125 +9,190 @@ alias .....="cd ../../../.."
 
 #===============================================================
 # brew
-alias brew_update_all="brew update && brew upgrade && brew cleanup --prune=all -v"
-alias brew_prune="brew cleanup --prune=all -v"
+if ( type brew &>/dev/null ) ; then
+  alias brew_prune="brew cleanup --prune=all -v"
+  alias brew_update_all="brew update && brew upgrade && brew cleanup --prune=all -v"
+fi
 
 #===============================================================
 # OS metrics
-alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
-alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
 alias htop='sudo htop'
-alias top='bashtop'
+if [[ "$(uname -s)" == "Darwin" ]] ; then
+  ( type powermetrics &>/dev/null ) && alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
+  ( type osx-cpu-temp &>/dev/null ) && alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
+fi
 
 #===============================================================
 # Utilities
-alias cdate='echo -n "$(date +%F\ %T)" | $_clipboardApp'
+if ( type bat &>/dev/null ) ; then
+  alias bat='bat --style=numbers'
+  alias cat='bat --style=numbers'
+fi
+alias cdate='echo -n "$(date +%F\ %T\ %Z)" | $_clipboardApp'      # TZ
+alias cdateu='echo -n "$(date -u +%F\ %T\ %Z)" | $_clipboardApp'  # UTC
 alias curl="curl --progress-bar --connect-timeout 3 -m 3 -s -H 'User-Agent: Mozilla/5 Gecko'"
-alias diff='colordiff'
-# ! disabling as this conflicts with bracketing within subshells !
-# alias grep="grep --color=always"
-unalias grep &>/dev/null
-unalias egrep &>/dev/null
-alias cgrep="grep --color=always"
-alias cegrep="egrep --color=always"
+( type colordiff &>/dev/null ) && alias diff='colordiff'
+alias egrep="egrep --color=auto"
+alias grep="grep --color=auto"
 alias history='history -i'
-alias ll="ls -Gahop"
-alias ls="ls -GFa"
-alias monitor="tail -f /var/log/{fsck_apfs_error.log,install.log,system.log,wifi.log}"
-alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
-alias python='/usr/local/bin/python3'
-alias sed="$(which gsed)"
+if ( type eza &>/dev/null ) ; then
+  alias ll="eza --group-directories-first -al --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -s type"
+  alias lld="eza --group-directories-first -al --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -D"
+  alias llt="eza --group-directories-first -alT --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -s type"
+  alias ls="eza --group-directories-first -a --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -s type"
+else
+  alias ll="ls -Gahop"
+  alias lld="ls -lad"
+  alias llt="tree --gitignore"
+  alias ls="ls -GFa"
+fi
+alias l="ls"
+alias monitor="tail -f /var/log/*.log"
+( type socat &>/dev/null ) && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
+( type python3 &>/dev/null ) && alias python="$(which python3)"
+( type gsed &>/dev/null ) && alias sed="$(which gsed)"
 alias stat='stat -x'
+alias synergy='(exec sh -c "/opt/homebrew/bin/synergy ")'
 alias tm='tmux'
 alias tma='tmux a'
 alias tmls='tmux ls'
+alias vi='nvim'
+alias vim='nvim'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
-# https://yamllint.readthedocs.io/en/stable/configuration.html
-alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
+( type yamllint &>/dev/null ) && alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
+
+
+#===============================================================
+# misc
+( type cmatrix &>/dev/null ) && alias cmatrix='cmatrix -abs'
 
 #===============================================================
 # fzf preview/edit
 alias pf="fzf --preview='less {}' --bind shift-up:preview-page-up,shift-down:preview-page-down"
-alias v='vim -o $(fzf -m --preview "bat --style=numbers --color=always --line-range :500 {}")'
+alias v="nvim -o \$(fzf -m --preview 'bat --style=numbers --color=always --line-range :500 {}')"
 
 #===============================================================
 # youtube-dl
-alias ytd="youtube-dl -c --write-description  --merge-output-format mp4"
-alias ytdf="youtube-dl -c --write-description --write-auto-sub --write-sub --sub-format srt --sub-lang es --merge-output-format mp4"
-
-alias ytd_best="youtube-dl -c --write-description -f bestvideo+bestaudio --merge-output-format mp4"
-alias ytd_get_subs="youtube-dl -c --write-sub --sub-format srt --sub-lang es"
-alias ytd_list_subs="youtube-dl --list-subs"
-alias ytd_mp3="youtube-dl -c -x --audio-format mp3"
+if ( type youtube-dl &>/dev/null ) ; then
+  alias ytd="youtube-dl -c --write-description  --merge-output-format mp4"
+  alias ytdf="youtube-dl -c --write-description --write-auto-sub --write-sub --sub-format srt --sub-lang es --merge-output-format mp4"
+  alias ytd_best="youtube-dl -c --write-description -f bestvideo+bestaudio --merge-output-format mp4"
+  alias ytd_get_subs="youtube-dl -c --write-sub --sub-format srt --sub-lang es"
+  alias ytd_list_subs="youtube-dl --list-subs"
+  alias ytd_mp3="youtube-dl -c -x --audio-format mp3"
+fi
 
 #===============================================================
 # AWS
-alias aws_examples="code /usr/local/share/awscli/examples/"
+alias aws_examples="${EDITOR} /usr/local/share/awscli/examples/"
 
 #===============================================================
-# git - see ~/.gitconfig
+# git
 alias g="git"
 alias ga='git a'
-alias gu='git u'
+alias gd='git diff'
+alias gll="git log --color --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ar) %C(bold blue)<%an>%C(reset)' --graph --stat --all"
+alias gll="git log --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ar) %C(bold blue)<%an>%C(reset)' --graph --stat"
 alias gs='git status'
-alias gt="gitui"
-alias gll="git log --pretty=format:'%Cred%h%Creset %C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --graph --stat"
-alias cm="git cm"
+alias gss='git status -s'
+alias gu='git u'
 alias lp="git lp"
 alias st="git st"
+if ( type lazygit &>/dev/null ) ; then
+  alias gt="lazygit -ucd ~/.config/lazygit"
+elif ( type gitui &>/dev/null ) ; then
+  alias gt="gitui"
+fi
 
 #===============================================================
 # docker
-alias c="colima"
-alias d="docker"
-alias db="docker buildx build --no-cache"
-alias dc="docker compose"
-alias de="docker exec -ti"
-alias dr="docker run -ti --rm"
-alias di='docker images'
-alias dils="docker image ls --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}'"
-alias dps="docker ps -a"
-# slim:
-alias slim='slim build --http-probe-off --continue-after 1 --include-cert-all --include-cert-dirs --include-cert-pk-all --include-cert-pk-dirs --include-shell'
-alias docker-slim='slim'
-# alpine
-alias alpine="docker run --rm -it -w /mnt -v $(pwd):/mnt:rw alpine:latest ash"
+if ( type docker &>/dev/null ) ; then
+  alias alpine="docker run --rm -it -w /mnt -v $(pwd):/mnt:rw alpine:latest ash"
+  alias d="docker"
+  alias db='docker buildx build --no-cache'
+  alias dc='docker compose'
+  alias de='docker exec -ti'
+  alias di='docker images'
+  alias dils="docker image ls --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}'"
+  alias dirm='docker image rm'
+  alias dps='docker ps -a'
+  alias dr='docker run -ti --rm'
+  alias dsta='docker stop $(docker ps -q)'
+  alias dvprune='docker volume prune'
+fi
+( type slim &>/dev/null ) && alias slim='slim build --http-probe-off --continue-after 1 --include-cert-all --include-cert-dirs --include-cert-pk-all --include-cert-pk-dirs --include-shell'
 
 #===============================================================
 # ACT - check ~/.actrc
-alias act="act --rm -b --use-new-action-cache --detect-event -s GITHUB_TOKEN=\"$(gh auth token)\""
+( type act &>/dev/null ) && ( type gh &>/dev/null ) && alias act="act --rm -b --use-new-action-cache --detect-event -s GITHUB_TOKEN=\"$(gh auth token)\""
 
 #===============================================================
 # kubernetes
-alias alpine_pod="kubectl run -it alpine --image alpine:latest -- ash"
-alias stern="stern --tail 20"
-alias k9s="k9s --headless --logoless"
-alias k9s-ro="k9s --readonly"
-alias kc='kubie ctx'
-alias kn='kubie ns'
-alias kubectl='kubecolor'
-alias k='kubecolor'
-alias kgn='k get node -o wide'
-alias kgnl='k get node -o wide --show-labels'
-alias ktn='k top node --use-protocol-buffers=true'
-alias ktnc='k top node --show-capacity=true --use-protocol-buffers=true'
-alias kgdl='k get deploy --show-labels'
-alias kge='k get event -w'
-alias kgea='k get event -Aw'
-# ARC
-alias runner_monitor="stern -n arc-runners -l app.kubernetes.io/component=runner"
+if ( type kubectl &>/dev/null ) ; then
+  if ( type kubecolor &>/dev/null ) ; then
+    alias k='kubecolor'
+    alias kubectl='kubecolor'
+  else
+    alias k='kubectl'
+  fi
+  ( type k9s &>/dev/null ) && alias k9s='k9s --headless --logoless'
+  alias kcp='kubectl cp'
+  alias kdel='kubectl delete'
+  alias keti='kubectl exec -t -i'
+  alias kga='kubectl get all'
+  alias kgaa='kubectl get all -A'
+  alias kgd='kubectl get deploy'
+  alias kge='kubectl get event -w'
+  alias kgea='kubectl get event -Aw'
+  alias kgee='kubectl events --types=Warning -w'
+  alias kgn='kubectl get node --sort-by=".metadata.creationTimestamp"'
+  alias kgnl='kubectl get node --sort-by=".metadata.creationTimestamp" --show-labels'
+  alias kgns='kubectl get namespace'
+  alias kgnsl='kubectl get namespace --show-labels'
+  alias kgp='kubectl get pods --sort-by=".metadata.creationTimestamp"'
+  alias kgpf='kubectl get pod --field-selector="status.phase!=Succeeded,status.phase!=Running"'
+  alias kgpw='kgp --watch'
+  alias kgs='kubectl get svc'
+  alias klog='kubectl logs'
+  alias kpf='kubectl port-forward'
+  alias krh='kubectl rollout history'
+  alias krs='kubectl rollout status'
+  alias krsd='kubectl rollout status deployment'
+  alias krsss='kubectl rollout status statefulset'
+  alias kru='kubectl rollout undo'
+  alias ksd='kubectl scale deployment'
+  alias ktn='kubectl top node --use-protocol-buffers=true'
+  alias ktnc='kubectl top node --show-capacity=true --use-protocol-buffers=true'
+  # krew stuff
+  ( type kubeconform &>/dev/null ) && alias kubeconform='kubeconform -output pretty -summary -strict -verbose'
+  # custom pods
+  alias pod_alpine="kubectl run -it --rm alpine --image alpine:latest --restart=Never -- ash"
+  alias pod_nats="kubectl run -it --rm nats-box --image=natsio/nats-box --restart=Never -- ash"
+  alias pod_ubuntu="kubectl run -it --rm ubuntu --image ubuntu:latest --restart=Never -- bash"
+fi
+# kubie
+if ( type kubie &>/dev/null ) ; then
+  alias kc='kubie ctx'  # context selector
+  alias kn='kubie ns'   # namespace selector
+fi
+# stern
+if ( type stern &>/dev/null ) ; then
+  alias stern="stern --only-log-lines -td -H '(?i)debug|info|warn[i][n][g]|auth|fail[e][d]|error|critical|unknown'"
+fi
 # helm
-alias helm-docs='helm-docs -b plastic -u'
-alias helmsman='helmsman -no-banner -update-deps'
-# (brew install chart-testing)
-alias ct="$(find $(brew --cellar)/chart-testing/ -type f -name 'ct')"
-alias mk='minikube'
+if ( type helm-docs &>/dev/null ) ; then
+  alias helm-docs='helm-docs -b plastic -u'
+fi
+# minikube
+if ( type minikube &>/dev/null ) ; then
+  alias mk='minikube'
+  alias mks='minikube profile list && minikube status'
+  alias mktunnel="minikube tunnel --cleanup=true --bind-address='*'"
+fi
 
 #===============================================================
-# incognito
-alias bi="/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser --incognito &"
-alias ci="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --incognito &"
+# private browsing
+# alias bbi="/path/to/brave --incognito &"
+# alias cci="/path/to/google-chrome --incognito &"
+# alias ffi="/path/to/firefox --private-window --safe-mode &"
 
-#===============================================================
-# clean MS Teams cache
-alias clean_msteams='rm -rvf ${HOME}/Library/Caches/com.microsoft.teams'

@@ -1,0 +1,155 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+command_timeout = 500
+follow_symlinks = false
+palette = 'catppuccin_mocha' # nord onedark catppuccin_mocha
+
+[directory]
+home_symbol = '~'
+read_only = ' '
+read_only_style = 'red'
+truncate_to_repo = true
+truncation_length = 1
+
+[git_branch]
+style = 'fg:green'
+symbol = ' ' # 
+format = '$symbol(white)[$branch ]($style)' # ❯
+
+[git_commit]
+style = 'fg:yellow'
+commit_hash_length = 7
+only_detached = true
+tag_disabled = false
+tag_symbol = '󰓹 '
+format = '[\($hash$tag\)]($style) '
+
+[git_metrics]
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+disabled = true
+
+[git_state]
+format = '[\($state( $progress_current of $progress_total)\)]($style) '
+
+[fill]
+symbol = ' '
+
+[python]
+style = 'teal'
+symbol = ' '
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+pyenv_prefix = ''
+# pyenv_version_name = true
+
+[lua]
+symbol = ' '
+format = '[$symbol($version )]($style)'
+
+[nodejs]
+style = 'green'
+symbol = ' '
+format = '[$symbol($version )]($style)'
+
+[golang]
+style = 'blue'
+symbol = ' '
+format = '[$symbol($version )]($style)'
+
+[haskell]
+style = 'blue'
+symbol = ' '
+format = '[$symbol($version )]($style)'
+
+[rust]
+style = 'orange'
+symbol = ' '
+format = '[$symbol($version )]($style)'
+
+[ruby]
+style = 'blue'
+symbol = ' '
+format = '[$symbol($version )]($style)'
+
+[package]
+symbol = '󰏗 '
+format = '[$symbol($version )]($style)'
+
+[aws]
+symbol = " "
+style = 'yellow'
+format = '[$symbol(profile: "$profile" )(\(region: $region\) )]($style)'
+
+[docker_context]
+symbol = ' '
+style = 'fg:#06969A'
+format = '[$symbol]($style) $path'
+detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
+detect_extensions = ['Dockerfile']
+
+[jobs]
+symbol = ' '
+style = 'red'
+number_threshold = 1
+format = '[$symbol]($style)'
+
+[cmd_duration]
+min_time = 500
+style = 'fg:gray'
+format = ' [$duration]($style)'
+
+[palettes.nord]
+dark_blue = '#5E81AC'
+blue = '#81A1C1'
+teal = '#88C0D0'
+red = '#BF616A'
+orange = '#D08770'
+green = '#A3BE8C'
+yellow = '#EBCB8B'
+purple = '#B48EAD'
+gray = '#434C5E'
+black = '#2E3440'
+white = '#D8DEE9'
+
+[palettes.onedark]
+format = '[$symbol($version )]($style)'
+dark_blue = '#61afef'
+blue = '#56b6c2'
+red = '#e06c75'
+green = '#98c379'
+purple = '#c678dd'
+cyan = '#56b6c2'
+orange = '#be5046'
+yellow = '#e5c07b'
+gray = '#828997'
+white = '#abb2bf'
+black = '#2c323c'
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"

@@ -1,29 +1,71 @@
-# REQUIREMENT:
-# echo -e "\n[ -r \${HOME}/.zshrc_custom ] && source \${HOME}/.zshrc_custom" >> ${HOME}/.zshrc
+######################################################################
+# Colors:
+export BOLD="\033[1;37m"
+export RED="\033[1;31m"
+export GREEN="\033[1;92m"
+export YELLOW="\033[1;93m"
+export BLUE="\033[1;94m"
+export MAGENTA="\033[1;95m"
+export CYAN="\033[1;96m"
+export NONE="\033[0m"
 
+######################################################################
+# clipboard tool
+_clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
+
+######################################################################
+# load custom aliases & functions
+ALIASES_WORK="${HOME}/.aliases_work"
+SECRETS_FILE="${HOME}/.secrets"
+for file in ${HOME}/{.aliases,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}" ; do
+    [ -r "${file}" ] && source "${file}"
+done ; unset file
+
+######################################################################
 # zsh
-export HISTSIZE=100000
-export SAVEHIST=100000
-setopt EXTENDED_HISTORY          # Write the history file in the ':start:elapsed;command' format.
-setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY             # Share history between all sessions.
-setopt HIST_EXPIRE_DUPS_FIRST    # Expire a duplicate event first when trimming history.
-setopt HIST_IGNORE_DUPS          # Do not record an event that was just recorded again.
-setopt HIST_IGNORE_ALL_DUPS      # Delete an old recorded event if a new event is a duplicate.
-setopt HIST_FIND_NO_DUPS         # Do not display a previously found event.
-setopt HIST_IGNORE_SPACE         # Do not record an event starting with a space.
-setopt HIST_SAVE_NO_DUPS         # Do not write a duplicate event to the history file.
-setopt HIST_VERIFY               # Do not execute immediately upon history expansion.
-setopt APPEND_HISTORY            # append to history file
-setopt HIST_NO_STORE             # Don't store history commands
+export HISTSIZE=13000
+export SAVEHIST=10000
+setopt APPEND_HISTORY          # append to history file
+setopt EXTENDED_HISTORY        # Write the history file in the ':start:elapsed;command' format.
+setopt HIST_EXPIRE_DUPS_FIRST  # Expire a duplicate event first when trimming history.
+setopt HIST_FIND_NO_DUPS       # Do not display a previously found event.
+setopt HIST_IGNORE_ALL_DUPS    # Delete an old recorded event if a new event is a duplicate.
+setopt HIST_IGNORE_DUPS        # Do not record an event that was just recorded again.
+setopt HIST_IGNORE_SPACE       # Do not record an event starting with a space.
+setopt HIST_NO_FUNCTIONS       # don't store function definitions
+setopt HIST_NO_STORE           # Don't store history commands
+setopt HIST_REDUCE_BLANKS      # remove unnecessary blanks
+setopt HIST_SAVE_NO_DUPS       # Do not write a duplicate event to the history file.
+setopt HIST_VERIFY             # Do not execute immediately upon history expansion.
+setopt INC_APPEND_HISTORY      # Write to the history file immediately, not when the shell exits.
+setopt INC_APPEND_HISTORY_TIME # append command to history file immediately after execution
+setopt SHARE_HISTORY           # Share history between all sessions.
+# async mode for autocompletion
+export ZSH_AUTOSUGGEST_USE_ASYNC=true
+export ZSH_HIGHLIGHT_MAXLENGTH=300
+# case insensitive path-completion
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' complete-options true
+zstyle ':completion:*' file-list all
+zstyle ':completion:*' file-sort modification
+zstyle ':completion:*' menu select
+zstyle ':completion:*' squeeze-slashes true
+zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
+zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions commands
+zstyle ':completion:*:*:cp:*' file-sort modification reverse
+zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
+zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+zstyle ':completion:*' verbose true
 
-prompt_context(){}
+######################################################################
+# iTerm2 Shell Integration
+if [[ -n "${ITERM_SESSION_ID}" ]] && [[ -f "${HOME}/.config/iterm2/shell_integration.zsh" ]] ; then
+  source "${HOME}/.config/iterm2/shell_integration.zsh"
+fi
 
 # export PATH
-export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin:${HOME}/.powerline/bin"
-
-# Load iTerm2 Shell Integration
-[ -r "${HOME}/.config/iterm2/shell_integration.zsh" ] && source "${HOME}/.config/iterm2/shell_integration.zsh"
+export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin:/usr/games"
 
 # You may need to manually set your MANPATH
 export MANPATH="/usr/local/man:${MANPATH}"
@@ -32,22 +74,8 @@ export MANPATH="/usr/local/man:${MANPATH}"
 export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-export EDITOR='vim'
+export EDITOR='nvim'
 export VISUAL="${EDITOR}"
-
-# fzf
-# https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
-# https://thevaluable.dev/fzf-shell-integration/
-# https://vitormv.github.io/fzf-themes/
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-  --color=fg:#d0d0d0,fg+:#d0d0d0,bg:-1,bg+:#262626
-  --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
-  --color=prompt:#d7005f,spinner:#af5fff,pointer:#af5fff,header:#87afaf
-  --color=border:#262626,label:#aeaeae,query:#d9d9d9
-  --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
-  --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
-export FZF_COMPLETION_OPTS='--border --info=inline'
-export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
 
 # homebrew stuff
 export HOMEBREW_NO_ENV_HINTS=1
@@ -58,6 +86,40 @@ export BUILDKIT_COLORS="run=light-blue:error=light-red:cancel=light-magenta:warn
 
 # .Net stuff
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+# fzf
+# https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
+# https://thevaluable.dev/fzf-shell-integration/
+# https://vitormv.github.io/fzf-themes/
+export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude .git"
+
+export FZF_DEFAULT_OPTS="--color=fg:#d0d0d0,fg+:#d0d0d0,bg:-1,bg+:#262626
+    --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
+    --color=prompt:#d7005f,spinner:cyan,pointer:#d7005f,header:#87afaf
+    --color=border:#262626,label:#aeaeae,query:#d9d9d9
+    --color=label:italic:yellow,preview-bg:#121212
+    --border='rounded' --border-label='' --preview-window='border-double'
+    --bind='ctrl-p:change-preview-window(50%,down|50%,right)'
+    --marker='❯' --pointer='❯' --separator='─'
+    --scrollbar='│' --info=inline"
+
+    # --prompt='> '
+    # --color=prompt:#d7005f,spinner:#af5fff,pointer:#af5fff,header:#87afaf
+    # --color=prompt:#d7005f,spinner:cyan,pointer:yellow,header:#87afaf
+    # symbols: ◆ ←   ▶ ▶  ❯   󰸞               
+
+export FZF_COMPLETION_OPTS='--border --info=inline'
+export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
+
+# Preview file content using bat (https://github.com/sharkdp/bat)
+export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target
+    --preview 'bat -n --color=always {}'
+    --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+
+# CTRL-Y to copy the command into clipboard using pbcopy
+export FZF_CTRL_R_OPTS="--bind 'ctrl-y:execute-silent(echo -n {2..} | $_clipboardApp)+abort'
+    --color header:italic
+    --header 'ctrl-y copy command to clipboard'"
 
 ######################################################################
 # vagrant completion
@@ -70,7 +132,6 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 ######################################################################
 # less tweaks
-scrtitle='\[\033k\033\\\]'  # ESC k ESC \ for titles in screen. advanced magic here.
 export LESS='-asrRix8'
 export LESSCHARSET='utf-8'
 
@@ -82,64 +143,37 @@ export LESS_TERMCAP_se=$'\E[0m'             # end standout-mode
 export LESS_TERMCAP_so=$'\E[38;07;246m'     # begin standout-mode - info box
 export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 export LESS_TERMCAP_us=$'\E[04;38;5;111m'   # begin underline
-# or use bat:
-# export MANPAGER="sh -c 'col -bx | bat -l man -p --style header --paging always'"
 
 ######################################################################
 
-# zsh auto completion for lot of tools
-AUTO_COMPLETION=(awless colima docker helm kubectl minikube k9s)
+# auto completion
+AUTO_COMPLETION=(docker helm kubectl)
 for app in ${AUTO_COMPLETION} ; do
-  ( command -v ${app} &>/dev/null ) && source <(${app} completion zsh)
+    ( command -v ${app} &>/dev/null ) && source <(${app} completion zsh)
 done ; unset app
 
 # stern has another syntax
 ( command -v stern &>/dev/null ) && source <(stern --completion zsh)
 
-# gh has another syntax
-( command -v gh &>/dev/null ) && source <(gh completion -s zsh)
+# gh and glab have another syntax
+for app in gh glab ; do
+    ( command -v ${app} &>/dev/null ) && source <(${app} completion -s zsh)
+done ; unset app
 
-# https://kubernetes.io/es/docs/tasks/tools/included/optional-kubectl-configs-zsh/
-# # Make all kubectl completion fzf
-# command -v fzf >/dev/null 2>&1 && {
-#   source <(kubectl completion zsh | sed 's#${requestComp} 2>/dev/null#${requestComp} 2>/dev/null | head -n -1 | fzf  --multi=0 #g')
-# }
-
-######################################################################
 # load fzf keybindings
 ( command -v fzf &>/dev/null ) && source <(fzf --zsh)
 
-######################################################################
-# remove dangling aliases (which will be set up later)
-for i in ga ls ll md ; do
-  unalias ${i} &>/dev/null
-done
+# 1p
+( type op &>/dev/null ) && eval "$(\op completion zsh)"; compdef _op op
 
-######################################################################
-WORK_ALIAS_FILE="${HOME}/.aliases_work"
-SECRETS_FILE="${HOME}/.secrets"
-
-######################################################################
-# load custom aliases & functions
-for file in ${HOME}/.{aliases,functions} "${WORK_ALIAS_FILE}" "${SECRETS_FILE}" ; do
-  [ -r "${file}" ] && source "${file}"
-done ; unset file
-
-######################################################################
-# k=kubectl
-complete -o default -F __start_kubectl k
-compdef __start_kubectl k
-# mk=minikube
-complete -o default -F __start_minikube mk
-compdef __start_minikube mk
-
-autoload -Uz compinit
-compinit
+# https://kubernetes.io/es/docs/tasks/tools/included/optional-kubectl-configs-zsh/
+# Make all kubectl completion fzf
+# command -v fzf >/dev/null 2>&1 && {
+# 	source <(kubectl completion zsh | sed 's#${requestComp} 2>/dev/null#${requestComp} 2>/dev/null | head -n -1 | fzf --multi=0 #g')
+# }
 
 ######################################################################
 # ssh-add
-ssh-add --apple-load-keychain &>/dev/null
+[[ "$(uname -s)" == "Darwin" ]] && ssh-add --apple-load-keychain &>/dev/null
 
 ######################################################################
-# random fortune cookie
-cookie

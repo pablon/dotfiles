@@ -1,0 +1,16 @@
+# Colors:
+export BOLD="\033[1;37m"
+export RED="\033[1;31m"
+export GREEN="\033[1;92m"
+export YELLOW="\033[1;93m"
+export BLUE="\033[1;94m"
+export MAGENTA="\033[1;95m"
+export CYAN="\033[1;96m"
+export NONE="\033[0m"
+
+function _print() {
+  echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
+}
+
+function _error() {
+  echo -e "${RED}❌ ${BOLD}${1}${NONE}\n"

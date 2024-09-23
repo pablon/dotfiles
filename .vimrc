@@ -100,6 +100,7 @@ function! ToggleWrap()
 endfunction
 map <F10> :call ToggleWrap()<CR> " wrap
 map! <F10> ^[:call ToggleWrap()<CR> " un-wrap
+
 nmap <C-S> :w<CR>   " quick save
 nmap <C-Q> :q!<CR>  " quit now
 
@@ -171,9 +172,9 @@ try
 catch
 endtry
 
-set background=dark         " my eyes say thank you
-set cursorline cursorcolumn " highlight current line & column
-"hi CursorLine cterm=BOLD ctermbg=gray
+set background=dark                 " my eyes say thank you
+set cursorline cursorcolumn         " highlight current line & column
+" hi CursorLine cterm=BOLD ctermbg=gray
 
 " Set extra options when running in GUI mode
 if has("gui_running")
@@ -368,9 +369,6 @@ map <leader>q :e ~/buffer<cr>
 
 " Quickly open a markdown buffer for scribble
 map <leader>x :e ~/buffer.md<cr>
-
-" Toggle paste mode on and off
-map <leader>pp :setlocal paste!<cr>
 
 "===============================================================
 " => Helper functions

@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 ##########################################################
-# Description: macos tweaks
+# Description: os tweaks
 # Borrowed from https://mths.be/macos
 ##########################################################
 
-if  [[ "$(uname -s)" != "Darwin" ]] ; then
-  echo "This script is for macOS only" ; exit 0
+if [[ "$(uname -s)" != "Darwin" ]]; then
+	echo "This script is for macOS only"
+	exit 0
 fi
+
+source ./.functions &>/dev/null
 
 # Ask for the administrator password upfront
 sudo -v
@@ -84,7 +87,7 @@ defaults write com.apple.helpviewer DevMode -bool true
 # sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 
 # Disable Notification Center and remove the menu bar icon
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
+launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2>/dev/null
 
 # Disable automatic capitalization as it's annoying when typing code
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
@@ -133,7 +136,7 @@ defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
 # Stop iTunes from responding to the keyboard media keys
-launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
+launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2>/dev/null
 
 ###############################################################################
 # Energy saving                                                               #
@@ -161,7 +164,7 @@ sudo pmset -b sleep 5
 sudo pmset -a standbydelay 86400
 
 # Never go into computer sleep mode
-sudo systemsetup -setcomputersleep Off > /dev/null
+sudo systemsetup -setcomputersleep Off >/dev/null
 
 # Hibernation mode
 # 0: Disable hibernation (speeds up entering sleep mode)
@@ -422,7 +425,7 @@ defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
 # Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
+hash tmutil &>/dev/null && sudo tmutil disablelocal
 
 ###############################################################################
 # Activity Monitor                                                            #
@@ -519,4 +522,4 @@ defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true
 # Don't show the preferences window on next start
 defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false
 
-echo "✅ Done"
+_print "✅ Done ${0}"

@@ -1,13 +1,4 @@
-#===============================================================
-# Colors:
-export BOLD="\033[1;37m"
-export RED="\033[1;31m"
-export GREEN="\033[1;92m"
-export YELLOW="\033[1;93m"
-export BLUE="\033[1;94m"
-export MAGENTA="\033[1;95m"
-export CYAN="\033[1;96m"
-export NONE="\033[0m"
+# shellcheck disable=SC2155,SC2086,SC2034
 #===============================================================
 _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
 #===============================================================
@@ -26,7 +17,16 @@ function md() {
 #===============================================================
 # find shorthand
 function f() {
-  find . -iname "*${1}*" 2>/dev/null | grep -i --color=never "${1}"
+	local SEARCH="$(fd . --one-file-system | fzf --header='󱞽 Copy path/file to clipboard' --preview 'bat --color=always --line-range :500 {}')"
+	if [ -n "${SEARCH}" ] ; then
+		local FILE="$(echo -n "${SEARCH}" | $_clipboardApp)"
+		echo "-- string \"${SEARCH}\" copied to clipboard"
+	fi
+}
+#===============================================================
+# kill tmux sessions
+function tmux-kill() {
+  tmux kill-session -t $(tmux ls 2>/dev/null | fzf -m --marker='X' --prompt='󱞽 Select session(s) to kill' | awk -F: '{print $1}') 2>/dev/null
 }
 #===============================================================
 # Start an HTTP server from a directory, optionally specifying the port
@@ -49,7 +49,7 @@ function cp_p () {
 function cp_tar() {
   local SRC="${1}"
   local DST="${2}"
-  [ -d "${SRC}" ] || _error "Source directory does not exist"
+  [ -d "${SRC}" ] || _error "Source directory does not exist" && return 1
   [ -d "${DST}" ] || mkdir -vp "${DST}"
   ( cd "${SRC}/" && tar -cf - . | ( cd "${DST}/" && tar -xpf - ) )
 }
@@ -60,7 +60,6 @@ function bkp() {
     BKP="${i}.$(date +%Y%m%d.%H%M%S)"
     if [ -d ${i} ] ; then
       cp -rpf "${i}" "${BKP}"
-      # echo -e "'${i}' to '${BKP}' \t[dir]"
       _banner "Copied [dir]  '${i}' ==> '${BKP}'"
     elif [ -f ${i} ] ; then
       cp -pf "${i}" "${BKP}"
@@ -103,8 +102,8 @@ function flushdns() {
     if [ -r "/etc/resolv.conf.bkp" ] ; then
       sudo cp -f /etc/resolv.conf.bkp /etc/resolv.conf
     fi
-    sudo dscacheutil -flushcache
-    sudo killall -HUP mDNSResponder
+      sudo dscacheutil -flushcache
+      sudo killall -HUP mDNSResponder
   elif [[ "$(uname)" == "Linux" ]] ; then
     if ( pidof nscd &>/dev/null ) ; then
       sudo /etc/init.d/nscd restart &>/dev/null || \
@@ -113,8 +112,8 @@ function flushdns() {
       sudo /etc/init.d/dnsmasq restart &>/dev/null || \
       sudo systemctl dnsmasq nscd &>/dev/null
     fi
-    sudo resolvectl flush-caches &>/dev/null || \
-    sudo systemd-resolve --flush-caches &>/dev/null
+      sudo resolvectl flush-caches &>/dev/null || \
+      sudo systemd-resolve --flush-caches &>/dev/null
   fi
   _banner "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
 }
@@ -123,12 +122,14 @@ function flushdns() {
 function cookie() {
   for program in cowsay fortune ; do
     if ! ( command -v ${program} &>/dev/null ) ; then
-        echo "YUCS!: Sorry, ${BOLD}${program}${NONE} is not installed :-/\n"
-        exit 1
+      echo "${program} is not installed ಠ_ಠ"
+      return
     fi
   done
-  # get all possible figures with: cowsay -l
-  array=( $(cowsay -l | grep -v Cow | sed '$!N;s/\n/ /') )
+  # get all possible figures with: cowsay -l:
+  # array=( $(cowsay -l | grep -v Cow | xargs) )
+  # or set a fixed list:
+  array=(koala luke-koala moofasa moose sheep skeleton small three-eyes tux vader vader-koala www)
   size=${#array[@]}
   index=$((${RANDOM} % ${size}))
   echo -e "${CYAN}" ; fortune -s | cowsay -f "${array[${index}]}" | sed 's|^|  |' ; echo "${NONE}"
@@ -143,7 +144,7 @@ function ytd_list() {
       echo -e "ERROR: ${1} is not a file\n"
     fi
   else
-    echo -e "ERROR: ARGV1 should be a list with 1 youtube linke per-line\n"
+    echo -e "ERROR: ARGV1 should be a list with 1 youtube link per-line\n"
   fi
 }
 #===============================================================
@@ -172,18 +173,19 @@ function curl-cert() {
 #===============================================================
 # spawn subshell into an aws profile
 function awsprofile() {
-  if ( which zsh &>/dev/null ) ; then
-      local AWSSHELL='zsh'
-  else
-      local AWSSHELL='bash'
+  if ( type zsh &>/dev/null ) ; then
+    local AWSSHELL='zsh'
+  elif ( type bash &>/dev/null ) ; then
+    local AWSSHELL='bash'
   fi
   local CREDENTIALS="${HOME}/.aws/credentials"
-  local PROFILES="$(grep '^\[' ${CREDENTIALS} | awk '{gsub(/\[|\]/,"")}1')"
-  [[ -z "${PROFILES}" ]] && _error "No profiles found in ${CREDENTIALS} :-("
+  local PROFILES="$(grep '^\[' ${CREDENTIALS} | awk '{gsub(/\[|\]/,"")}1' 2>/dev/null)"
+  [[ -z "${PROFILES}" ]] && _error "No profiles found in ${CREDENTIALS} :-(" && return 1
   ANSWER="$(echo "${PROFILES}" | fzf )"
   if [[ -z "${ANSWER}" ]] ; then
-    echo -e "\t-- No profile selected --"
+    _error "No profile selected" && return 1
   else
+    local AWSSHELL='bash'
     case "${AWSSHELL}" in
       'zsh')  ( export AWS_PROFILE="${ANSWER}" && zsh -i ) ;;
       'bash') ( export AWS_PROFILE="${ANSWER}" && bash --rcfile <(echo "PS1=\"[${YELLOW}aws${NONE}|${MAGENTA}${ANSWER}${NONE}] \W ${GREEN}→${NONE} \"") -i ) ;;
@@ -195,19 +197,10 @@ function awsprofile() {
 function disappointed() { echo -n " ಠ_ಠ " | tee /dev/tty | $_clipboardApp; }
 function flip() { echo -n "（╯°□°）╯ ┻━┻" | tee /dev/tty | $_clipboardApp; }
 function shrug() { echo -n "¯\_(ツ)_/¯" | tee /dev/tty | $_clipboardApp; }
-#===============================================================
-# matrix
-function matrix() {
-  echo -e "\e[1;40m"
-  clear
-  while :; do
-    echo $LINES $COLUMNS $(( $RANDOM % $COLUMNS)) $(( $RANDOM % 72 )) ;sleep 0.05; done | \
-    awk '{ letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"; c=$4; letter=substr(letters,c,1);a[$3]=0;for (x in a) {o=a[x];a[x]=a[x]+1; printf "\033[%s;%sH\033[2;32m%s",o,x,letter; printf "\033[%s;%sH\033[1;37m%s\033[0;0H",a[x],x,letter;if (a[x] >= $1) { a[x]=0; } }}'
-}
 
-#===============================================================
+################################################################
 # vagrant
-#===============================================================
+################################################################
 
 #===============================================================
 # List all vagrant boxes available in the system including its
@@ -246,7 +239,9 @@ function vagrant_snapshot() {
         _banner "[${VM_NAME}] no snapshots to ${1}"
       fi
       ;;
-    *) echo -e "Manage vagrant snapshots.\nUsage:\n $(basename ${0}) {list,save,restore,delete}\n"
+    *)
+      echo -e "Manage vagrant snapshots.\nUsage:\n $(basename ${0}) {list,save,restore,delete}\n"
+      ;;
   esac
 }
 
@@ -254,23 +249,22 @@ function vagrant_snapshot() {
 # docker
 #===============================================================
 
+for alias in da ds drm drmi ; do unalias ${alias} &>/dev/null ; done
+
 #===============================================================
 # Select a docker container to start and attach to
-unalias da &>/dev/null
 function da() {
   local cid=$(docker ps -a | sed 1d | fzf -1 -q "$1" | awk '{print $1}')
   [ -n "$cid" ] && docker start "$cid" && docker attach "$cid"
 }
 #===============================================================
 # Select a running docker container to stop
-unalias ds &>/dev/null
 function ds() {
   local cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
   [ -n "$cid" ] && docker stop "$cid"
 }
 #===============================================================
 # Same as above, but allows multi selection
-unalias drm &>/dev/null
 function drm() {
   docker ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $1}' | xargs -r docker rm
 }
@@ -280,13 +274,21 @@ function drmi() {
   docker images | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $3}' | xargs -r docker rmi
 }
 
-#===============================================================
+################################################################
 # git
+################################################################
+
 #===============================================================
+# required aliases/vars:
+alias glNoGraph='git log --color --date=format:"%F %H:%M" --format="%C(auto)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>" --graph "$@"'
+_gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+_viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | bat --style=numbers'"
+_viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
 
 #===============================================================
 # take this repo and copy it to somewhere else minus the .git stuff
 function gitexport(){
+  is_in_git_repo || return
   if [ ! -d "${1}" ] ; then
     mkdir -vp "${1}" && git archive HEAD | tar -x -C "${1}"
   else
@@ -295,76 +297,121 @@ function gitexport(){
 }
 #===============================================================
 # gls - git commit browser with previews and vim integration
-# required aliases:
-alias glNoGraph='git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr% C(auto)%an" --graph "$@"'
-_gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
-_viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | bat --style=numbers'"
-_viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
-
-# gls - git commit browser with previews and vim integration
 function gls() {
+  is_in_git_repo || return
   glNoGraph |
     fzf --no-sort --reverse --tiebreak=index --no-multi \
-      --ansi --preview="$_viewGitLogLine" \
-      --header "enter: view, ctrl-y: copy hash, ctrl-e: edit" \
-      --bind "enter:execute:$_viewGitLogLine   | less -R" \
-      --bind "ctrl-e:execute:$_viewGitLogLineUnfancy | vim -" \
-      --bind "ctrl-y:execute:$_gitLogLineToHash | $_clipboardApp"
+    --ansi --preview-window='right:50%' --preview="$_viewGitLogLine" \
+    --header "enter: view, ctrl-y: copy hash, ctrl-e: edit" \
+    --border-label=' Preview' \
+    --color=label:italic:yellow,preview-bg:#343434 \
+    --bind "enter:execute:$_viewGitLogLine | less -R" \
+    --bind "ctrl-e:execute:$_viewGitLogLineUnfancy | vim -" \
+    --bind "ctrl-y:execute:$_gitLogLineToHash | $_clipboardApp"
 }
 #===============================================================
-function stash-explore() {
+function stash-explorer() {
   while out=$(git stash list "$@" |
-    fzf --header="ctrl-a: apply | ctrl-b: branch | ctrl-p: pop | ESC" \
-      --ansi --no-sort --reverse --print-query --query="$query" \
-      --expect=ctrl-a,ctrl-b,ctrl-p \
-      --bind="ctrl-u:preview-page-up" \
-      --bind="ctrl-d:preview-page-down" \
-      --bind="ctrl-k:preview-up" \
-      --bind="ctrl-j:preview-down" \
-      --preview="echo {} | cut -d':' -f1 | xargs git stash show -p" \
-      --preview-window='down:85%') ;
+    fzf --header="ctrl-a: apply | ctrl-b: branch | ctrl-p: pop | ctrl-x: drop | ESC" \
+    --ansi --no-sort --reverse --print-query --query="$query" \
+    --expect=ctrl-a,ctrl-b,ctrl-p,ctrl-x \
+    --bind="ctrl-u:preview-page-up" \
+    --bind="ctrl-d:preview-page-down" \
+    --bind="ctrl-k:preview-up" \
+    --bind="ctrl-j:preview-down" \
+    --border --border-label-pos=3 \
+    --border-label=' stash diff' \
+    --color='label:italic:yellow,preview-bg:#212121' \
+    --preview="echo {} | cut -d':' -f1 | xargs git stash show --color -p" \
+    --preview-window='right:55%') ;
   do
-      # Tokenize selection by newline
-      selection=("${(f)out}")
+    # Tokenize selection by newline
+    selection=("${(f)out}")
 
-      # Keep the query accross fzf calls
-      query="${selection[1]}"
+    # Keep the query accross fzf calls
+    query="${selection[1]}"
 
-      # Represents the stash, e.g. stash{1}
-      reflog_selector=$(echo "${selection[3]}" | cut -d ':' -f 1)
+    # Represents the stash, e.g. stash{1}
+    reflog_selector=$(echo "${selection[3]}" | cut -d ':' -f 1)
 
-      case "${selection[2]}" in
-          # ctrl-a applies the stash to the current tree
-          ctrl-a)
-            git stash apply "${reflog_selector}"
-            break
-            ;;
-          # ctrl-b checks out the stash as a branch
-          ctrl-b)
-            sha=$(echo "${selection[3]}" | grep -o '[a-f0-9]\{7\}')
-            git stash branch "stash-$sha" "${reflog_selector}"
-            break
-            ;;
-          # ctrl-p is like ctrl-a but it drops the stash. Uses stash pop.
-          ctrl-p)
-            git stash pop "${reflog_selector}"
-            break
-            ;;
-          # del will drop the stash
-          del)
-            git stash drop "${reflog_selector}"
-            ;;
-      esac
+    case "${selection[2]}" in
+      # ctrl-a applies the stash to the current tree
+      ctrl-a)
+        git stash apply "${reflog_selector}"
+        break
+        ;;
+      # ctrl-b checks out the stash as a branch
+      ctrl-b)
+        sha=$(echo "${selection[3]}" | grep -o '[a-f0-9]\{7\}')
+        git stash branch "stash-$sha" "${reflog_selector}"
+        break
+        ;;
+      # ctrl-p is like ctrl-a but it drops the stash. Uses stash pop.
+      ctrl-p)
+        git stash pop "${reflog_selector}"
+        break
+        ;;
+      # del or ctrl-x will drop the stash
+      del|ctrl-x)
+        git stash drop "${reflog_selector}"
+        break
+        ;;
+    esac
   done
 }
 #===============================================================
+function rebaser() {
+  glNoGraph | fzf \
+    --ansi \
+    --reverse \
+    --no-sort \
+    --preview='
+    hash=$(echo {} | grep -o "[a-f0-9]\{7\}" | sed -n "1p") \
+    && [[ $hash != "" ]] \
+    && git show --color $hash
+    ' \
+    --bind='enter:execute(
+    hash=$(echo {} | grep -o "[a-f0-9]\{7\}" | sed -n "1p") \
+    && [[ $hash != "" ]] \
+    && sh -c "git show --color $hash | less -R"
+    )' \
+    --bind='ctrl-c:execute(
+    hash=$(echo {} | grep -o "[a-f0-9]\{7\}" | sed -n "1p") \
+    && [[ $hash != "" ]] \
+    && git checkout $hash
+    )+abort' \
+    --bind='ctrl-r:execute(
+    hash=$(echo {} | grep -o "[a-f0-9]\{7\}" | sed -n "1p") \
+    && [[ $hash != "" ]] \
+    && git reset $hash
+    )+abort' \
+    --bind='ctrl-i:execute(
+    hash=$(echo {} | grep -o "[a-f0-9]\{7\}" | sed -n "1p") \
+    && [[ $hash != "" ]] \
+    && git rebase --interactive $hash
+    )+abort' \
+    --header-first \
+    --header '> ENTER to display the diff
+> CTRL-C to checkout the commit | CTRL-R to reset to the commit
+> CTRL-I to rebase interactively'
+}
+
+#===============================================================
+function is_in_git_repo() {
+  git rev-parse HEAD > /dev/null
+}
+
+#===============================================================
 # use gh+fzf+bat to explore pull requests, and checkout the PR branch
 function pr-checkout() {
+  is_in_git_repo || return
+  # pull first
+  git pull --stat --tags
   local jq_template pr_number
   jq_template='"'\
 '#\(.number) - \(.title)'\
 '\t'\
-'Author: \(.user.login)\n'\
+'Author:  \(.user.login)\n'\
 'Created: \(.created_at)\n'\
 'Updated: \(.updated_at)\n\n'\
 '\(.body)'\
@@ -374,10 +421,14 @@ function pr-checkout() {
     jq ".[] | ${jq_template}" |
     sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
     fzf \
-      --with-nth=1 \
-      --delimiter='\t' \
-      --preview='echo -e {2} | bat -l md --style=numbers --color=always' \
-      --preview-window=top:wrap |
+    --with-nth=1 \
+    --color='label:italic:yellow,preview-bg:#212121' \
+    --border --border-label-pos=3 \
+    --border-label=' Pull Request checkout' \
+    --pointer='' \
+    --delimiter='\t' \
+    --preview='echo -e {2} | bat -l md --style=plain --color=always' \
+    --preview-window=top:wrap |
     sed 's/^#\([0-9]\+\).*/\1/'
   )
   if [ -n "${pr_number}" ]; then
@@ -385,32 +436,63 @@ function pr-checkout() {
   fi
 }
 #===============================================================
+# use glab+fzf+bat to explore pull requests, and checkout
+# the MR branch to start collaborating
+function mr-checkout() {
+  is_in_git_repo || return
+  # pull first
+  git pull --stat --tags
+  local jq_template mr_number
+  jq_template='"'\
+'#\(.iid)   \(.title)  <\(.author.name)>'\
+'\t'\
+'\(.web_url)\n'\
+'---------------------------------------\n'\
+'(\(.target_branch)) ← (\(.source_branch))\n'\
+'---------------------------------------\n'\
+'Title     \(.title)\n'\
+'Author    \(.author.name)\n'\
+'Created   \(.created_at)\n'\
+'Updated   \(.updated_at)\n'\
+'---------------------------------------\n\n'\
+'\(.description)'\
+'"'
+  mr_number=$(
+    glab mr list -F json |
+    jq ".[] | ${jq_template}" |
+    sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
+    fzf \
+    --with-nth=1 \
+    --border --border-label-pos=3 \
+    --color=label:italic:yellow,preview-bg:#101010 \
+    --border-label='󰮠 Merge Request checkout' \
+    --delimiter='\t' \
+    --preview='echo -e {2} | bat -l md --style=plain --color=always' \
+    --preview-window=top,50%:wrap | sed 's/^#\([0-9]\+\).*/\1/'
+  )
+  if [ -n "${mr_number}" ] ; then
+    glab mr checkout "${mr_number}"
+  fi
+}
+#===============================================================
 # gh-watch -- watch the current github action
 function gh-watch() {
+  is_in_git_repo || return
   gh run list \
     --branch $(git rev-parse --abbrev-ref HEAD) \
     --json status,name,databaseId |
-    jq -r '.[] | select(.status != "completed") | (.databaseId | tostring) + "\t" + (.name)' |
-    fzf -1 -0 | awk '{print $1}' | xargs gh run watch
-}
-#===============================================================
-function is_in_git_repo() {
-  # git rev-parse HEAD 2>&1> /dev/null
-  git rev-parse HEAD > /dev/null
+  jq -r '.[] | select(.status != "completed") | (.databaseId | tostring) + "\t" + (.name)' |
+  fzf -1 -0 | awk '{print $1}' | xargs gh run watch
 }
 #===============================================================
 # Filter branches.
 function git-br-fzf() {
-    is_in_git_repo || return
-    local tags branches target
-    tags=$(
-    git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
-    branches=$(
-    git branch --all | grep -v HEAD |
-    sed "s/.* //" | sed "s#remotes/[^/]*/##" |
-    sort -u | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
-    target=$(
-    (echo "$tags"; echo "$branches") |
+  is_in_git_repo || return
+  local tags branches target
+  tags=$(git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
+  branches=$(git branch --all | grep -v HEAD |sed "s/.* //" | sed "s#remotes/[^/]*/##" |
+  sort -u | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
+  target=$((echo "$tags"; echo "$branches") |
     fzf --no-hscroll --no-multi --delimiter="\t" -n 2 \
     --ansi --preview="git log -200 --pretty=format:%s $(echo {+2..} |  sed 's/$/../' )" ) || return
     echo $(echo "$target" | awk -F "\t" '{print $2}')
@@ -418,36 +500,205 @@ function git-br-fzf() {
 #===============================================================
 # Filter branches and checkout the selected one with <enter> key,
 function git-co-fzf() {
-    is_in_git_repo || return
-    git checkout $(git-br-fzf)
+  is_in_git_repo || return
+  git checkout $(git-br-fzf)
 }
 #===============================================================
 # Filter commit logs. The diff is shown on the preview window.
 function git-log-fzf() { # fshow - git commit browser
-    is_in_git_repo || return
+  is_in_git_repo || return
 
-    _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
-    _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always %'"
-    git log --graph --color=always \
-    --format="%C(auto)%h%d [%an] %s %C(black)%C(bold)%cr" "$@" |
-    fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
-    --preview="$_viewGitLogLine" \
-    --bind "ctrl-m:execute:
-    (grep -o '[a-f0-9]\{7\}' | head -1 |
-    xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
-    {}
+  _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+  _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always %'"
+  git log --graph --color=always \
+  --format="%C(auto)%h%d [%an] %s %C(black)%C(bold)%cr" "$@" |
+  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+  --preview="$_viewGitLogLine" \
+  --bind "ctrl-m:execute:
+  (grep -o '[a-f0-9]\{7\}' | head -1 |
+  xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+  {}
 FZF-EOF"
 }
 
 #===============================================================
+# git add+commit+push helper using fzf
+function commit() {
+  function _banner() {
+    echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
+  }
+  function _error() {
+    echo -e "❌ ${1}, bye\n" ; git status -s
+  }
+  function _help() {
+    \cat << EOF
+git add+commit+push helper using fzf
+ * Detects conventional-commit in branch name
+ * Detects ticket patterns
+ * Automates git commands
+ * Easy AF
+
+Usage:
+  commit   [-c] [-s] [-d]
+
+Options:
+  -c     overrides conventional commit type from branch name
+         and displays the type selector
+  -s     appends '[skip ci]' to the commit message
+  -d     dry-run, nothing will be executed
+
+EOF
+  }
+
+  while getopts cdsh Option ; do
+    case "${Option}" in
+      b)  local CREATE_BRANCH=1
+        ;;
+      c)  local CHANGE_CC_TYPE=1
+        ;;
+      d)  is_in_git_repo || return
+        local DRY_RUN=1
+        _banner "🛠️ DRY_RUN mode"
+        ;;
+      s)  is_in_git_repo || return
+        local SKIP_CI=" [skip ci]"
+        _banner "🛠️ SKIP_CI mode"
+        ;;
+      h)  _help
+        return 0
+        ;;
+      *)  continue
+        ;;
+    esac
+  done
+
+  # check if this is a git repo
+  git rev-parse HEAD > /dev/null || return
+  # get current branch
+  local CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  # add files with fzf explorer
+  local ADDED_FILES="$(git ls-files --exclude-standard -mo | fzf -m --header='> Select file(s) to stage (ESC to cancel)' --color=label:italic:yellow,preview-bg:#101010 --border-label='Preview' --marker='' --preview-window='right:60%' --preview 'git diff --color=always {-1}' | xargs)"
+
+  #* empty-commit?
+  if [ -z "${ADDED_FILES}" ] ; then
+    echo -en "${RED}⚠️ No files were added!\n⚠️ Create an ${MAGENTA}empty-commit${RED}?${NONE} [y/N]: " ; read -r empty_option
+    case "${empty_option}" in
+			Y|y) local ALLOW_EMPTY='--allow-empty ' ;;
+			*)   _error "Cancelled" ; return 1 ;;
+    esac
+  else
+    echo "${BLUE}ℹ️ Files added:${NONE} ${ADDED_FILES}"
+  fi
+
+  # list of conventional commits types
+  local CC_LIST=('feat' 'fix' 'test' 'chore' 'docs' 'refactor' 'ci' 'style' 'perf' 'build' 'revert')
+  # list of conventional commits types with description
+  local CC_TYPES=('feat       - A new feature' 'fix        - A bug fix' 'test       - Adding missing tests or correcting existing ones' 'chore      - Other changes that dont modify src or test files' 'docs       - Documentation only changes' 'refactor   - A code change that neither fixes a bug nor adds a feature' 'ci         - Changes to our CI configuration files and scripts' 'style      - Formatting changes that do not affect the meaning of the code' 'perf       - A code change that improves performance' 'build      - Changes that affect the build system or external dependencies' 'revert     - Reverts a previous commit')
+  # guess if our branch prefix is an allowed conventional commit type
+  local CC_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F/ '{print $1}')"
+  # ..and check that out:
+  if [[ "${CC_LIST[@]}" =~ "${CC_GUESS}" ]] && [ -z "${CHANGE_CC_TYPE}" ] ; then
+    #* set conventional commit type as the branch prefix
+    local THIS_CC_TYPE="${CC_GUESS}"
+  else
+    #* select conventional commit type with fzf explorer
+    local THIS_CC_TYPE="$(for i in ${CC_TYPES[@]} ; do echo "${i}" ; done | fzf --prompt '> Select conventional commit type (ESC to cancel)' | awk '{print $1}')"
+  fi
+
+  if [ -z "${THIS_CC_TYPE}" ] ; then
+    _error "No conventional commit type was specified" && return 1
+  else
+    #* conventional commit scope
+    echo -en "${MAGENTA}> Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (optional, hit ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
+
+    #* detect ticket in branch name
+    local TICKET="$(echo ${CURRENT_BRANCH} | awk -F/ '{print $2}' | grep -E -o '[A-Z][A-Z0-9]+-[0-9]+')"
+    if [ -n "${TICKET}" ] ; then
+      echo "${BLUE}ℹ️ Ticket ${CYAN}${TICKET}${BLUE} will be prepended in the commit message, do not type it ;-)"
+      local THIS_TICKET="[${TICKET}] "
+      local THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | sed -e "s|^.*${TICKET}-||" -e 's|[_-]| |g')"
+      echo -en "${MAGENTA}> Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
+    else
+      local THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F/ '{print $NF}' | sed -e 's|[_-]| |g')"
+      echo -en "${MAGENTA}> Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
+    fi
+    [ -z "${COMMIT_MESSAGE}" ] && local COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
+
+    #* create add/commit/push commands
+    [ -n "${THIS_CC_SCOPE}" ] && local ADDED_SCOPE="(${THIS_CC_SCOPE})"
+    local COMMAND_COMMIT="git commit ${ALLOW_EMPTY}-m '${THIS_CC_TYPE}${ADDED_SCOPE}: ${THIS_TICKET}${COMMIT_MESSAGE}${SKIP_CI}'"
+    local COMMAND_ADD="git add ${ADDED_FILES}"
+    local COMMAND_PUSH="git push -u origin ${CURRENT_BRANCH}"
+
+    #* dry-run info
+    if [ "${DRY_RUN}" ] ; then
+    _banner "🛟 DRY_RUN ${BLUE}These commands would have been executed:${NONE}"
+    [ ! "${ALLOW_EMPTY}" ] && _banner "🛟 DRY_RUN ${NONE}${COMMAND_ADD}"
+    _banner "🛟 DRY_RUN ${NONE}${COMMAND_COMMIT}"
+    _banner "🛟 DRY_RUN ${NONE}${COMMAND_PUSH}"
+    else
+    echo "${BLUE}ℹ️ will execute..:${NONE}"
+    [ ! "${ALLOW_EMPTY}" ] && echo "  ${COMMAND_ADD}"
+    echo "  ${COMMAND_COMMIT}"
+
+    #* add & commit
+    echo -en "\n🔥 ${MAGENTA}Add & commit?${NONE} [Y/n]: " && read -r add_commit_option
+    case "${add_commit_option}" in
+      N|n)
+        echo ; return 0
+        ;;
+      *)
+      if [ ! "${ALLOW_EMPTY}" ] ; then
+        #! add files
+        eval "${COMMAND_ADD}"
+        ADD_RC="$?"
+      fi
+      #! commit files
+      eval "${COMMAND_COMMIT}"
+      COMMIT_RC="$?"
+      ;;
+    esac
+
+    #* push
+    if [ "${COMMIT_RC}" -eq "0" ] ; then
+      echo -en "\n🔥 ${MAGENTA}Push to  ${CYAN}${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: " && read -r push_option
+      case "${push_option}" in
+      N|n)
+        echo ; return 0
+        ;;
+      *)
+        #! push
+        eval "${COMMAND_PUSH}"
+        PUSH_RC="$?"
+        ;;
+      esac
+    else
+      return 1
+    fi
+
+    if [ "${PUSH_RC}" -eq "0" ] ; then
+      #* show the commit (git log)
+      echo && git log \
+      --date=relative \
+      --author="$(git config --get user.email)" \
+      --format="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C(reset)" \
+      --color --stat --decorate --graph -1
+    fi
+    echo
+    fi
+  fi
+}
+
+
+################################################################
 # devops misc
-#===============================================================
+################################################################
 
 #===============================================================
 # helm create function
 function helm_create() {
   if [ -z "${1}" ] ; then
-    _banner "Usage:\n  helm_create my-chart\n"
+    _banner "Usage:\n  helm_create <chart-name>\n"
   elif [ ! -d "${1}" ] ; then
     echo -en "${YELLOW}"
     helm create "${1}"
@@ -455,12 +706,12 @@ function helm_create() {
     _banner "cd ${CYAN}$(pwd)/"
     cd "${1}/" && \rm -rf templates/tests templates/*.{txt,yaml}
     cat << EOF > templates/NOTES.txt
-To verify that ${1} has started, run:
+To verify that <${1}> has started, run:
 
-  kubectl --namespace={{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ template "${1}.name" . }}"
+  kubectl -n {{ .Release.Namespace }} get all -l "app.kubernetes.io/name={{ template "${1}.name" . }}"
 
 EOF
-    pwd ; tree
+  pwd ; tree
   else
     _banner "⚠️  ${1} already exists - nothing to do"
     ls -ld "${1}" ; echo
@@ -468,56 +719,229 @@ EOF
 }
 #===============================================================
 function search_image() {
-  if [ ! -r "${WORK_ALIAS_FILE}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
-    exit 0
+  if [ ! -r "${ALIASES_WORK}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
+    return
   else
-    source "${WORK_ALIAS_FILE}"
+    source "${ALIASES_WORK}"
     source "${SECRETS_FILE}"
     local IMAGE="${1}"
     local COUNT="${2:-5}"
     if [ -z "${1}" ] ; then
-      echo -e "Usage: search_image foo\n"
+    echo -e "Usage: search_image foo\n"
     else
-      _banner "latest [${COUNT}] versions for image: ${YELLOW}${IMAGE}"
-      curl -su "${DOCKER_REGISTRY_USERNAME}:${DOCKER_REGISTRY_PASSWORD}" \
-        -X GET ${DOCKER_REGISTRY_URI}/v2/${IMAGE}/tags/list \
-        | jq -r '.tags[]' | sort -nr | head -${COUNT}
+    _banner "latest [${COUNT}] versions for image: ${YELLOW}${IMAGE}"
+    curl -su "${DOCKER_REGISTRY_USERNAME}:${DOCKER_REGISTRY_PASSWORD}" \
+      -X GET ${DOCKER_REGISTRY_URI}/v2/${IMAGE}/tags/list \
+      | jq -r '.tags[]' | sort -nr | head -${COUNT}
     fi
   fi
 }
 #===============================================================
 function search_chart() {
-  if [ ! -r "${WORK_ALIAS_FILE}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
-    exit 0
+  if [ ! -r "${ALIASES_WORK}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
+    return
   else
-    source "${WORK_ALIAS_FILE}"
+    source "${ALIASES_WORK}"
     source "${SECRETS_FILE}"
     local CHART="${1}"
     local COUNT="${2:-5}"
     if [ -z "${1}" ] ; then
-      echo -e "Usage: search_chart foo\n"
+    echo -e "Usage: search_chart foo\n"
     else
-      _banner "latest [${COUNT}] versions for chart: ${YELLOW}${CHART}"
-      curl -su "${CHARTMUSEM_USERNAME}:${CHARTMUSEM_PASSWORD}" ${CHARTMUSEM_URI}/${CHART} | \
-        jq -r '.[] | .version+" (appVersion: "+.appVersion+")"' | sort -nr | column -tx | head -${COUNT}
+    _banner "latest [${COUNT}] versions for chart: ${YELLOW}${CHART}"
+    curl -su "${CHARTMUSEM_USERNAME}:${CHARTMUSEM_PASSWORD}" ${CHARTMUSEM_URI}/${CHART} | \
+      jq -r '.[] | .version+" (appVersion: "+.appVersion+")"' | sort -nr | column -tx | head -${COUNT}
     fi
   fi
 }
 #===============================================================
-function yaml2json() {
-  if ( command -v yq &>/dev/null ) && [ ! -z "${1}" ] && [ -f "${1}" ] ; then
-    local OUTPUT="${1%.y*ml}.json"
-    yq -p yaml -o json "${1}" > "${OUTPUT}" && _banner "created: ${OUTPUT}"
-  fi
+# kubectl exec selector
+function kx () {
+  local pod=($(kubectl get pods --no-headers -o wide | fzf | awk '{print $1}'))
+  local attr=${@}
+  _banner "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
+  kubectl exec -it ${pod[1]} ${attr} -- ash 2>/dev/null ||
+		kubectl exec -it ${pod[1]} ${attr} -- bash 2>/dev/null ||
+		kubectl exec -it ${pod[1]} ${attr} -- sh 2>/dev/null
+}
+
+#===============================================================
+# kubectl logs selector
+function kl () {
+  local pod=($(kubectl get pods --no-headers -o wide | fzf | awk '{print $1}'))
+  local attr=${@:-""}
+  _banner "kubectl logs --timestamps -f ${attr} ${pod[1]}"
+  kubectl logs --timestamps -f ${attr} ${pod[1]}
 }
 #===============================================================
-function json2yaml() {
-  if ( command -v yq &>/dev/null ) && [ ! -z "${1}" ] && [ -f "${1}" ] ; then
-    local OUTPUT="${1%.json}.yaml"
-    yq -p json -o yaml "${1}" > "${OUTPUT}" && _banner "created: ${OUTPUT}"
+# export kubernetes objects using https://github.com/itaysk/kubectl-neat
+function kexport() {
+  if ( ! type kubectl-neat &>/dev/null ) ; then
+    echo "Install kubectl-neat first -- https://github.com/itaysk/kubectl-neat"
+    return 1
+  elif [[ -z "${*}" ]] ; then
+    echo -e "export kubernetes objects using kubectl-neat\nUsage:\n\t${0} [-n <namespace>] <kind> <name>"
+    return 1
   fi
+  \kubectl get ${@} -o yaml | kubectl-neat | \bat -l yaml -n --theme=monokay -H 2  # set +x
 }
+
 #===============================================================
+# k8s: list node count+version
+function get-node-versions() {
+  date
+  _banner "Cluster: ${GREEN}$(kubectl config current-context)"
+  for i in $(kubectl get node --no-headers | awk '{print $5}'| sort | uniq | xargs) ; do echo "${i} $(kubectl get node --no-headers | grep -c "${i}") nodes" ; done | column -t
+  # also:
+  # kubectl get nodes -o json | jq -r '.items[].status.nodeInfo.kubeletVersion' | sort | uniq -c
+}
+
+#===============================================================
+# k8s: list nodepools count+version
+function get-nodepools() {
+  _banner "Nodepools: ${GREEN}$(kubectl config current-context)"
+  for i in $(kubectl get nodepools -o custom-columns=':.metadata.name' | xargs) ; do echo "${i} $(kubectl get node --show-labels | grep -c "nodepool=${i}") nodes" ; done | column -tx
+}
+
+#===============================================================
+# k8s: get node resources
+function get-node-resources() {
+  if ( ! command -v numfmt &>/dev/null ) ; then
+    echo "${MAGENTA}numfmt${NONE} not found - install coreutils package"
+    return 1
+  fi
+  _banner "Cluster: ${GREEN}$(kubectl config current-context)"
+
+  function divider() {
+    echo -e "${BOLD}$(printf '=%.0s' {1..60})${NONE}"
+  }
+
+  kubecolor top node --use-protocol-buffers
+  kubectl get node -o wide --no-headers | awk '{print $1" "$3" "$6}' | while IFS=' ' read -r THIS_NODE_NAME THIS_NODE_ROLE THIS_NODE_IP ; do
+
+    [ "${THIS_NODE_ROLE}" = "<none>" ] && THIS_NODE_ROLE="${GREEN}worker${NONE}" || THIS_NODE_ROLE="${RED}${THIS_NODE_ROLE}${NONE}"
+    THIS_NODE_INSTANCE_TYPE="$(kubectl get node/${THIS_NODE_NAME} --no-headers -o jsonpath='{.metadata.labels.beta\.kubernetes\.io/instance-type}' 2>/dev/null)"
+
+    divider ; _banner "Resources for ${MAGENTA}${THIS_NODE_NAME}${NONE} ${THIS_NODE_IP} (${THIS_NODE_ROLE}) ${YELLOW}${THIS_NODE_INSTANCE_TYPE}" | column -tx
+
+    NODE_DETAILS="$(kubectl describe node/${THIS_NODE_NAME} 2>/dev/null)"
+    NODE_RESOURCES="$(echo "${NODE_DETAILS}" | grep '^Capacity' -A 12)"
+    NODE_PRESSURE="$(echo "${NODE_DETAILS}" | grep 'Pressure')"
+
+    CAP_CPU_CORES="$(echo "${NODE_RESOURCES}" | awk '/cpu:/ {print $2}' | head -1)"
+    CAP_CPU_MILLIS="$(expr ${CAP_CPU_CORES} '*' 1000)m"
+    ALLOC_CPU_MILLIS="$(echo "${NODE_RESOURCES}" | grep '^Allocatable:' -A 1 | awk '/cpu:/ {print $2}' | sed 's|m||')"
+    ALLOC_CPU_CORES="$(echo "scale=1; ${ALLOC_CPU_MILLIS} / 1000" | bc)"
+    ALLOC_CPU_MILLIS="${ALLOC_CPU_MILLIS}m"
+
+    CAP_MEM_KI="$(kubectl get node/${THIS_NODE_NAME} -o jsonpath='{.status.capacity.memory}')"
+    CAP_MEM_MI="$(numfmt --from=iec-i --to-unit=1M --grouping ${CAP_MEM_KI} | sed 's|,||')Mi"
+    CAP_MEM_GI="$(numfmt --from=iec-i --to=iec ${CAP_MEM_KI})i"
+
+    ALLOC_MEM_KI="$(kubectl get node/${THIS_NODE_NAME} -o jsonpath='{.status.allocatable.memory}')"
+    ALLOC_MEM_MI="$(numfmt --from=iec-i --to-unit=1M --grouping ${ALLOC_MEM_KI} | sed 's|,||')Mi"
+    ALLOC_MEM_GI="$(numfmt --from=iec-i --to=iec ${ALLOC_MEM_KI})i"
+
+    echo -e "${CYAN}Capacity:${NONE}
+  cpu:     ${CAP_CPU_CORES}\t= ${CAP_CPU_MILLIS}
+  memory:    ${CAP_MEM_GI}\t= ${CAP_MEM_MI} = ${CAP_MEM_KI}
+${CYAN}Allocatable:${NONE}
+  cpu:     ${ALLOC_CPU_CORES}\t= ${ALLOC_CPU_MILLIS}
+  memory:    ${ALLOC_MEM_GI}\t= ${ALLOC_MEM_MI} = ${ALLOC_MEM_KI}
+${CYAN}Pressure:${NONE}
+${NODE_PRESSURE}"
+  done
+  divider
+}
+
+#===============================================================
+# k8s: get PersistentVolume info
+function get-pv-info() {
+  local ME="${0}"
+
+  function divider() {
+    echo -e "${BOLD}$(printf '=%.0s' {1..60})${NONE}"
+  }
+
+  function show_help() {
+    cat << EOF
+Usage:
+  ${ME} [-n <namespace>] [-l <label-selector>] [-A]
+
+Optional:
+  -n  namespace
+
+Required:
+  -l  use label to filter results
+
+Examples:
+  ${ME} -n prod
+  ${ME} -n dev -l cluster-name=foo
+
+EOF
+  }
+
+  while getopts n:l:h Option ; do
+    case "${Option}" in
+      n)  local NAMESPACE="${OPTARG}" ;;
+      l)  local OPT_LABEL="-l ${OPTARG}" ;;
+      h)  show_help ; return 0 ;;
+      *)  show_help ; return 0 ;;
+    esac
+  done
+
+  if [ -n "${NAMESPACE}" ] ; then
+    if ! (\kubectl get ns --no-headers | grep "^${NAMESPACE}" &>/dev/null) ; then
+    # ${NAMESPACE} not found:
+    sleep 1
+    local NAMESPACE="$(kubectl get ns -o custom-columns=':.metadata.name' --no-headers | grep -v '^kube' | fzf -s --tac --header "-- Namespace [${NAMESPACE}] not found -- please select another  (ESC to Cancel)")"
+    if [ -z "${NAMESPACE}" ] ; then
+      echo "No namespace selected, bye"
+      return 1
+    fi
+    fi
+  elif [ "${KUBE_PS1_NAMESPACE}" ] || ( \kubectl config view --minify -o jsonpath='{..namespace}' &>/dev/null ) ; then
+    local NAMESPACE="$(\kubectl config view --minify -o jsonpath='{..namespace}' 2>/dev/null)"
+    echo "Guessed NAMESPACE: $NAMESPACE"
+  else
+    _error "Please specify a namespace"
+    return 1
+  fi
+
+  local PRINT_NAMESPACE="${GREEN}${NAMESPACE}${NONE}/"
+  local ALL_PODS="$(\kubectl get pod -n ${NAMESPACE} ${OPT_LABEL} -o jsonpath='{range.items[*]}{..metadata.name}{" "}{..nodeName}{"\n"}{end}')"
+
+  if [ -z "${ALL_PODS}" ] ; then
+    echo -e "  No matching pods were found. Try:\n\tkubectl -n ${NAMESPACE} get pod --show-labels\n  then use label-selectors:\n\t${ME} -n ${NAMESPACE} [-l key=value]\n"
+    return 1
+  fi
+
+  local POD_COUNT="$(echo "${ALL_PODS}" | wc -l | sed 's/^[ \t]*//;s/[ \t]*$//')"
+  local CURRENT_CONTEXT="$(\kubectl config current-context)"
+
+  [ -n "${CURRENT_CONTEXT}" ] && divider ; _banner "Cluster:   ${GREEN}${CURRENT_CONTEXT}" ; _banner "Namespace: ${GREEN}${NAMESPACE}${NONE}" ; divider
+  echo -e "Match: ${BOLD}${POD_COUNT}${NONE} Pod(s)"
+
+  echo "${ALL_PODS}" | while read -r THIS_POD THIS_POD_NODE ; do
+    local THIS_PVC="$(\kubectl -n ${NAMESPACE} describe pod/${THIS_POD} | awk '/ClaimName/ {print $2}')"
+    if [ -n "${THIS_PVC}" ] ; then
+    local THIS_POD_NODE_EXTERNAL_IP="$(\kubectl get node/${THIS_POD_NODE} -o jsonpath='{.status.addresses[?(@.type == "InternalIP")].address}')"
+    local THIS_PVC_CLASS="$(\kubectl -n ${NAMESPACE} get pvc/${THIS_PVC} -o yaml | yq '.spec.storageClassName')"
+    local THIS_PV="$(\kubectl describe -n ${NAMESPACE} pvc/${THIS_PVC} 2>/dev/null | awk '/Volume:/ {print $2}')"
+    local THIS_SIZE="$(\kubectl get pv/${THIS_PV} -o yaml | yq '.spec.capacity.storage')"
+    # try first a HostPath
+    local THIS_PV_INFO="$(\kubectl describe pv/${THIS_PV} 2>/dev/null | awk '/Path:/ {print $2}')"
+    # otherwise try to get something else..
+    if [ -z "${THIS_PV_INFO}" ] ; then
+      local THIS_PV_INFO="driver:$(\kubectl get pv/${THIS_PV} -o yaml 2>/dev/null | yq '.spec.csi| (.driver, .volumeHandle, .fsType)' | xargs)"
+    fi
+    divider
+    echo -e "  Pod: ${CYAN}${THIS_POD}${NONE}\n   Node: ${THIS_POD_NODE}\tip:${BOLD}${THIS_POD_NODE_EXTERNAL_IP}${NONE}\n  PVC: ${THIS_PVC}\tclass:${BOLD}${THIS_PVC_CLASS}${NONE}\n   PV: ${THIS_PV} size:${BOLD}${THIS_SIZE}${NONE}\nDetails: ${YELLOW}${THIS_PV_INFO}${NONE}"
+    fi
+  done
+  divider
+  echo
+}
 
 
 ################################################################
