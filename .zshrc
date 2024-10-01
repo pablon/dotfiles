@@ -15,6 +15,9 @@ autoload -Uz compinit ; compinit
 # load ~/.zshrc_custom
 [ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
 
+# atuin
+eval "$(atuin init zsh --disable-up-arrow)"
+
 # starship
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init zsh)"
