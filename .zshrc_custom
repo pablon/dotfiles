@@ -40,13 +40,18 @@ setopt HIST_VERIFY             # Do not execute immediately upon history expansi
 setopt INC_APPEND_HISTORY      # Write to the history file immediately, not when the shell exits.
 setopt INC_APPEND_HISTORY_TIME # append command to history file immediately after execution
 setopt SHARE_HISTORY           # Share history between all sessions.
+unsetopt menu_complete         # do not autoselect the first completion entry
+unsetopt flowcontrol
+setopt auto_menu               # show completion menu on successive tab press
+setopt complete_in_word
+setopt always_to_end
 # async mode for autocompletion
 export ZSH_AUTOSUGGEST_USE_ASYNC=true
 export ZSH_HIGHLIGHT_MAXLENGTH=300
+
 # case insensitive path-completion
-zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' complete-options true
-zstyle ':completion:*' file-list all
 zstyle ':completion:*' file-sort modification
 zstyle ':completion:*' menu select
 zstyle ':completion:*' squeeze-slashes true

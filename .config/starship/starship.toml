@@ -14,8 +14,8 @@ truncation_length = 1
 
 [git_branch]
 style = 'fg:green'
-symbol = ' ' # 
-format = '$symbol(white)[$branch ]($style)' # ❯
+symbol = ' '
+format = '$symbol(white)[$branch ]($style)'
 
 [git_commit]
 style = 'fg:yellow'
@@ -77,9 +77,18 @@ symbol = '󰏗 '
 format = '[$symbol($version )]($style)'
 
 [aws]
-symbol = " "
-style = 'yellow'
-format = '[$symbol(profile: "$profile" )(\(region: $region\) )]($style)'
+symbol = " "
+style = 'bold peach'
+format = '[(\($region\)) $symbol]($style) '
+# format = '[$symbol(profile: "$profile" )(\(region: $region\) )]($style) '
+# disabled = true
+
+[gcloud]
+symbol = " "
+style = 'bold blue'
+format = '[(\($region\)) $symbol]($style) '
+# format = '[$symbol$account(@$domain)(\($region\))]($style) '
+# disabled = true
 
 [docker_context]
 symbol = ' '

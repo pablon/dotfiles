@@ -1,5 +1,7 @@
 # atuin default-config > ~/.config/atuin/config.toml
 
+command_timeout = 2000
+
 ## Invert the UI - put the search bar at the top , Default to `false`
 invert = true
 
