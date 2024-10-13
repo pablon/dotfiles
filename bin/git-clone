@@ -1,36 +1,50 @@
 #!/usr/bin/env bash
+set -euo pipefail
 ##########################################################
 # Description:  git clone with style
 # Author:       https://github.com/pablon
 ##########################################################
 
+##########################################################
+# if you don't like ~/projects set GIT_WORKDIR in your shell
 GIT_DEFAULT_WORKDIR=~/projects
+# git log format
+PRETTY_FORMAT='%C(auto)%h%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>'
+##########################################################
 
-set -euo pipefail
-export BOLD="\033[1;37m"
-export BLUE="\033[1;94m"
-export NONE="\033[0m"
-function _print() {
-	echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
+# colors
+BLUE="\033[1;94m"
+BOLD="\033[1;37m"
+CLEAR="\033[0m"
+GREEN="\033[1;92m"
+MAGENTA="\033[1;95m"
+RED="\033[1;31m"
+YELLOW="\033[1;93m"
+
+function _info() {
+	echo -e "${BLUE}==> ${BOLD}${1}${CLEAR}"
 }
-# if you don't like ~/projects:
-#   export GIT_WORKDIR=/path/to/your/dir
-CLONE_DIR=${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}
+
+WORKDIR=${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}
 CLONE_URL="${1:?missing git clone url}"
-[ -d "${CLONE_DIR}" ] || mkdir -p "${CLONE_DIR}"
-pattern='^(git.+:|(https:\/\/)?([^:\/\n]+)\/)(.*)\/(.*).git$'
-if [[ "${CLONE_URL}" =~ ${pattern} ]]; then
-	if [ -d "${CLONE_DIR}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}" ]; then
-		_print "project already exists: ${CLONE_DIR}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
+PATTERN='^(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+).git$'
+
+if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
+	REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
+	CLONE_PATH="$(dirname ${REPO_DIR})"
+	if [ -d "${REPO_DIR}" ]; then
+		_info "  Project already exists in ${CLEAR}${REPO_DIR}"
+		echo
 	else
-		_print "cloning ${CLONE_URL} ..."
-		_print "into ${CLONE_DIR}/${BASH_REMATCH[4]} ..."
-		mkdir -p "${CLONE_DIR}/${BASH_REMATCH[4]}" &&
-			git -C "${CLONE_DIR}/${BASH_REMATCH[4]}" clone "${CLONE_URL}" &&
-			_print "repository cloned to: ${CLONE_DIR}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}" &&
-			git -C "${CLONE_DIR}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}/" log --color --decorate --format="%C(auto)%h%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>" --all | head -5
+		_info "${RED}${BOLD} Cloning ${CLEAR}${CLONE_URL}${BOLD} ..."
+		mkdir -p "${CLONE_PATH}" &&
+			git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
+			_info "${GREEN} ${BOLD} Cloned to ${YELLOW}${CLONE_PATH}" &&
+			_info "${BLUE} ${BOLD} Latest changes:" &&
+			git -C "${REPO_DIR}/" log --color --decorate --format="${PRETTY_FORMAT}" --all | head -5
+		echo
 	fi
 else
-	_print "❌ unsupported git uri: ${CLONE_URL}"
+	_info "${RED}  Unsupported git uri: ${YELLOW}${CLONE_URL}"
 	exit 1
 fi
