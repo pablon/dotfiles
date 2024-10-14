@@ -23,9 +23,9 @@ export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init zsh)"
 
 if [ -z "${TMUX}" ] ; then
-	# print random fortune cookie
-	cookie
-	# list tmux sessions
+  # print random fortune cookie
+  cookie
+  # list tmux sessions
   tmux ls 2>/dev/null | while read session ; do _banner "tmux session:${NONE} ${session}" ; done ; echo
 fi
 

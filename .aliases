@@ -52,7 +52,6 @@ alias monitor="tail -f /var/log/*.log"
 ( type python3 &>/dev/null ) && alias python="$(which python3)"
 ( type gsed &>/dev/null ) && alias sed="$(which gsed)"
 alias stat='stat -x'
-alias synergy='(exec sh -c "/opt/homebrew/bin/synergy ")'
 alias tm='tmux'
 alias tma='tmux a'
 alias tmls='tmux ls'
@@ -142,8 +141,8 @@ if ( type kubectl &>/dev/null ) ; then
   alias kga='kubectl get all'
   alias kgaa='kubectl get all -A'
   alias kgd='kubectl get deploy'
-  alias kge='kubectl get event -w'
-  alias kgea='kubectl get event -Aw'
+  alias kge="kubectl get event --sort-by='.lastTimestamp' -w"
+  alias kgea="kubectl get event --sort-by='.lastTimestamp' -Aw"
   alias kgee='kubectl events --types=Warning -w'
   alias kgn='kubectl get node --sort-by=".metadata.creationTimestamp"'
   alias kgnl='kubectl get node --sort-by=".metadata.creationTimestamp" --show-labels'

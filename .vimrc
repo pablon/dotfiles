@@ -18,6 +18,7 @@
 
 set history=1000            " sets how many lines of history VIM has to remember
 set number                  " show line numbers
+set relativenumber          " show relative line numbers
 set path+=**                " recurse into dirs
 filetype plugin indent on   " Enable filetype plugins
 set fillchars+=vert:\       " Remove unpleasant pipes from vertical splits
@@ -461,16 +462,18 @@ match ExtraWhiteSpace /\s\+$/
 "===============================================================
 
 call plug#begin('~/.vim/autoload/plugged')
-  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-  Plug 'preservim/nerdtree'
-  Plug 'junegunn/vim-easy-align'
-  Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-fugitive'
   Plug 'camspiers/animate.vim'
   Plug 'camspiers/lens.vim'
+  Plug 'chentoast/marks.nvim'
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/vim-easy-align'
+  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+  Plug 'preservim/nerdtree'
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-fugitive'
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
-  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+  Plug 'mhinz/vim-startify'
 call plug#end()
 
 let g:airline_theme='dark'          " set airline theme

@@ -39,7 +39,7 @@ if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
 		_info "${RED}${BOLD} Cloning ${CLEAR}${CLONE_URL}${BOLD} ..."
 		mkdir -p "${CLONE_PATH}" &&
 			git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
-			_info "${GREEN} ${BOLD} Cloned to ${YELLOW}${CLONE_PATH}" &&
+			_info "${GREEN} ${BOLD} Cloned to ${YELLOW}${REPO_DIR}" &&
 			_info "${BLUE} ${BOLD} Latest changes:" &&
 			git -C "${REPO_DIR}/" log --color --decorate --format="${PRETTY_FORMAT}" --all | head -5
 		echo

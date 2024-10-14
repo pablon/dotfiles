@@ -79,16 +79,16 @@ format = '[$symbol($version )]($style)'
 [aws]
 symbol = " "
 style = 'bold peach'
-format = '[(\($region\)) $symbol]($style) '
-# format = '[$symbol(profile: "$profile" )(\(region: $region\) )]($style) '
+format = '[\($symbol $profile\)]($style) '
+# format = '[\($symbol $profile|$region\)]($style) '
 # disabled = true
 
 [gcloud]
-symbol = " "
+symbol = ""
 style = 'bold blue'
-format = '[(\($region\)) $symbol]($style) '
-# format = '[$symbol$account(@$domain)(\($region\))]($style) '
-# disabled = true
+format = '[\($symbol $account\)]($style) '
+# format = '[\($symbol $account)|($region)\)]($style) '
+disabled = true
 
 [docker_context]
 symbol = ' '

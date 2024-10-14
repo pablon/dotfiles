@@ -171,6 +171,16 @@ function curl-cert() {
   openssl s_client -showcerts -connect "${1}":443 -servername ${1}
 }
 #===============================================================
+# yazi wrapper
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+#===============================================================
 # spawn subshell into an aws profile
 function awsprofile() {
   if ( type zsh &>/dev/null ) ; then
@@ -185,7 +195,7 @@ function awsprofile() {
   if [[ -z "${ANSWER}" ]] ; then
     _error "No profile selected" && return 1
   else
-    local AWSSHELL='bash'
+    echo "${ANSWER}"
     case "${AWSSHELL}" in
       'zsh')  ( export AWS_PROFILE="${ANSWER}" && zsh -i ) ;;
       'bash') ( export AWS_PROFILE="${ANSWER}" && bash --rcfile <(echo "PS1=\"[${YELLOW}aws${NONE}|${MAGENTA}${ANSWER}${NONE}] \W ${GREEN}→${NONE} \"") -i ) ;;
@@ -271,7 +281,7 @@ function drm() {
 #===============================================================
 # Select a docker image or images to remove
 function drmi() {
-  docker images | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $3}' | xargs -r docker rmi
+  docker images | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $3}' | xargs -r docker rmi -f
 }
 
 ################################################################
