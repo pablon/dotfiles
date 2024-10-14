@@ -467,6 +467,7 @@ call plug#begin('~/.vim/autoload/plugged')
   Plug 'camspiers/lens.vim'
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
+  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 call plug#end()
 
 let g:airline_theme='dark'          " set airline theme
