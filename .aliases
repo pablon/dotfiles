@@ -194,4 +194,3 @@ fi
 # alias bbi="/path/to/brave --incognito &"
 # alias cci="/path/to/google-chrome --incognito &"
 # alias ffi="/path/to/firefox --private-window --safe-mode &"
-

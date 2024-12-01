@@ -36,7 +36,7 @@ default_stages: [pre-commit, pre-push]
 repos:
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-yaml
         args:
@@ -61,7 +61,7 @@ repos:
       - id: check-shebang-scripts-are-executable
 
   - repo: https://github.com/tcort/markdown-link-check
-    rev: v3.12.2
+    rev: v3.13.6
     hooks:
       - id: markdown-link-check
         args: [-q]
