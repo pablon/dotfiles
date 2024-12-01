@@ -7,11 +7,11 @@
 ##########################################################
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
-	echo "This script is for macOS only"
-	exit 0
+  echo "This script is for macOS only"
+  exit 0
 fi
 
-source ./.functions &>/dev/null
+source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
 
 # taps: warrensbox/tap # tfswitch
 # casks: homebrew/cask-fonts/font-powerline-symbols homebrew/cask-fonts/font-meslo-for-powerline
@@ -29,23 +29,23 @@ NONE="\033[0m"
 # Detect Apple Silicon chipset + install rosetta
 
 if [[ "$(uname -s)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
-	echo -e "${YELLOW}HEY! I've detected you're running an Apple Silicon Chip - ${CYAN}I will install Rosetta now${NONE}"
-	sleep 2
-	_banner "Installing ${YELLOW}rosetta"
-	/usr/sbin/softwareupdate --install-rosetta --agree-to-license
-	echo -e "/usr/sbin/softwareupdate --install-rosetta --agree-to-license${NONE} = ${YELLOW}$?${NONE}"
+  echo -e "${YELLOW}HEY! I've detected you're running an Apple Silicon Chip - ${CYAN}I will install Rosetta now${NONE}"
+  sleep 2
+  _info "Installing ${YELLOW}rosetta"
+  /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+  echo -e "/usr/sbin/softwareupdate --install-rosetta --agree-to-license${NONE} = ${YELLOW}$?${NONE}"
 fi
 
 #===============================================================
 # Install Homebrew
 if (! command -v brew &>/dev/null); then
-	_banner "Installing ${YELLOW}homebrew"
-	NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-	# verify
-	if ! (command -v brew config &>/dev/null); then
-		echo "❌ Something went wrong while installing homebrew. Aborting."
-		return 1
-	fi
+  _info "Installing ${YELLOW}homebrew"
+  NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  # verify
+  if ! (command -v brew config &>/dev/null); then
+    echo "❌ Something went wrong while installing homebrew. Aborting."
+    return 1
+  fi
 fi
 
 # Disable brew analytics
@@ -55,16 +55,16 @@ brew analytics off
 # Install packages
 
 if [ -r "${BREW_LEAVES}" ]; then
-	_banner "About to install $(wc -l "${BREW_LEAVES}" | awk '{print $1}') packages"
-	xargs brew install <"${BREW_LEAVES}"
+  _info "About to install $(wc -l "${BREW_LEAVES}" | awk '{print $1}') packages"
+  xargs brew install <"${BREW_LEAVES}"
 fi
 
 # docker-buildx is a Docker plugin. For Docker to find this plugin, symlink it:
 if [ -x "/usr/local/opt/docker-buildx/bin/docker-buildx" ]; then
-	if [ ! -d "${HOME}/.docker/cli-plugins" ]; then
-		mkdir -p "${HOME}/.docker/cli-plugins"
-		ln -sfn /usr/local/opt/docker-buildx/bin/docker-buildx "${HOME}/.docker/cli-plugins/docker-buildx"
-	fi
+  if [ ! -d "${HOME}/.docker/cli-plugins" ]; then
+    mkdir -p "${HOME}/.docker/cli-plugins"
+    ln -sfn /usr/local/opt/docker-buildx/bin/docker-buildx "${HOME}/.docker/cli-plugins/docker-buildx"
+  fi
 fi
 
 #===============================================================

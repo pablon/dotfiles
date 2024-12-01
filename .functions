@@ -2,17 +2,25 @@
 #===============================================================
 _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
 #===============================================================
-# multi purpose banners (brew-style)
-function _banner() {
+# multi purpose banners
+function _info() {
   echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
 }
+function _success() {
+  echo -e "${GREEN}==> ${BOLD}${1}${NONE}"
+}
 function _error() {
-  echo -e "${RED}❌ ${BOLD}${1}${NONE}\n"
+  echo -e "${RED}==> ${MAGENTA}${1}${NONE}"
+}
+function divider() {
+  [[ "${COLUMNS}" ]] || COLUMNS=80
+  eval "printf '=%.0s' {1..$COLUMNS}"
+  echo
 }
 #===============================================================
 # Create a new directory and enter it
 function md() {
-  mkdir -vp "${1}" && cd "${1}" && _banner "cd ${CYAN}$(pwd)/"
+  mkdir -vp "${1}" && cd "${1}" && _info "cd ${CYAN}$(pwd)/"
 }
 #===============================================================
 # find shorthand
@@ -60,11 +68,11 @@ function bkp() {
     BKP="${i}.$(date +%Y%m%d.%H%M%S)"
     if [ -d ${i} ] ; then
       cp -rpf "${i}" "${BKP}"
-      _banner "Copied [dir]  '${i}' ==> '${BKP}'"
+      _info "Copied [dir]  '${i}' ==> '${BKP}'"
     elif [ -f ${i} ] ; then
       cp -pf "${i}" "${BKP}"
       chmod 600 ${BKP}
-      _banner "Copied [file] '${i}' ==> '${BKP}'"
+      _info "Copied [file] '${i}' ==> '${BKP}'"
     else
       echo "-- skipping [${i}] - not a file or folder"
     fi
@@ -115,7 +123,7 @@ function flushdns() {
       sudo resolvectl flush-caches &>/dev/null || \
       sudo systemd-resolve --flush-caches &>/dev/null
   fi
-  _banner "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
+  _info "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
 }
 #===============================================================
 # print random fortune with cowsay & fortune
@@ -239,14 +247,14 @@ function vagrant_snapshot() {
         local SNAPSHOT="$(vagrant snapshot list | sed 1d | fzf --header='^-- Select snapshot to restore')"
         vagrant snapshot ${1}  --no-tty --no-start "${VM_NAME}" "${SNAPSHOT}" 2>/dev/null
       else
-        _banner "[${VM_NAME}] no snapshots to ${1}"
+        _info "[${VM_NAME}] no snapshots to ${1}"
       fi
       ;;
     delete)
       if [[ "$(vagrant snapshot list | sed 1d &>/dev/null | wc -l)" -gt "0" ]] ; then
         for i in $(vagrant snapshot list | sed 1d | fzf -m --header='^-- Select snapshot(s) to delete - use TAB for multiple selection' | xargs) ; do vagrant snapshot ${1} --no-tty  "${i}" ; done
       else
-        _banner "[${VM_NAME}] no snapshots to ${1}"
+        _info "[${VM_NAME}] no snapshots to ${1}"
       fi
       ;;
     *)
@@ -302,7 +310,7 @@ function gitexport(){
   if [ ! -d "${1}" ] ; then
     mkdir -vp "${1}" && git archive HEAD | tar -x -C "${1}"
   else
-    _banner "[dir] ${1} already exists"
+    _info "[dir] ${1} already exists"
   fi
 }
 #===============================================================
@@ -534,7 +542,7 @@ FZF-EOF"
 #===============================================================
 # git add+commit+push helper using fzf
 function commit() {
-  function _banner() {
+  function _info() {
     echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
   }
   function _error() {
@@ -568,11 +576,11 @@ EOF
         ;;
       d)  is_in_git_repo || return
         local DRY_RUN=1
-        _banner "🛠️ DRY_RUN mode"
+        _info "🛠️ DRY_RUN mode"
         ;;
       s)  is_in_git_repo || return
         local SKIP_CI=" [skip ci]"
-        _banner "🛠️ SKIP_CI mode"
+        _info "🛠️ SKIP_CI mode"
         ;;
       h)  _help
         return 0
@@ -587,7 +595,7 @@ EOF
   # get current branch
   local CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
   # add files with fzf explorer
-  local ADDED_FILES="$(git ls-files --exclude-standard -mo | fzf -m --header='> Select file(s) to stage (ESC to cancel)' --color=label:italic:yellow,preview-bg:#101010 --border-label='Preview' --marker='' --preview-window='right:60%' --preview 'git diff --color=always {-1}' | xargs)"
+  local ADDED_FILES="$(git ls-files --exclude-standard -mo | fzf -m --header=' > Select file(s) to stage (ESC to cancel)' --color=label:italic:yellow,preview-bg:#101010 --border-label='Preview' --marker='' --preview-window='right:60%' --preview 'git diff --color=always {-1}' | xargs)"
 
   #* empty-commit?
   if [ -z "${ADDED_FILES}" ] ; then
@@ -612,14 +620,14 @@ EOF
     local THIS_CC_TYPE="${CC_GUESS}"
   else
     #* select conventional commit type with fzf explorer
-    local THIS_CC_TYPE="$(for i in ${CC_TYPES[@]} ; do echo "${i}" ; done | fzf --prompt '> Select conventional commit type (ESC to cancel)' | awk '{print $1}')"
+    local THIS_CC_TYPE="$(for i in ${CC_TYPES[@]} ; do echo "${i}" ; done | fzf --prompt ' > Select conventional commit type (ESC to cancel)' | awk '{print $1}')"
   fi
 
   if [ -z "${THIS_CC_TYPE}" ] ; then
     _error "No conventional commit type was specified" && return 1
   else
     #* conventional commit scope
-    echo -en "${MAGENTA}> Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (optional, hit ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
+    echo -en "${MAGENTA} > Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (optional, hit ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
 
     #* detect ticket in branch name
     local TICKET="$(echo ${CURRENT_BRANCH} | awk -F/ '{print $2}' | grep -E -o '[A-Z][A-Z0-9]+-[0-9]+')"
@@ -627,10 +635,10 @@ EOF
       echo "${BLUE}ℹ️ Ticket ${CYAN}${TICKET}${BLUE} will be prepended in the commit message, do not type it ;-)"
       local THIS_TICKET="[${TICKET}] "
       local THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | sed -e "s|^.*${TICKET}-||" -e 's|[_-]| |g')"
-      echo -en "${MAGENTA}> Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
+      echo -en "${MAGENTA} > Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
     else
       local THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F/ '{print $NF}' | sed -e 's|[_-]| |g')"
-      echo -en "${MAGENTA}> Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
+      echo -en "${MAGENTA} > Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
     fi
     [ -z "${COMMIT_MESSAGE}" ] && local COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
 
@@ -642,10 +650,10 @@ EOF
 
     #* dry-run info
     if [ "${DRY_RUN}" ] ; then
-    _banner "🛟 DRY_RUN ${BLUE}These commands would have been executed:${NONE}"
-    [ ! "${ALLOW_EMPTY}" ] && _banner "🛟 DRY_RUN ${NONE}${COMMAND_ADD}"
-    _banner "🛟 DRY_RUN ${NONE}${COMMAND_COMMIT}"
-    _banner "🛟 DRY_RUN ${NONE}${COMMAND_PUSH}"
+    _info "🛟 DRY_RUN ${BLUE}These commands would have been executed:${NONE}"
+    [ ! "${ALLOW_EMPTY}" ] && _info "🛟 DRY_RUN ${NONE}${COMMAND_ADD}"
+    _info "🛟 DRY_RUN ${NONE}${COMMAND_COMMIT}"
+    _info "🛟 DRY_RUN ${NONE}${COMMAND_PUSH}"
     else
     echo "${BLUE}ℹ️ will execute..:${NONE}"
     [ ! "${ALLOW_EMPTY}" ] && echo "  ${COMMAND_ADD}"
@@ -708,12 +716,12 @@ EOF
 # helm create function
 function helm_create() {
   if [ -z "${1}" ] ; then
-    _banner "Usage:\n  helm_create <chart-name>\n"
+    _info "Usage:\n  helm_create <chart-name>\n"
   elif [ ! -d "${1}" ] ; then
     echo -en "${YELLOW}"
     helm create "${1}"
     echo -en "${NONE}"
-    _banner "cd ${CYAN}$(pwd)/"
+    _info "cd ${CYAN}$(pwd)/"
     cd "${1}/" && \rm -rf templates/tests templates/*.{txt,yaml}
     cat << EOF > templates/NOTES.txt
 To verify that <${1}> has started, run:
@@ -723,11 +731,12 @@ To verify that <${1}> has started, run:
 EOF
   pwd ; tree
   else
-    _banner "⚠️  ${1} already exists - nothing to do"
+    _info "⚠️  ${1} already exists - nothing to do"
     ls -ld "${1}" ; echo
   fi
 }
 #===============================================================
+# search image in docker registry (configured in $ALIASES_WORK)
 function search_image() {
   if [ ! -r "${ALIASES_WORK}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
     return
@@ -739,7 +748,7 @@ function search_image() {
     if [ -z "${1}" ] ; then
     echo -e "Usage: search_image foo\n"
     else
-    _banner "latest [${COUNT}] versions for image: ${YELLOW}${IMAGE}"
+    _info "latest [${COUNT}] versions for image: ${YELLOW}${IMAGE}"
     curl -su "${DOCKER_REGISTRY_USERNAME}:${DOCKER_REGISTRY_PASSWORD}" \
       -X GET ${DOCKER_REGISTRY_URI}/v2/${IMAGE}/tags/list \
       | jq -r '.tags[]' | sort -nr | head -${COUNT}
@@ -748,6 +757,7 @@ function search_image() {
 }
 #===============================================================
 function search_chart() {
+# search helm chart in chart repo (configured in $ALIASES_WORK)
   if [ ! -r "${ALIASES_WORK}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
     return
   else
@@ -758,7 +768,7 @@ function search_chart() {
     if [ -z "${1}" ] ; then
     echo -e "Usage: search_chart foo\n"
     else
-    _banner "latest [${COUNT}] versions for chart: ${YELLOW}${CHART}"
+    _info "latest [${COUNT}] versions for chart: ${YELLOW}${CHART}"
     curl -su "${CHARTMUSEM_USERNAME}:${CHARTMUSEM_PASSWORD}" ${CHARTMUSEM_URI}/${CHART} | \
       jq -r '.[] | .version+" (appVersion: "+.appVersion+")"' | sort -nr | column -tx | head -${COUNT}
     fi
@@ -769,7 +779,7 @@ function search_chart() {
 function kx () {
   local pod=($(kubectl get pods --no-headers -o wide | fzf | awk '{print $1}'))
   local attr=${@}
-  _banner "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
+  _info "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
   kubectl exec -it ${pod[1]} ${attr} -- ash 2>/dev/null ||
 		kubectl exec -it ${pod[1]} ${attr} -- bash 2>/dev/null ||
 		kubectl exec -it ${pod[1]} ${attr} -- sh 2>/dev/null
@@ -780,7 +790,7 @@ function kx () {
 function kl () {
   local pod=($(kubectl get pods --no-headers -o wide | fzf | awk '{print $1}'))
   local attr=${@:-""}
-  _banner "kubectl logs --timestamps -f ${attr} ${pod[1]}"
+  _info "kubectl logs --timestamps -f ${attr} ${pod[1]}"
   kubectl logs --timestamps -f ${attr} ${pod[1]}
 }
 #===============================================================
@@ -800,7 +810,7 @@ function kexport() {
 # k8s: list node count+version
 function get-node-versions() {
   date
-  _banner "Cluster: ${GREEN}$(kubectl config current-context)"
+  _info "Cluster: ${GREEN}$(kubectl config current-context)"
   for i in $(kubectl get node --no-headers | awk '{print $5}'| sort | uniq | xargs) ; do echo "${i} $(kubectl get node --no-headers | grep -c "${i}") nodes" ; done | column -t
   # also:
   # kubectl get nodes -o json | jq -r '.items[].status.nodeInfo.kubeletVersion' | sort | uniq -c
@@ -809,7 +819,7 @@ function get-node-versions() {
 #===============================================================
 # k8s: list nodepools count+version
 function get-nodepools() {
-  _banner "Nodepools: ${GREEN}$(kubectl config current-context)"
+  _info "Nodepools: ${GREEN}$(kubectl config current-context)"
   for i in $(kubectl get nodepools -o custom-columns=':.metadata.name' | xargs) ; do echo "${i} $(kubectl get node --show-labels | grep -c "nodepool=${i}") nodes" ; done | column -tx
 }
 
@@ -820,23 +830,19 @@ function get-node-resources() {
     echo "${MAGENTA}numfmt${NONE} not found - install coreutils package"
     return 1
   fi
-  _banner "Cluster: ${GREEN}$(kubectl config current-context)"
-
-  function divider() {
-    echo -e "${BOLD}$(printf '=%.0s' {1..60})${NONE}"
-  }
+  _info "Cluster: ${GREEN}$(kubectl config current-context)"
 
   kubecolor top node --use-protocol-buffers
   kubectl get node -o wide --no-headers | awk '{print $1" "$3" "$6}' | while IFS=' ' read -r THIS_NODE_NAME THIS_NODE_ROLE THIS_NODE_IP ; do
 
-    [ "${THIS_NODE_ROLE}" = "<none>" ] && THIS_NODE_ROLE="${GREEN}worker${NONE}" || THIS_NODE_ROLE="${RED}${THIS_NODE_ROLE}${NONE}"
+    [[ "${THIS_NODE_ROLE}" == *"control"* ]] && THIS_NODE_ROLE="${RED}${THIS_NODE_ROLE}${NONE}" || THIS_NODE_ROLE="${GREEN}${THIS_NODE_ROLE}${NONE}"
     THIS_NODE_INSTANCE_TYPE="$(kubectl get node/${THIS_NODE_NAME} --no-headers -o jsonpath='{.metadata.labels.beta\.kubernetes\.io/instance-type}' 2>/dev/null)"
 
-    divider ; _banner "Resources for ${MAGENTA}${THIS_NODE_NAME}${NONE} ${THIS_NODE_IP} (${THIS_NODE_ROLE}) ${YELLOW}${THIS_NODE_INSTANCE_TYPE}" | column -tx
+    divider ; _info "Resources for ${MAGENTA}${THIS_NODE_NAME}${NONE} ${THIS_NODE_IP} (${THIS_NODE_ROLE}) ${YELLOW}${THIS_NODE_INSTANCE_TYPE}" | column -tx
 
     NODE_DETAILS="$(kubectl describe node/${THIS_NODE_NAME} 2>/dev/null)"
     NODE_RESOURCES="$(echo "${NODE_DETAILS}" | grep '^Capacity' -A 12)"
-    NODE_PRESSURE="$(echo "${NODE_DETAILS}" | grep 'Pressure')"
+    NODE_PRESSURE="$(echo "${NODE_DETAILS}" | awk '/Pressure/ {print $1"\t"$2}')"
 
     CAP_CPU_CORES="$(echo "${NODE_RESOURCES}" | awk '/cpu:/ {print $2}' | head -1)"
     CAP_CPU_MILLIS="$(expr ${CAP_CPU_CORES} '*' 1000)m"
@@ -853,10 +859,10 @@ function get-node-resources() {
     ALLOC_MEM_GI="$(numfmt --from=iec-i --to=iec ${ALLOC_MEM_KI})i"
 
     echo -e "${CYAN}Capacity:${NONE}
-  cpu:     ${CAP_CPU_CORES}\t= ${CAP_CPU_MILLIS}
+     cpu:    ${CAP_CPU_CORES}\t= ${CAP_CPU_MILLIS}
   memory:    ${CAP_MEM_GI}\t= ${CAP_MEM_MI} = ${CAP_MEM_KI}
 ${CYAN}Allocatable:${NONE}
-  cpu:     ${ALLOC_CPU_CORES}\t= ${ALLOC_CPU_MILLIS}
+     cpu:    ${ALLOC_CPU_CORES}\t= ${ALLOC_CPU_MILLIS}
   memory:    ${ALLOC_MEM_GI}\t= ${ALLOC_MEM_MI} = ${ALLOC_MEM_KI}
 ${CYAN}Pressure:${NONE}
 ${NODE_PRESSURE}"
@@ -868,10 +874,6 @@ ${NODE_PRESSURE}"
 # k8s: get PersistentVolume info
 function get-pv-info() {
   local ME="${0}"
-
-  function divider() {
-    echo -e "${BOLD}$(printf '=%.0s' {1..60})${NONE}"
-  }
 
   function show_help() {
     cat << EOF
@@ -929,7 +931,7 @@ EOF
   local POD_COUNT="$(echo "${ALL_PODS}" | wc -l | sed 's/^[ \t]*//;s/[ \t]*$//')"
   local CURRENT_CONTEXT="$(\kubectl config current-context)"
 
-  [ -n "${CURRENT_CONTEXT}" ] && divider ; _banner "Cluster:   ${GREEN}${CURRENT_CONTEXT}" ; _banner "Namespace: ${GREEN}${NAMESPACE}${NONE}" ; divider
+  [ -n "${CURRENT_CONTEXT}" ] && divider ; _info "Cluster:   ${GREEN}${CURRENT_CONTEXT}" ; _info "Namespace: ${GREEN}${NAMESPACE}${NONE}" ; divider
   echo -e "Match: ${BOLD}${POD_COUNT}${NONE} Pod(s)"
 
   echo "${ALL_PODS}" | while read -r THIS_POD THIS_POD_NODE ; do
@@ -946,13 +948,12 @@ EOF
       local THIS_PV_INFO="driver:$(\kubectl get pv/${THIS_PV} -o yaml 2>/dev/null | yq '.spec.csi| (.driver, .volumeHandle, .fsType)' | xargs)"
     fi
     divider
-    echo -e "  Pod: ${CYAN}${THIS_POD}${NONE}\n   Node: ${THIS_POD_NODE}\tip:${BOLD}${THIS_POD_NODE_EXTERNAL_IP}${NONE}\n  PVC: ${THIS_PVC}\tclass:${BOLD}${THIS_PVC_CLASS}${NONE}\n   PV: ${THIS_PV} size:${BOLD}${THIS_SIZE}${NONE}\nDetails: ${YELLOW}${THIS_PV_INFO}${NONE}"
+    echo -e "    Pod: ${CYAN}${THIS_POD}${NONE}\n   Node: ${THIS_POD_NODE}\tip:${BOLD}${THIS_POD_NODE_EXTERNAL_IP}${NONE}\n    PVC: ${THIS_PVC}\tclass:${BOLD}${THIS_PVC_CLASS}${NONE}\n     PV: ${THIS_PV} size:${BOLD}${THIS_SIZE}${NONE}\nDetails: ${YELLOW}${THIS_PV_INFO}${NONE}"
     fi
   done
   divider
   echo
 }
-
 
 ################################################################
 # Add your custom functions below!

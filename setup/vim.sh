@@ -6,7 +6,7 @@
 
 (type vim &>/dev/null) || brew install vim
 
-source ./.functions &>/dev/null
+source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
 
 mkdir -p "${HOME}/.vim/autoload/plugged"
 curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -14,4 +14,4 @@ curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubuserc
 # install plugins
 vim -E -s -u "${HOME}/.vimrc" +PlugInstall +qall
 
-_print "✅ Done ${0}"
+_info "✅ Done ${0}"

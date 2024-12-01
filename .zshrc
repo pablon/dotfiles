@@ -26,7 +26,7 @@ if [ -z "${TMUX}" ] ; then
   # print random fortune cookie
   cookie
   # list tmux sessions
-  tmux ls 2>/dev/null | while read session ; do _banner "tmux session:${NONE} ${session}" ; done ; echo
+  tmux ls 2>/dev/null | while read session ; do _info "tmux session:${NONE} ${session}" ; done ; echo
 fi
 
 # get zsh load time - END

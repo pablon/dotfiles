@@ -5,11 +5,11 @@
 ##########################################################
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
-	echo "This script is for macOS only"
-	exit 0
+  echo "This script is for macOS only"
+  exit 0
 fi
 
-source ./.functions &>/dev/null
+source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
 
 # Ask for the administrator password upfront
 sudo -v
@@ -305,9 +305,9 @@ sudo chflags nohidden /Volumes
 # Expand the following File Info panes:
 # "General", "Open with", and "Sharing & Permissions"
 defaults write com.apple.finder FXInfoPanesExpanded -dict \
-	General -bool true \
-	OpenWith -bool true \
-	Privileges -bool true
+  General -bool true \
+  OpenWith -bool true \
+  Privileges -bool true
 
 ###############################################################################
 # Dock, Dashboard, and hot corners                                            #
@@ -522,4 +522,4 @@ defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true
 # Don't show the preferences window on next start
 defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false
 
-_print "✅ Done ${0}"
+_info "✅ Done ${0}"
