@@ -14,4 +14,4 @@ curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubuserc
 # install plugins
 vim -E -s -u "${HOME}/.vimrc" +PlugInstall +qall
 
-_info "✅ Done ${0}"
+_success "Done ${0}"

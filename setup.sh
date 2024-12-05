@@ -11,7 +11,7 @@ if [ -d ${HOME}/dotfiles ]; then
   (
     cd ${HOME}/dotfiles/setup/ || exit 1
     for f in *.sh; do
-      _info "Running $f"
+      _info "Running ${GREEN}$f"
       bash "$f"
     done
   )
@@ -26,4 +26,4 @@ fi
 _info "Linking files"
 (cd ${HOME}/dotfiles/ && stow -v .)
 
-_info "Now reload your shell:\n\t${YELLOW}source ~/.zshrc\n"
+_success "Now reload your shell:\n\t${GREEN}source ~/.zshrc\n"

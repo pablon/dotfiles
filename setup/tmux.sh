@@ -19,4 +19,4 @@ if [ ! -d ~/.tmux/plugins/tpm ]; then
   fi
 fi
 
-_info "✅ Done ${0}"
+_success "Done ${0}"

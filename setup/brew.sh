@@ -76,4 +76,4 @@ unset BLUE
 unset CYAN
 unset NONE
 
-echo "✅ Done ${0}"
+_success "Done ${0}"

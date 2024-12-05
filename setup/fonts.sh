@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 ##########################################################
-# Description: pimp my zsh
+# Description: pimp my fonts
 # Author: https://github.com/pablon
 ##########################################################
 
-NERD_FONTS=(Hack JetBrainsMono)
+NERD_FONTS=('Hack' 'JetBrainsMono' 'Ubuntu')
 
 PROJECT='ryanoasis/nerd-fonts'
 LATEST="$(curl -s "https://api.github.com/repos/${PROJECT}/releases/latest" | jq -r ".tag_name")"
@@ -17,16 +17,18 @@ elif [[ "${OSTYPE}" =~ "linux" ]]; then
   TARGET_DIR=~/.local/share/fonts
 fi
 [ -d ${TARGET_DIR} ] || mkdir -p ${TARGET_DIR}
-cd ${TARGET_DIR}/ || exit 1
 
 for font in "${NERD_FONTS[@]}"; do
-  _info "Downloading font ${font}"
-  curl -fsSL https://github.com/${PROJECT}/releases/download/${LATEST}/${font}.zip -o ${font}.zip &&
-    unzip -oq ${font}.zip &&
-    rm -f ${font}.zip
+  (
+    cd ${TARGET_DIR}/ || exit 1
+    _info "Downloading font ${YELLOW}${font}"
+    \curl -fsSL https://github.com/${PROJECT}/releases/download/${LATEST}/${font}.zip -o ${font}.zip &&
+      unzip -oq ${font}.zip &&
+      rm -f ${font}.zip
+  )
 done
 
 _info "Runnning fc-cache"
 fc-cache -f
 
-_info "✅ Done ${0}"
+_success "Done ${0}"
