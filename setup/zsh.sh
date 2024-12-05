@@ -17,4 +17,4 @@ done
 [ -n "${ITERM_SESSION_ID}" ] &&
   curl --create-dirs -o "${HOME}/.config/iterm2/shell_integration.zsh" -L https://iterm2.com/shell_integration/zsh
 
-_info "✅ Done ${0}"
+_success "Done ${0}"

@@ -522,4 +522,4 @@ defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true
 # Don't show the preferences window on next start
 defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false
 
-_info "✅ Done ${0}"
+_success "Done ${0}"

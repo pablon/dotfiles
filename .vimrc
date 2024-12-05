@@ -40,7 +40,7 @@ set autoread
 au FocusGained,BufEnter * checktime
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
-let mapleader = ","
+let mapleader = " "
 " Fast saving
 nmap <leader>w :w!<cr>
 nmap <leader>W :wall!<cr>
@@ -54,6 +54,7 @@ command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is o
 set nocompatible                    " yup
 set showcmd                         " show command in bottom bar
 set title                           " change the terminal's title
+set signcolumn=yes
 "folding stuff
 set foldcolumn=1                    " Add a bit extra margin to the left
 set foldenable                      " enable folding
@@ -131,22 +132,22 @@ if has("win16") || has("win32")
 else
   set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
 endif
-set ruler "Always show current position
-set cmdheight=1 " Height of the command bar
-set hid " A buffer becomes hidden when it is abandoned
+set ruler                      " Always show current position
+set cmdheight=1                " Height of the command bar
+set hid                        " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent " Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l
-set ignorecase " Ignore case when searching
-set smartcase " When searching try to be smart about cases
-set hlsearch " Highlight search results
-set incsearch " Makes search act like search in modern browsers
-set lazyredraw " Don't redraw while executing macros (good performance config)
-set ttyfast " Indicates a fast terminal connection.
-set magic " For regular expressions turn magic on
-set showmatch " Show matching brackets when text indicator is over them
-set mat=2 " How many tenths of a second to blink when matching brackets
-set noerrorbells " Disable beep or screen flash
-set novisualbell " Disable screen bell
+set ignorecase                 " Ignore case when searching
+set smartcase                  " When searching try to be smart about cases
+set hlsearch                   " Highlight search results
+set incsearch                  " Makes search act like search in modern browsers
+set lazyredraw                 " Don't redraw while executing macros (good performance config)
+set ttyfast                    " Indicates a fast terminal connection.
+set magic                      " For regular expressions turn magic on
+set showmatch                  " Show matching brackets when text indicator is over them
+set mat=2                      " How many tenths of a second to blink when matching brackets
+set noerrorbells               " Disable beep or screen flash
+set novisualbell               " Disable screen bell
 set t_vb=
 set tm=500
 
@@ -462,21 +463,24 @@ match ExtraWhiteSpace /\s\+$/
 "===============================================================
 
 call plug#begin('~/.vim/autoload/plugged')
+  Plug 'Xuyuanp/nerdtree-git-plugin'
   Plug 'camspiers/animate.vim'
   Plug 'camspiers/lens.vim'
   Plug 'chentoast/marks.nvim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/vim-easy-align'
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+  Plug 'mhinz/vim-startify'
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'preservim/nerdtree'
+  Plug 'ryanoasis/vim-devicons'
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-fugitive'
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
-  Plug 'mhinz/vim-startify'
 call plug#end()
 
-let g:airline_theme='dark'          " set airline theme
+let g:airline_theme = 'dark'        " set airline theme
 let g:airline_powerline_fonts = 1   " use powerline fonts & symbols
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_alt_sep = '|'
@@ -499,6 +503,7 @@ nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 let g:NERDTreeFileLines = 1
 let g:NERDTreeWinSize=40
+let g:NERDTreeShowHidden=1
 map <Leader>f :NERDTreeFind<CR>
 
 "===============================================================

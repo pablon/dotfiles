@@ -25,11 +25,11 @@ function md() {
 #===============================================================
 # find shorthand
 function f() {
-	local SEARCH="$(fd . --one-file-system | fzf --header='󱞽 Copy path/file to clipboard' --preview 'bat --color=always --line-range :500 {}')"
-	if [ -n "${SEARCH}" ] ; then
-		local FILE="$(echo -n "${SEARCH}" | $_clipboardApp)"
-		echo "-- string \"${SEARCH}\" copied to clipboard"
-	fi
+  local SEARCH="$(fd . --one-file-system | fzf --header='󱞽 Copy path/file to clipboard' --preview 'bat --color=always --line-range :500 {}')"
+  if [ -n "${SEARCH}" ] ; then
+    local FILE="$(echo -n "${SEARCH}" | $_clipboardApp)"
+    echo "-- string \"${SEARCH}\" copied to clipboard"
+  fi
 }
 #===============================================================
 # kill tmux sessions
@@ -181,12 +181,12 @@ function curl-cert() {
 #===============================================================
 # yazi wrapper
 function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
 }
 #===============================================================
 # spawn subshell into an aws profile
@@ -601,8 +601,8 @@ EOF
   if [ -z "${ADDED_FILES}" ] ; then
     echo -en "${RED}⚠️ No files were added!\n⚠️ Create an ${MAGENTA}empty-commit${RED}?${NONE} [y/N]: " ; read -r empty_option
     case "${empty_option}" in
-			Y|y) local ALLOW_EMPTY='--allow-empty ' ;;
-			*)   _error "Cancelled" ; return 1 ;;
+      Y|y) local ALLOW_EMPTY='--allow-empty ' ;;
+      *)   _error "Cancelled" ; return 1 ;;
     esac
   else
     echo "${BLUE}ℹ️ Files added:${NONE} ${ADDED_FILES}"
@@ -781,8 +781,8 @@ function kx () {
   local attr=${@}
   _info "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
   kubectl exec -it ${pod[1]} ${attr} -- ash 2>/dev/null ||
-		kubectl exec -it ${pod[1]} ${attr} -- bash 2>/dev/null ||
-		kubectl exec -it ${pod[1]} ${attr} -- sh 2>/dev/null
+    kubectl exec -it ${pod[1]} ${attr} -- bash 2>/dev/null ||
+    kubectl exec -it ${pod[1]} ${attr} -- sh 2>/dev/null
 }
 
 #===============================================================
