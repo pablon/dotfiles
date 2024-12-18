@@ -16,7 +16,24 @@
 " => General
 "===============================================================
 
-set history=1000            " sets how many lines of history VIM has to remember
+" With a map leader it's possible to do extra key combinations
+" like <leader>w saves the current file
+let mapleader = " "
+" Fast saving
+nmap <leader>w :w!<cr>
+nmap <leader>W :wall!<cr>
+" Fast quit
+nmap <leader>q :q!<cr>
+nmap <leader>Q :qall!<cr>
+" :W sudo saves the file
+" (useful for handling the permission-denied error)
+command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
+" basic stuff
+set nocompatible            " yup
+set showcmd                 " show command in bottom bar
+set title                   " change the terminal's title
+set signcolumn=yes          " draw the signcolumn
+set history=2000            " sets how many lines of history VIM has to remember
 set number                  " show line numbers
 set relativenumber          " show relative line numbers
 set path+=**                " recurse into dirs
@@ -38,23 +55,6 @@ set splitright
 " Set to auto read when a file is changed from the outside
 set autoread
 au FocusGained,BufEnter * checktime
-" With a map leader it's possible to do extra key combinations
-" like <leader>w saves the current file
-let mapleader = " "
-" Fast saving
-nmap <leader>w :w!<cr>
-nmap <leader>W :wall!<cr>
-" Fast quit
-nmap <leader>q :q!<cr>
-nmap <leader>Q :qall!<cr>
-" :W sudo saves the file
-" (useful for handling the permission-denied error)
-command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
-" basic stuff
-set nocompatible                    " yup
-set showcmd                         " show command in bottom bar
-set title                           " change the terminal's title
-set signcolumn=yes
 "folding stuff
 set foldcolumn=1                    " Add a bit extra margin to the left
 set foldenable                      " enable folding
@@ -105,6 +105,13 @@ function! ToggleWrap()
 endfunction
 map <F10> :call ToggleWrap()<CR> " wrap
 map! <F10> ^[:call ToggleWrap()<CR> " un-wrap
+
+function GitDiff()
+    :silent write
+    :silent execute '!git diff --color=always -- ' . expand('%:p') . ' | less --RAW-CONTROL-CHARS --quit-if-one-screen --mouse'
+    :redraw!
+endfunction
+nnoremap <leader>gd :call GitDiff()<cr>
 
 nmap <C-S> :w<CR>   " quick save
 nmap <C-Q> :q!<CR>  " quit now
@@ -169,17 +176,19 @@ endif
 
 try
   " To see a list of ready-to-use themes: :colorscheme [space] [Ctrl+d]
-  " colorscheme elflord
-  " colorscheme ron
-  " colorscheme torte
-  colorscheme lunaperche
-  " colorscheme retrobox
+  colorscheme catppuccin_mocha
 catch
 endtry
 
 set background=dark                 " my eyes say thank you
 set cursorline cursorcolumn         " highlight current line & column
-" hi CursorLine cterm=BOLD ctermbg=gray
+" highlights
+hi CursorLine cterm=BOLD ctermbg=Black guibg=Black
+hi CursorColumn cterm=BOLD ctermbg=Black guibg=Black
+hi Comment cterm=italic ctermfg=DarkGray
+hi lineNr term=bold cterm=NONE ctermbg=none ctermfg=none gui=bold
+hi CursorLineNr term=bold cterm=none ctermbg=none ctermfg=yellow gui=bold
+hi SignColumn ctermbg=Black guibg=Black
 
 " Set extra options when running in GUI mode
 if has("gui_running")
@@ -206,22 +215,19 @@ set noswapfile
 "===============================================================
 " => Text, tab and indent related
 "===============================================================
-" Use spaces instead of tabs
 set expandtab
-" Be smart when using tabs ;)
 set smarttab
-" 1 tab == 2 spaces
 set tabstop=2 softtabstop=2 shiftwidth=2 " use 2 spaces for tabs
-" Show indentation guides
+" Show indentation guides without plugins
 set list
-set list listchars=tab:┊\ ,trail:·,extends:»,precedes:«,nbsp:× " display indentation guides
+set list listchars=tab:┊\ ,trail:·,extends:»,precedes:«,nbsp:×
 set listchars=multispace:┊\ 
 " Linebreak on 500 characters
-set lbr
-set tw=500
-set ai      " Auto indent
-set si      " Smart indent
-set nowrap  " Don't wrap lines
+set textwidth=500
+set linebreak
+set autoindent
+set smartindent
+set nowrap
 
 """"""""""""""""""""""""""""""
 " => Visual mode related
@@ -428,9 +434,6 @@ function! VisualSelection(direction, extra_filter) range
   let @" = l:saved_reg
 endfunction
 
-highlight lineNr term=bold cterm=NONE ctermbg=none  ctermfg=none gui=bold
-highlight CursorLineNr term=bold cterm=none ctermbg=none ctermfg=yellow gui=bold
-
 let g:fzf_colors =
 \ { 'fg':         ['fg', 'Normal'],
   \ 'bg':         ['bg', 'Normal'],
@@ -456,7 +459,6 @@ match ExtraWhiteSpace /\s\+$/
 "===============================================================
 " => Plugins
 " https://github.com/junegunn/vim-plug
-"===============================================================
 " => Prep-work:
 " mkdir -p ~/.vim/autoload/plugged
 " curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -464,8 +466,10 @@ match ExtraWhiteSpace /\s\+$/
 
 call plug#begin('~/.vim/autoload/plugged')
   Plug 'Xuyuanp/nerdtree-git-plugin'
+  Plug 'airblade/vim-gitgutter'
   Plug 'camspiers/animate.vim'
   Plug 'camspiers/lens.vim'
+  Plug 'catppuccin/vim', { 'as': 'catppuccin' }
   Plug 'chentoast/marks.nvim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/vim-easy-align'
@@ -480,23 +484,39 @@ call plug#begin('~/.vim/autoload/plugged')
   Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
-let g:airline_theme = 'dark'        " set airline theme
-let g:airline_powerline_fonts = 1   " use powerline fonts & symbols
+"===============================================================
+" Airline
+"===============================================================
+let g:airline_theme = 'catppuccin_mocha'
+let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#left_sep = ' '
 
-" " Start interactive EasyAlign in visual mode (e.g. vipga)
-" xmap ga <Plug>(EasyAlign)
-" " Start interactive EasyAlign for a motion/text object (e.g. gaip)
-" nmap ga <Plug>(EasyAlign)
+"===============================================================
+" gitgutter
+"===============================================================
+let g:gitgutter_set_sign_backgrounds = 1
+let g:gitgutter_highlight_linenrs = 1
+let g:gitgutter_preview_win_floating = 1
+hi GitGutterAdd guifg=#009900 ctermfg=2
+hi GitGutterChange guifg=#bbbb00 ctermfg=3
+hi GitGutterDelete guifg=#ff2222 ctermfg=1
 
-" Start interactive EasyAlign in visual mode (e.g. vipga)
+"===============================================================
+" EasyAlign behavior
+"===============================================================
+" Start interactive EasyAlign in visual mode (e.g. vipal)
 xmap al <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+" Start interactive EasyAlign for a motion/text object (e.g. alip)
 nmap al <Plug>(EasyAlign)
 
-" NERDTree options:
+"===============================================================
+" NERDTree behavior
+" https://github.com/preservim/nerdtree#frequently-asked-questions
+"===============================================================
+
+" Options:
 nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
@@ -505,24 +525,6 @@ let g:NERDTreeFileLines = 1
 let g:NERDTreeWinSize=40
 let g:NERDTreeShowHidden=1
 map <Leader>f :NERDTreeFind<CR>
-
-"===============================================================
-" Custom NERDTree behavior
-"===============================================================
-
-" " Always start NERDTree when Vim is started
-" autocmd VimEnter * NERDTree
-
-" " Start NERDTree when Vim is started without file arguments.
-" autocmd StdinReadPre * let s:std_in=1
-" autocmd VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
-
-" " Start NERDTree, unless a file or session is specified, eg. vim -S session_file.vim.
-" autocmd StdinReadPre * let s:std_in=1
-" autocmd VimEnter * if argc() == 0 && !exists('s:std_in') && v:this_session == '' | NERDTree | endif
-
-" " Open the existing NERDTree on each new tab.
-" autocmd BufWinEnter * if &buftype != 'quickfix' && getcmdwintype() == '' | silent NERDTreeMirror | endif
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif

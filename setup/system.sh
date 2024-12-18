@@ -4,9 +4,9 @@
 # Borrowed from https://mths.be/macos
 ##########################################################
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
+if [[ "${OSTYPE,,}" != "darwin"* ]]; then
   echo "This script is for macOS only"
-  exit 0
+  exit 1
 fi
 
 source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
