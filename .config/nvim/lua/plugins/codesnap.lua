@@ -1,8 +1,9 @@
 -- https://github.com/mistricky/codesnap.nvim
 -- Snapshot plugin with rich features that can make pretty code snapshots for Neovim
+-- 󰋼 https://github.com/mistricky/codesnap.nvim#compile-from-source
 return {
   "mistricky/codesnap.nvim",
-  build = "make build_generator",
+  build = "make",
   keys = {
     { "<leader>cx", "<cmd>CodeSnapSave<cr>", mode = "x", desc = "Save selected code snapshot in ~/Desktop" },
     { "<leader>cX", "<cmd>CodeSnap<cr>", mode = "x", desc = "Save selected code snapshot into clipboard" },
