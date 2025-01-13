@@ -8,19 +8,14 @@ local g = vim.g -- global
 vim.wo.colorcolumn = "80"
 -- opt.textwidth = 80
 -- opt.linebreak = true
-
 opt.scrolloff = 7
 opt.ignorecase = true
-
 opt.backup = false
 opt.writebackup = false
 opt.swapfile = false
-
 opt.hlsearch = true
 opt.incsearch = true
-
 opt.signcolumn = "yes"
-
 opt.cursorline = true
 opt.cursorcolumn = true
 
@@ -56,10 +51,9 @@ opt.completeopt = "menuone,noselect"
 -- windows
 opt.splitbelow = true -- split: always split down
 opt.splitright = true -- vsplit: always split right
-
 opt.termguicolors = true
 opt.signcolumn = "yes"
 opt.isfname:append("@-@")
 
 -- browser
-g.mkdp_browser = "/Applications/Firefox.app/Contents/MacOS/firefox"
+g.mkdp_browser = "firefox"

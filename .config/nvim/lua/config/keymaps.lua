@@ -16,29 +16,41 @@ vim.keymap.set(
 
 -- vim.keymap.set("n", "<leader>h1", "<cmd>r!gendate h 1<cr>", { desc = "Insert date h1" })
 -- vim.keymap.set("n", "<leader>h2", "<cmd>r!gendate h 2<cr>", { desc = "Insert date h2" })
+
 -- lsp
 vim.keymap.set("n", "<leader>S", "<cmd>LspStop<CR>", { desc = "LspStop" })
+vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Lsp Hover" })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Lsp Definition" })
+vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Lsp Code Action" })
+
+-- undotree
+vim.keymap.set("n", "<leader>U", vim.cmd.UndotreeToggle, { desc = "Undotree Toggle" })
 
 -- surrounding words
 vim.keymap.set("n", "<leader>wsq", 'ciw""<Esc>P', { desc = "Word Surround Quotes" })
 
--- replaces
+-- replace backward slash
 vim.keymap.set("n", "<leader>rbs", "<cmd>%s/\\//g<CR>", { desc = "Replace Backward Slash" })
 
--- telescope symbols
+-- telescope-symbols
 vim.keymap.set("n", "<leader>fs", "<cmd>Telescope symbols<cr>", { desc = "Find Symbols" })
 
+-- markdown-preview
+vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Markdown Preview" })
+
+-- render-markdown
+vim.keymap.set("n", "<leader>mt", "<cmd>RenderMarkdown toggle<cr>", { desc = "RenderMarkdown toggle" })
+
 -- convert Current line to title cases
+-- vim.keymap.set("n", "<leader>rlt", "<cmd>s/<./\u&/g<cr>", { desc = "Replace Line Title" })
 vim.keymap.set(
   "n",
   "<leader>rlt",
   "<cmd>lua require('textcase').current_word('to_title_case')<CR>",
   { desc = "Replace Line Title" }
 )
--- vim.keymap.set("n", "<leader>rlt", "<cmd>s/<./\u&/g<cr>", { desc = "Replace Line Title" })
 
--- these keep the cursor in the middle when scrolling with ctrl d and u
--- from https://github.com/ThePrimeagen/init.lua
+-- these keep the cursor in the middle when scrolling with C-d and C-u
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 

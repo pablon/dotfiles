@@ -1,3 +1,6 @@
+**/*.bkp
 **/*.disabled
-.config/nvim/lazy-lock.json
-.config/nvim/lazyvim.json
+**/lazy-lock.json
+**/lazyvim.json
+**/state.yml
+.DS_Store
