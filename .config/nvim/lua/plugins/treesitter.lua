@@ -27,6 +27,9 @@ return {
         "vim",
         "yaml",
       },
+      highlight = {
+        enable = true,
+      },
     },
   },
 }

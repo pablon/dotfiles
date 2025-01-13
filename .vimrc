@@ -29,16 +29,17 @@ nmap <leader>Q :qall!<cr>
 " (useful for handling the permission-denied error)
 command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
 " basic stuff
-set nocompatible            " yup
-set showcmd                 " show command in bottom bar
-set title                   " change the terminal's title
-set signcolumn=yes          " draw the signcolumn
-set history=2000            " sets how many lines of history VIM has to remember
-set number                  " show line numbers
-set relativenumber          " show relative line numbers
-set path+=**                " recurse into dirs
-filetype plugin indent on   " Enable filetype plugins
+set clipboard=unnamed       " will make Vim yank to the clipboard
 set fillchars+=vert:\       " Remove unpleasant pipes from vertical splits
+set history=2000            " sets how many lines of history VIM has to remember
+set nocompatible            " yup
+set number                  " show line numbers
+set path+=**                " recurse into dirs
+set relativenumber          " show relative line numbers
+set showcmd                 " show command in bottom bar
+set signcolumn=yes          " draw the signcolumn
+set title                   " change the terminal's title
+filetype plugin indent on   " Enable filetype plugins
 let &t_ut=''                " To render properly background of the color scheme
 " Create the `tags` file (may need to install ctags first)
 command! MakeTags !ctags -R .
@@ -202,7 +203,7 @@ endif
 set encoding=utf8
 
 " Use Unix as the standard file type
-set ffs=unix,dos,mac
+set ffs=unix,dos
 
 "===============================================================
 " => Files, backups and undo
@@ -215,19 +216,14 @@ set noswapfile
 "===============================================================
 " => Text, tab and indent related
 "===============================================================
+set autoindent
 set expandtab
+set linebreak
+set nowrap
+set smartindent
 set smarttab
 set tabstop=2 softtabstop=2 shiftwidth=2 " use 2 spaces for tabs
-" Show indentation guides without plugins
-set list
-set list listchars=tab:┊\ ,trail:·,extends:»,precedes:«,nbsp:×
-set listchars=multispace:┊\ 
-" Linebreak on 500 characters
 set textwidth=500
-set linebreak
-set autoindent
-set smartindent
-set nowrap
 
 """"""""""""""""""""""""""""""
 " => Visual mode related
@@ -475,6 +471,7 @@ call plug#begin('~/.vim/autoload/plugged')
   Plug 'junegunn/vim-easy-align'
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
   Plug 'mhinz/vim-startify'
+  Plug 'nathanaelkane/vim-indent-guides'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'preservim/nerdtree'
   Plug 'ryanoasis/vim-devicons'
@@ -525,6 +522,7 @@ let g:NERDTreeFileLines = 1
 let g:NERDTreeWinSize=40
 let g:NERDTreeShowHidden=1
 map <Leader>f :NERDTreeFind<CR>
-
+let g:indent_guides_guide_size = 1
+let g:indent_guides_enable_on_vim_startup = 1
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif

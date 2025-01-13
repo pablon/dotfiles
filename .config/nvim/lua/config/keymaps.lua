@@ -41,6 +41,9 @@ vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Ma
 -- render-markdown
 vim.keymap.set("n", "<leader>mt", "<cmd>RenderMarkdown toggle<cr>", { desc = "RenderMarkdown toggle" })
 
+-- Screenkey toggle
+vim.keymap.set("n", "<leader>k", "<cmd>Screenkey<cr>", { desc = "Screenkey toggle" })
+
 -- convert Current line to title cases
 -- vim.keymap.set("n", "<leader>rlt", "<cmd>s/<./\u&/g<cr>", { desc = "Replace Line Title" })
 vim.keymap.set(

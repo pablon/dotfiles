@@ -88,7 +88,7 @@ return {
         wip = { raw = "[/]", rendered = " ", highlight = "RenderMarkdownTodo", scope_highlight = nil },
         -- obsidian
         bookmark = { raw = "[b]", rendered = " ", highlight = "RenderMarkdownTodo", scope_highlight = nil },
-        important = { raw = "[!]", rendered = " ", highlight = "DiagnosticError" },
+        important = { raw = "[!]", rendered = " ", highlight = "DiagnosticWarn" },
         info = { raw = "[i]", rendered = "󰋼 ", highlight = "RenderMarkdownInfo", scope_highlight = nil },
         pr_draft = { raw = "[D]", rendered = " ", highlight = "DiagnosticWarn", scope_highlight = nil },
         pr_merged = { raw = "[M]", rendered = " ", highlight = "RenderMarkdownSuccess", scope_highlight = nil },

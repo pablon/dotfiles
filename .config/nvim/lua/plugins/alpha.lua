@@ -34,7 +34,7 @@ return {
       dashboard.button("m", "󰺾  Mason", "<cmd>Mason<CR>"),
       dashboard.button("c", "  Configuration", ":silent Neotree $HOME/.config/nvim<CR>"),
       dashboard.button("O", "  Notes", ":silent Neotree $HOME/obsidian-vault<CR>"),
-      dashboard.button("p", "  Projects", ":silent Neotree $HOME/projects<CR>"),
+      dashboard.button("p", "  Projects", ":silent Neotree $HOME/projects<CR>"),
       dashboard.button("d", "󱗼  Dotfiles", ":silent Neotree $HOME/dotfiles<CR>"),
       dashboard.button("q", "󰿅  Quit", "<cmd>qa<CR>"),
     }
