@@ -20,7 +20,8 @@ return {
         nvim_cmp = true,
         min_chars = 2,
       },
-      new_notes_location = "notes_subdir",
+      notes_subdir = "Notes",
+      new_notes_location = "Notes",
       note_id_func = function(title)
         return title
       end,
@@ -54,7 +55,7 @@ return {
 
       daily_notes = {
         -- Optional, if you keep daily notes in a separate directory.
-        folder = "250-daily",
+        folder = "101-Daily",
         -- folder = "notes/dailies",
         -- Optional, if you want to change the date format for the ID of daily notes.
         date_format = "%Y-%m-%d",
