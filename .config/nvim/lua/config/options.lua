@@ -5,7 +5,7 @@
 local opt = vim.opt -- option
 local g = vim.g -- global
 
-vim.wo.colorcolumn = "80"
+-- vim.wo.colorcolumn = "80"
 -- opt.textwidth = 80
 -- opt.linebreak = true
 opt.scrolloff = 7
@@ -18,6 +18,10 @@ opt.incsearch = true
 opt.signcolumn = "yes"
 opt.cursorline = true
 opt.cursorcolumn = true
+opt.wrap = false
+opt.conceallevel = 2
+
+opt.spelllang = { "en,es" }
 
 -- Fixes Notify opacity issues
 opt.termguicolors = true
