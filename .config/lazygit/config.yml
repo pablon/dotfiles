@@ -63,7 +63,7 @@ gui:
   showDivergenceFromBaseBranch: arrowAndNumber
   commandLogSize: 8
   splitDiff: auto
-  windowSize: normal
+  screenMode: normal
   border: rounded
   animateExplosion: true
   portraitMode: auto
