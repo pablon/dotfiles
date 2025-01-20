@@ -11,6 +11,12 @@ vim.keymap.set(
   { desc = "Disable completion" }
 )
 
+-- windows
+vim.keymap.set("n", "<leader><left>", ":vertical resize +20<cr>", { desc = "Vertical resize +20" })
+vim.keymap.set("n", "<leader><right>", ":vertical resize -20<cr>", { desc = "Vertical resize +20" })
+vim.keymap.set("n", "<leader><up>", ":resize +10<cr>", { desc = "Horizontal resize +10" })
+vim.keymap.set("n", "<leader><down>", ":resize -10<cr>", { desc = "Horizontal resize -10" })
+
 -- insert date in my desired configuration
 -- vim.keymap.set("n", "<leader>d", "<cmd>r!date<cr>", { desc = "Insert date" })
 
@@ -82,3 +88,8 @@ vim.keymap.set("n", "<leader>ol", "<cmd>ObsidianLinks<CR>", { desc = "Show Obsid
 vim.keymap.set("n", "<leader>on", "<cmd>ObsidianNew<CR>", { desc = "Create New Note" })
 vim.keymap.set("n", "<leader>os", "<cmd>ObsidianSearch<CR>", { desc = "Search Obsidian" })
 vim.keymap.set("n", "<leader>oq", "<cmd>ObsidianQuickSwitch<CR>", { desc = "Quick Switch" })
+
+-- vim.keymap.set("n", "<leader>wsq", 'ciw""<Esc>P', { desc = "Word Surround Quotes" })
+
+-- formatting
+vim.keymap.set("n", "<C-i>", "<leader>gsa _<CR>", { desc = "Format: Italic" })
