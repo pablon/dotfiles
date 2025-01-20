@@ -91,11 +91,15 @@ function! TogglePaste()
     set paste
   endif
 endfunction
-map <F2> :call TogglePaste()<CR> " wrap
-map! <F2> ^[:call TogglePaste()<CR> " un-wrap
+
+" <F2> toggles paste mode
+map <F2> :call TogglePaste()<CR> " paste
+map! <F2> ^[:call TogglePaste()<CR> " nopaste
+
 " <F3> prints current timestamp as a comment (for quick notes)
 nmap <F3> i<C-R>=strftime("\n# %Y-%m-%d %T \t\t")<CR>
 imap <F3> <C-R>=strftime("\n# %Y-%m-%d %T \t\t")<CR>
+
 " <F10> toggles wrap on/off
 function! ToggleWrap()
   if (&wrap == 1)
@@ -140,24 +144,23 @@ if has("win16") || has("win32")
 else
   set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
 endif
-set ruler                      " Always show current position
+set backspace=eol,start,indent " Configure backspace so it acts as it should act
 set cmdheight=1                " Height of the command bar
 set hid                        " A buffer becomes hidden when it is abandoned
-set backspace=eol,start,indent " Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l
-set ignorecase                 " Ignore case when searching
-set smartcase                  " When searching try to be smart about cases
 set hlsearch                   " Highlight search results
+set ignorecase                 " Ignore case when searching
 set incsearch                  " Makes search act like search in modern browsers
 set lazyredraw                 " Don't redraw while executing macros (good performance config)
-set ttyfast                    " Indicates a fast terminal connection.
 set magic                      " For regular expressions turn magic on
-set showmatch                  " Show matching brackets when text indicator is over them
 set mat=2                      " How many tenths of a second to blink when matching brackets
 set noerrorbells               " Disable beep or screen flash
-set novisualbell               " Disable screen bell
-set t_vb=
-set tm=500
+set novisualbell               " Disable visual bell
+set ruler                      " Always show current position
+set showmatch                  " Show matching brackets when text indicator is over them
+set smartcase                  " When searching try to be smart about cases
+set timeoutlen=500             " Time in milliseconds to wait for a mapped sequence to complete.
+set ttyfast                    " Indicates a fast terminal connection.
+set whichwrap+=<,>,h,l         " Allow specified keys that move the cursor left/right
 
 " Properly disable sound on errors on MacVim
 if has("gui_macvim")
