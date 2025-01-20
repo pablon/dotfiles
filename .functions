@@ -32,6 +32,11 @@ function f() {
   fi
 }
 #===============================================================
+function asdf_install() {
+  [ -z "${1}" ] && _error "Please provide a package name" && return 1
+  asdf plugin add ${1} && asdf install ${1} latest && asdf global ${1} latest
+}
+#===============================================================
 # kill tmux sessions
 function tmux-kill() {
   tmux kill-session -t $(tmux ls 2>/dev/null | fzf -m --marker='X' --prompt='󱞽 Select session(s) to kill' | awk -F: '{print $1}') 2>/dev/null
