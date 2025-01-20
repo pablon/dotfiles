@@ -4,3 +4,4 @@
 **/lazyvim.json
 **/state.yml
 .DS_Store
+.config/nvim/spell
