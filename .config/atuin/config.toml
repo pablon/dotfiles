@@ -2,23 +2,20 @@
 
 command_timeout = 2000
 
-## Invert the UI - put the search bar at the top , Default to `false`
-invert = true
-
 ## which style to use
 ## possible values: auto, full, compact
-style = "compact"
+style = "full"
 
 ## the maximum number of lines the interface should take up
 ## set it to 0 to always go full screen
-inline_height = 40
+inline_height = 30
 
 ## use ctrl instead of alt as the shortcut modifier key for numerical UI shortcuts
 ## alt-0 .. alt-9
 ctrl_n_shortcuts = true
 
 ## default history list format - can also be specified with the --format arg
-history_format = "{time}\t{duration}\t{command}"
+history_format = "{command} {directory}"
 
 ## Configure whether or not to show the help row, which includes the current Atuin
 ## version (and whether an update is available), a keymap hint, and the total
@@ -26,38 +23,14 @@ history_format = "{time}\t{duration}\t{command}"
 show_help = false
 
 ## Configure whether or not to show tabs for search and inspect
-# show_tabs = true
+show_tabs = false
 
 ## Defaults to true. If enabled, upon hitting enter Atuin will immediately execute the command. Press tab to return to the shell and edit.
 # This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
 enter_accept = true
 
-[stats]
-## Set commands where we should consider the subcommand for statistics. Eg, kubectl get vs just kubectl
-common_subcommands = [
-  "apt",
-  "cargo",
-  "composer",
-  "dnf",
-  "docker",
-  "git",
-  "go",
-  "ip",
-  "kubectl",
-  "nix",
-  "nmcli",
-  "npm",
-  "pecl",
-  "pnpm",
-  "podman",
-  "port",
-  "systemctl",
-  "tmux",
-  "yarn",
-]
-
 ## Set commands that should be totally stripped and ignored from stats
 common_prefix = ["sudo"]
 
 ## Set commands that will be completely ignored from stats
-ignored_commands = ["cd", "ls", "vim"]
+ignored_commands = ["cd", "ls", "vim", "nvim", "code"]
