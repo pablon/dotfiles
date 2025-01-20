@@ -30,12 +30,7 @@ return {
       dashboard.button("g", "  Find text", ":silent Telescope live_grep hidden=true no_ignore=true <CR>"),
       dashboard.button("r", "󰄉  Recent files", ":silent Telescope oldfiles <CR>"),
       dashboard.button("u", "  Update Plugins", "<cmd>Lazy update<CR>"),
-      dashboard.button("e", "  Extras", "<cmd>LazyExtras<CR>"),
-      dashboard.button("m", "󰺾  Mason", "<cmd>Mason<CR>"),
       dashboard.button("c", "  Configuration", ":silent Neotree $HOME/.config/nvim<CR>"),
-      dashboard.button("O", "  Notes", ":silent Neotree $HOME/obsidian-vault<CR>"),
-      dashboard.button("p", "  Projects", ":silent Neotree $HOME/projects<CR>"),
-      dashboard.button("d", "󱗼  Dotfiles", ":silent Neotree $HOME/dotfiles<CR>"),
       dashboard.button("q", "󰿅  Quit", "<cmd>qa<CR>"),
     }
 
