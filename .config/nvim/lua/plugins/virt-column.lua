@@ -2,6 +2,7 @@
 -- Plugin that shows the vertical bar or vertical column
 return {
   "lukas-reineke/virt-column.nvim",
+  ft = { "markdown" },
   opts = {
     -- char = "|",
     -- char = "",

@@ -5,42 +5,55 @@ return {
   version = "*",
   lazy = false,
   ft = "markdown",
-  dependencies = {
+  requires = {
     "nvim-lua/plenary.nvim",
   },
-  -- config = function()
-  --   require("obsidian").setup({
   opts = {
+    notes_subdir = "new",
+    new_notes_location = "notes_subdir",
+
     workspaces = {
       {
         name = "obsidian-vault",
         path = "~/obsidian-vault",
       },
     },
+
     completion = {
       nvim_cmp = true,
       min_chars = 2,
     },
-    notes_subdir = "notes",
-    new_notes_location = "notes",
+
     note_id_func = function(title)
-      return title
+      -- Create note IDs in a Zettelkasten format:
+      local suffix = ""
+      if title ~= nil then
+        suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
+        -- else
+        --   -- If title is nil, just add 4 random uppercase letters to the suffix.
+        --   for _ = 1, 4 do
+        --     suffix = suffix .. string.char(math.random(65, 90))
+        --   end
+        return tostring(os.date("%Y-%m-%d")) .. "-" .. suffix
+      else
+        return tostring(os.date("%Y-%m-%d"))
+      end
     end,
+
     note_frontmatter_func = function(note)
       local out = { id = note.id, aliases = note.aliases, tags = note.tags }
-
       if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
         for k, v in pairs(note.metadata) do
           out[k] = v
         end
       end
-
       return out
     end,
+
     mappings = {},
 
     templates = {
-      subdir = "Templates",
+      subdir = "templates",
       date_format = "%Y-%m-%d",
       time_format = "%H:%M",
       tags = "",
@@ -55,21 +68,14 @@ return {
     },
 
     daily_notes = {
-      -- Optional, if you keep daily notes in a separate directory.
       folder = "101-Daily",
-      -- folder = "notes/dailies",
-      -- Optional, if you want to change the date format for the ID of daily notes.
       date_format = "%Y-%m-%d",
-      -- Optional, if you want to change the date format of the default alias of daily notes.
-      alias_format = "%B %-d, %Y",
-      -- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
+      default_tags = { "daily" },
       template = "daily.md",
     },
 
     ui = {
       enable = false, -- using render-markdown.nvim instead
     },
-    -- })
-    -- end,
   },
 }

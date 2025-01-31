@@ -20,10 +20,10 @@ return {
       signs = { "󰫎 " },
       width = "block", -- block, full
       left_margin = 0,
-      left_pad = 1,
+      left_pad = 0,
       right_pad = 4,
       min_width = 80,
-      border = true,
+      border = false,
       border_virtual = false,
       border_prefix = false,
       above = "▄",
