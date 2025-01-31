@@ -1,8 +1,9 @@
--- https://www.lazyvim.org/plugins/editor#gitsignsnvim
--- Plugin that shows git changes in the left sign column
+-- https://github.com/lewis6991/gitsigns.nvim
+-- Super fast git decorations implemented purely in Lua.
 return {
   "lewis6991/gitsigns.nvim",
   event = "LazyFile",
+  lazy = true,
   opts = {
     signs = {
       add = { text = "▎" },
@@ -19,6 +20,26 @@ return {
       topdelete = { text = "" },
       changedelete = { text = "▎" },
     },
+    signs_staged_enable = true,
+    attach_to_untracked = false,
+    auto_attach = true,
+    linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
+    numhl = true, -- Toggle with `:Gitsigns toggle_numhl`
+    signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
+    word_diff = true, -- Toggle with `:Gitsigns toggle_word_diff`
+    watch_gitdir = {
+      follow_files = true,
+    },
+    current_line_blame = false,
+    current_line_blame_opts = {
+      virt_text = true,
+      virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
+      delay = 1000,
+      ignore_whitespace = false,
+      virt_text_priority = 100,
+      use_focus = true,
+    },
+    current_line_blame_formatter = "<author>, <author_time:%F> - <summary>",
     on_attach = function(buffer)
       local gs = package.loaded.gitsigns
 
@@ -51,14 +72,14 @@ return {
       map("n", "<leader>ghp", gs.preview_hunk_inline, "Preview Hunk Inline")
       map("n", "<leader>ghb", function() gs.blame_line({ full = true }) end, "Blame Line")
       map("n", "<leader>ghB", function() gs.blame() end, "Blame Buffer")
-      -- map("n", "<leader>ghd", gs.diffthis, "Diff This")
+      map("n", "<leader>ghd", gs.diffthis, "Diff This")
       -- Enable wrap in both diff windows
-      map("n", "<leader>ghd", function()
-        gs.diffthis()
-        vim.cmd("windo set wrap")
-      end, "Diff This")
+      map("n", "<leader>ghd", function() gs.diffthis() vim.cmd("windo set wrap") end, "Diff This")
       map("n", "<leader>ghD", function() gs.diffthis("~") end, "Diff This ~")
       map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+      -- custom
+      map("n", "<leader>gb", ":Gitsigns toggle_current_line_blame<CR>","Toggle current line blame")
+      map("n", "<leader>gH", ":Gitsigns toggle_linehl<CR>","Toggle line highlight")
     end,
   },
 }

@@ -5,59 +5,46 @@
 local opt = vim.opt -- option
 local g = vim.g -- global
 
--- vim.wo.colorcolumn = "80"
--- opt.textwidth = 80
--- opt.linebreak = true
-opt.scrolloff = 7
-opt.ignorecase = true
-opt.backup = false
-opt.writebackup = false
-opt.swapfile = false
-opt.hlsearch = true
-opt.incsearch = true
-opt.signcolumn = "yes"
-opt.cursorline = true
-opt.cursorcolumn = true
-opt.wrap = false
+opt.autoindent = true -- copy indentation on new line
+opt.backup = false -- no backup
+opt.completeopt = "menuone,noselect"
 opt.conceallevel = 2
-
+opt.cursorcolumn = true
+opt.cursorline = true
+opt.expandtab = true -- convert tabs to spaces
+opt.formatoptions:remove("t") -- no auto-intent of line breaks, keep line wrap enabled
+opt.hlsearch = true
+opt.ignorecase = true
+opt.incsearch = true
+opt.isfname:append("@-@")
+opt.list = true -- show tab characters and trailing whitespace
+opt.listchars = "tab:»\\ ,extends:›,precedes:‹,nbsp:·,trail:·" -- show tab characters and trailing whitespace
+opt.number = true
+opt.relativenumber = true
+opt.scrolloff = 7
+opt.shiftwidth = 0 -- the number of spaces inserted for each indentation
+opt.signcolumn = "yes"
+opt.smartindent = true -- smart indentation
+opt.softtabstop = 2 -- insert 2 spaces for a tab
 opt.spelllang = { "en,es" }
-
--- Fixes Notify opacity issues
-opt.termguicolors = true
+opt.splitbelow = true -- split: always split down
+opt.splitright = true -- vsplit: always split right
+opt.swapfile = false
+opt.tabstop = 2 -- insert 2 spaces for a tab
+opt.termguicolors = true -- Fixes Notify opacity issues
+opt.textwidth = 100
+opt.undodir = os.getenv("HOME") .. "/.vim/undodir" -- set directory where undo files are stored
+opt.undofile = true -- save undo history to a file
+opt.wrap = false -- do not wrap lines
+opt.writebackup = false -- no backup
 
 -- folding
 opt.foldenable = true
---
--- opt.foldmethod = "expr"
--- opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
---
--- opt.foldmethod = "manual"
---
-opt.foldmethod = "indent"
-
--- scrolling
-opt.number = true
-opt.relativenumber = true
-opt.scrolloff = 8
-
--- indentation
-opt.tabstop = 2 -- insert 2 spaces for a tab
-opt.softtabstop = 2 -- insert 2 spaces for a tab
-opt.expandtab = true -- convert tabs to spaces
-opt.shiftwidth = 2 -- the number of spaces inserted for each indentation
-opt.smartindent = true -- smart indentation
-
--- completion
-opt.completeopt = "menuone,noselect"
--- vim.o.timeoutlen = 300 -- time to wait for a mapped sequence to complete
-
--- windows
-opt.splitbelow = true -- split: always split down
-opt.splitright = true -- vsplit: always split right
-opt.termguicolors = true
-opt.signcolumn = "yes"
-opt.isfname:append("@-@")
+opt.foldmethod = "expr"
+-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()"
 
 -- browser
+-- g.mkdp_browser = "safari"
+-- g.mkdp_browser = "google-chrome"
 g.mkdp_browser = "firefox"
