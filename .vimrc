@@ -18,7 +18,9 @@
 
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
-let mapleader = " "
+" let mapleader = " "
+let mapleader = "\<Space>"
+
 " Fast saving
 nmap <leader>w :w!<cr>
 nmap <leader>W :wall!<cr>
@@ -251,6 +253,12 @@ map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
+
+" Resize windows
+map <leader><left> :vertical resize +20<cr>
+map <leader><right> :vertical resize -20<cr>
+map <leader><up> :resize +10<cr>
+map <leader><down> :resize -10<cr>
 
 " Close the current buffer
 map <leader>bd :Bclose<cr>:tabclose<cr>gT
@@ -526,6 +534,6 @@ let g:NERDTreeWinSize=40
 let g:NERDTreeShowHidden=1
 map <Leader>f :NERDTreeFind<CR>
 let g:indent_guides_guide_size = 1
-let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_enable_on_vim_startup = 0
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
