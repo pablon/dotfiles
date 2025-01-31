@@ -89,7 +89,6 @@ export HOMEBREW_NO_ANALYTICS=1
 
 # Docker stuff
 export BUILDKIT_COLORS="run=light-blue:error=light-red:cancel=light-magenta:warning=light-yellow"
-export DOCKER_DEFAULT_PLATFORM="linux/amd64"
 
 # .Net stuff
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
