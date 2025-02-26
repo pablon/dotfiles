@@ -8,6 +8,12 @@ return {
   requires = {
     "nvim-lua/plenary.nvim",
   },
+  config = function()
+    local vault_path = os.getenv("OBSIDIAN_VAULT_DIR") or vim.fn.expand("~/obsidian-vault")
+    if vim.fn.isdirectory(vault_path) == 0 then
+      vim.fn.mkdir(vault_path, "p")
+    end
+  end,
   opts = {
     notes_subdir = "new",
     new_notes_location = "notes_subdir",
