@@ -64,7 +64,7 @@ repos:
           - --external-sources
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.35.1
+    rev: v1.36.2
     hooks:
       - id: yamllint
         files: .*/\.(yaml|yml)$
@@ -72,7 +72,7 @@ repos:
         entry: yamllint
 
   - repo: https://github.com/tcort/markdown-link-check
-    rev: v3.13.6
+    rev: v3.13.7
     hooks:
       - id: markdown-link-check
         args:

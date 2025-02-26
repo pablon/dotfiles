@@ -103,7 +103,7 @@ git:
   allBranchesLogCmds: []
   overrideGpg: false
   disableForcePushing: true
-  commitPrefix: {}
+  commitPrefix: [{}]
   commitPrefixes: {}
   branchPrefix: ""
   parseEmoji: false
