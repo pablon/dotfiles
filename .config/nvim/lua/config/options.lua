@@ -2,11 +2,14 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+local cmd = vim.cmd -- command
 local opt = vim.opt -- option
 local g = vim.g -- global
 
+-- all
 opt.autoindent = true -- copy indentation on new line
 opt.backup = false -- no backup
+opt.colorcolumn = "80"
 opt.completeopt = "menuone,noselect"
 opt.conceallevel = 2
 opt.cursorcolumn = true
