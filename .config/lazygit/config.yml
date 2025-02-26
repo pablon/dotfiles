@@ -101,7 +101,7 @@ git:
   branchLogCmd: git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
   allBranchesLogCmd: git log --graph --all --color=always --abbrev-commit --decorate --date=relative  --pretty=medium
   allBranchesLogCmds: []
-  overrideGpg: false
+  overrideGpg: true
   disableForcePushing: true
   commitPrefix: {}
   commitPrefixes: {}
