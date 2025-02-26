@@ -1,7 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = false
-command_timeout = 500
+command_timeout = 1000
 follow_symlinks = false
 palette = 'catppuccin_mocha' # nord onedark catppuccin_mocha
 
@@ -104,7 +104,7 @@ number_threshold = 1
 format = '[$symbol]($style)'
 
 [cmd_duration]
-min_time = 500
+# min_time = 500
 style = 'fg:gray'
 format = ' [$duration]($style)'
 

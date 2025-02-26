@@ -1,4 +1,4 @@
-alias reload="reset ; clear ; source ~/.zshrc"
+alias reload="reset ; source ${HOME}/.zshrc"
 
 #===============================================================
 # Navigation
@@ -17,7 +17,7 @@ fi
 #===============================================================
 # OS metrics
 alias htop='sudo htop'
-if [[ "$(uname -s)" == "Darwin" ]] ; then
+if [[ "$(uname)" == "Darwin" ]] ; then
   ( type powermetrics &>/dev/null ) && alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
   ( type osx-cpu-temp &>/dev/null ) && alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
 fi
@@ -82,10 +82,6 @@ if ( type youtube-dl &>/dev/null ) ; then
 fi
 
 #===============================================================
-# AWS
-alias aws_examples="${EDITOR} /usr/local/share/awscli/examples/"
-
-#===============================================================
 # git
 alias g="git"
 alias ga='git a'
@@ -98,7 +94,7 @@ alias gu='git u'
 alias lp="git lp"
 alias st="git st"
 if ( type lazygit &>/dev/null ) ; then
-  alias gt="lazygit -ucd ~/.config/lazygit"
+  alias gt="lazygit log -ucd ~/.config/lazygit"
 elif ( type gitui &>/dev/null ) ; then
   alias gt="gitui"
 fi
@@ -190,7 +186,7 @@ if ( type minikube &>/dev/null ) ; then
 fi
 
 #===============================================================
-# private browsing
-# alias bbi="/path/to/brave --incognito &"
-# alias cci="/path/to/google-chrome --incognito &"
-# alias ffi="/path/to/firefox --private-window --safe-mode &"
+# private browser
+# alias pb="$(which brave) --incognito &"
+# alias pb="$(which google-chrome) --incognito &"
+# alias pb="$(which firefox) --private-window --safe-mode &"

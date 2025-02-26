@@ -1,5 +1,6 @@
 **/*.bkp
 **/*.disabled
+**/.tool-versions
 **/lazy-lock.json
 **/lazyvim.json
 **/state.yml
