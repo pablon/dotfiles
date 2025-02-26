@@ -6,6 +6,9 @@ _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( 
 function _info() {
   echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
 }
+function _warning() {
+  echo -e "${YELLOW}==> ${BOLD}${1}${NONE}"
+}
 function _success() {
   echo -e "${GREEN}==> ${BOLD}${1}${NONE}"
 }
@@ -33,13 +36,46 @@ function f() {
 }
 #===============================================================
 function asdf_install() {
-  [ -z "${1}" ] && _error "Please provide a package name" && return 1
-  asdf plugin add ${1} && asdf install ${1} latest && asdf global ${1} latest
+  local PLUGIN="${1}"
+  # https://asdf-vm.com/guide/getting-started.html
+  [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list all | fzf --reverse --accept-nth=1)"
+  [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
+  asdf plugin add ${PLUGIN} || return 1
+  local VERSION="$(asdf list all ${PLUGIN} | sed 's/^$/latest/' | fzf --reverse --tac --prompt="Select ${PLUGIN} version to install" | xargs)"
+  [ -z "${VERSION}" ] && echo "No version provided" && return 1
+  asdf install ${PLUGIN} ${VERSION}
+  asdf set ${PLUGIN} ${VERSION}
+  asdf current ${PLUGIN}
+  _success "Done"
+}
+function asdf_uninstall() {
+  local PLUGIN="${1}"
+  [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
+  [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
+  local VERSION="$(asdf list ${PLUGIN} | sed 's/\*//' | fzf --reverse --tac --prompt="Select ${PLUGIN} version to remove" | xargs)"
+  asdf uninstall ${PLUGIN} ${VERSION}
+  _success "Done"
+}
+function asdf_remove() {
+  local PLUGIN="${1}"
+  [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
+  [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
+  echo -en "⚠️ ${YELLOW}Completely remove ALL ${PLUGIN} versions + the plugin? [y/N]:${NONE} " ; read -r confirm
+  case "${confirm}" in
+    [yY]*)
+    true
+    ;;
+    *)
+    return 0
+    ;;
+  esac
+  asdf plugin remove ${PLUGIN}
+  _success "Done"
 }
 #===============================================================
 # kill tmux sessions
 function tmux-kill() {
-  tmux kill-session -t $(tmux ls 2>/dev/null | fzf -m --marker='X' --prompt='󱞽 Select session(s) to kill' | awk -F: '{print $1}') 2>/dev/null
+  tmux kill-session -t $(tmux ls 2>/dev/null | fzf -0 -m --delimiter=':' --accept-nth='1' --marker='X' --prompt='󱞽 Select session(s) to kill') 2>/dev/null
 }
 #===============================================================
 # Start an HTTP server from a directory, optionally specifying the port
@@ -144,21 +180,8 @@ function cookie() {
   # or set a fixed list:
   array=(koala luke-koala moofasa moose sheep skeleton small three-eyes tux vader vader-koala www)
   size=${#array[@]}
-  index=$((${RANDOM} % ${size}))
+  index=$((RANDOM % size))
   echo -e "${CYAN}" ; fortune -s | cowsay -f "${array[${index}]}" | sed 's|^|  |' ; echo "${NONE}"
-}
-#===============================================================
-# listing with youtube-dl
-function ytd_list() {
-  if [ "${1}" ] ; then
-    if [ -f "${1}" ] ; then
-      cat "${1}" | while read link ; do youtube-dl -c --write-description --merge-output-format mp4 "${link}" ; done ; date
-    else
-      echo -e "ERROR: ${1} is not a file\n"
-    fi
-  else
-    echo -e "ERROR: ARGV1 should be a list with 1 youtube link per-line\n"
-  fi
 }
 #===============================================================
 # left trim
@@ -277,24 +300,18 @@ for alias in da ds drm drmi ; do unalias ${alias} &>/dev/null ; done
 #===============================================================
 # Select a docker container to start and attach to
 function da() {
-  local cid=$(docker ps -a | sed 1d | fzf -1 -q "$1" | awk '{print $1}')
+  local cid=$(docker ps -a | sed 1d | fzf -0 -q "$1" --accept-nth='1')
   [ -n "$cid" ] && docker start "$cid" && docker attach "$cid"
 }
 #===============================================================
-# Select a running docker container to stop
+# Select running docker container(s) to stop
 function ds() {
-  local cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
-  [ -n "$cid" ] && docker stop "$cid"
+  docker ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='1' | xargs -r docker rm -f
 }
 #===============================================================
-# Same as above, but allows multi selection
-function drm() {
-  docker ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $1}' | xargs -r docker rm
-}
-#===============================================================
-# Select a docker image or images to remove
+# Select a docker image(s) to remove
 function drmi() {
-  docker images | sed 1d | fzf -q "$1" --no-sort -m --tac | awk '{print $3}' | xargs -r docker rmi -f
+  docker images | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' | xargs -r docker rmi -f
 }
 
 ################################################################
@@ -320,33 +337,38 @@ function gitexport(){
 }
 #===============================================================
 # gls - git commit browser with previews and vim integration
-function gls() {
+function git-log() {
   is_in_git_repo || return
   glNoGraph |
-    fzf --no-sort --reverse --tiebreak=index --no-multi \
+    fzf --no-sort --reverse --tiebreak=index --no-multi --exact \
     --ansi --preview-window='right:50%' --preview="$_viewGitLogLine" \
     --header "enter: view, ctrl-y: copy hash, ctrl-e: edit" \
-    --border-label=' Preview' \
-    --color=label:italic:yellow,preview-bg:#343434 \
+    --border-label=' git-log Preview' \
+    --bind "ctrl-u:preview-page-up" \
+    --bind "ctrl-d:preview-page-down" \
     --bind "enter:execute:$_viewGitLogLine | less -R" \
     --bind "ctrl-e:execute:$_viewGitLogLineUnfancy | vim -" \
     --bind "ctrl-y:execute:$_gitLogLineToHash | $_clipboardApp"
+
+    # --color=label:italic:yellow,preview-bg:#343434 \
 }
+alias gls=git-log
 #===============================================================
 function stash-explorer() {
   while out=$(git stash list "$@" |
     fzf --header="ctrl-a: apply | ctrl-b: branch | ctrl-p: pop | ctrl-x: drop | ESC" \
     --ansi --no-sort --reverse --print-query --query="$query" \
     --expect=ctrl-a,ctrl-b,ctrl-p,ctrl-x \
-    --bind="ctrl-u:preview-page-up" \
-    --bind="ctrl-d:preview-page-down" \
-    --bind="ctrl-k:preview-up" \
-    --bind="ctrl-j:preview-down" \
+    --bind "ctrl-u:preview-page-up" \
+    --bind "ctrl-d:preview-page-down" \
+    --bind "ctrl-k:preview-up" \
+    --bind "ctrl-j:preview-down" \
     --border --border-label-pos=3 \
     --border-label=' stash diff' \
-    --color='label:italic:yellow,preview-bg:#212121' \
     --preview="echo {} | cut -d':' -f1 | xargs git stash show --color -p" \
     --preview-window='right:55%') ;
+
+      # --color='label:italic:yellow,preview-bg:#212121' \
   do
     # Tokenize selection by newline
     selection=("${(f)out}")
@@ -421,15 +443,13 @@ function rebaser() {
 
 #===============================================================
 function is_in_git_repo() {
-  git rev-parse HEAD > /dev/null
+  git rev-parse HEAD &> /dev/null
 }
 
 #===============================================================
 # use gh+fzf+bat to explore pull requests, and checkout the PR branch
 function pr-checkout() {
   is_in_git_repo || return
-  # pull first
-  git pull --stat --tags
   local jq_template pr_number
   jq_template='"'\
 '#\(.number) - \(.title)'\
@@ -463,8 +483,6 @@ function pr-checkout() {
 # the MR branch to start collaborating
 function mr-checkout() {
   is_in_git_repo || return
-  # pull first
-  git pull --stat --tags
   local jq_template mr_number
   jq_template='"'\
 '#\(.iid)   \(.title)  <\(.author.name)>'\
@@ -505,11 +523,11 @@ function gh-watch() {
     --branch $(git rev-parse --abbrev-ref HEAD) \
     --json status,name,databaseId |
   jq -r '.[] | select(.status != "completed") | (.databaseId | tostring) + "\t" + (.name)' |
-  fzf -1 -0 | awk '{print $1}' | xargs gh run watch
+  fzf -1 -0 --accept-nth='1' | xargs gh run watch
 }
 #===============================================================
 # Filter branches.
-function git-br-fzf() {
+function git-br() {
   is_in_git_repo || return
   local tags branches target
   tags=$(git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
@@ -522,28 +540,10 @@ function git-br-fzf() {
 }
 #===============================================================
 # Filter branches and checkout the selected one with <enter> key,
-function git-co-fzf() {
+function git-co() {
   is_in_git_repo || return
-  git checkout $(git-br-fzf)
+  git checkout $(git-br)
 }
-#===============================================================
-# Filter commit logs. The diff is shown on the preview window.
-function git-log-fzf() { # fshow - git commit browser
-  is_in_git_repo || return
-
-  _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
-  _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always %'"
-  git log --graph --color=always \
-  --format="%C(auto)%h%d [%an] %s %C(black)%C(bold)%cr" "$@" |
-  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
-  --preview="$_viewGitLogLine" \
-  --bind "ctrl-m:execute:
-  (grep -o '[a-f0-9]\{7\}' | head -1 |
-  xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
-  {}
-FZF-EOF"
-}
-
 #===============================================================
 # git add+commit+push helper using fzf
 function commit() {
@@ -581,11 +581,11 @@ EOF
         ;;
       d)  is_in_git_repo || return
         local DRY_RUN=1
-        _info "🛠️ DRY_RUN mode"
+        _info "󱌣 DRY_RUN mode"
         ;;
       s)  is_in_git_repo || return
         local SKIP_CI=" [skip ci]"
-        _info "🛠️ SKIP_CI mode"
+        _info "󱌣 SKIP_CI mode"
         ;;
       h)  _help
         return 0
@@ -604,13 +604,13 @@ EOF
 
   #* empty-commit?
   if [ -z "${ADDED_FILES}" ] ; then
-    echo -en "${RED}⚠️ No files were added!\n⚠️ Create an ${MAGENTA}empty-commit${RED}?${NONE} [y/N]: " ; read -r empty_option
+    echo -en "${RED}⚠ No files were added!\n⚠️ Create an ${MAGENTA}empty-commit${RED}?${NONE} [y/N]: " ; read -r empty_option
     case "${empty_option}" in
       Y|y) local ALLOW_EMPTY='--allow-empty ' ;;
       *)   _error "Cancelled" ; return 1 ;;
     esac
   else
-    echo "${BLUE}ℹ️ Files added:${NONE} ${ADDED_FILES}"
+    echo "${BLUE} Files added:${NONE} ${ADDED_FILES}"
   fi
 
   # list of conventional commits types
@@ -625,89 +625,96 @@ EOF
     local THIS_CC_TYPE="${CC_GUESS}"
   else
     #* select conventional commit type with fzf explorer
-    local THIS_CC_TYPE="$(for i in ${CC_TYPES[@]} ; do echo "${i}" ; done | fzf --prompt ' > Select conventional commit type (ESC to cancel)' | awk '{print $1}')"
+    local THIS_CC_TYPE="$(for i in ${CC_TYPES[@]} ; do echo "${i}" ; done | fzf --accept-nth='1' --prompt ' > Select conventional commit type (ESC to cancel)')"
   fi
 
   if [ -z "${THIS_CC_TYPE}" ] ; then
     _error "No conventional commit type was specified" && return 1
   else
     #* conventional commit scope
-    echo -en "${MAGENTA} > Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (optional, hit ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
+    if [ -n "${SCOPE}" ]; then
+      local THIS_CC_SCOPE="${SCOPE}"
+      echo "${BLUE} Scope ${CYAN}${SCOPE}${BLUE} will be used"
+    else
+      echo -en "${MAGENTA} > Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (optional, hit ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
+    fi
 
     #* detect ticket in branch name
     local TICKET="$(echo ${CURRENT_BRANCH} | awk -F/ '{print $2}' | grep -E -o '[A-Z][A-Z0-9]+-[0-9]+')"
     if [ -n "${TICKET}" ] ; then
-      echo "${BLUE}ℹ️ Ticket ${CYAN}${TICKET}${BLUE} will be prepended in the commit message, do not type it ;-)"
+      echo "${BLUE} Ticket ${CYAN}${TICKET}${BLUE} will be prepended in the commit message, do not type it ;-)"
       local THIS_TICKET="[${TICKET}] "
       local THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | sed -e "s|^.*${TICKET}-||" -e 's|[_-]| |g')"
-      echo -en "${MAGENTA} > Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
     else
       local THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F/ '{print $NF}' | sed -e 's|[_-]| |g')"
-      echo -en "${MAGENTA} > Type a commit message, or hit ENTER to accept [${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}]:${NONE} " && read -r COMMIT_MESSAGE
     fi
+    echo -en "${MAGENTA} > Hit ENTER to accept \"${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}\",\n > Or type a custom commit message:${NONE} " && read -r COMMIT_MESSAGE
     [ -z "${COMMIT_MESSAGE}" ] && local COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
 
     #* create add/commit/push commands
     [ -n "${THIS_CC_SCOPE}" ] && local ADDED_SCOPE="(${THIS_CC_SCOPE})"
-    local COMMAND_COMMIT="git commit ${ALLOW_EMPTY}-m '${THIS_CC_TYPE}${ADDED_SCOPE}: ${THIS_TICKET}${COMMIT_MESSAGE}${SKIP_CI}'"
+    [ -n "$(git config --get user.signingkey)" ] && SIGN_COMMIT="-S "
+    local COMMAND_COMMIT="git commit ${SIGN_COMMIT}${ALLOW_EMPTY}-m '${THIS_CC_TYPE}${ADDED_SCOPE}: ${THIS_TICKET}${COMMIT_MESSAGE}${SKIP_CI}'"
     local COMMAND_ADD="git add ${ADDED_FILES}"
     local COMMAND_PUSH="git push -u origin ${CURRENT_BRANCH}"
 
     #* dry-run info
     if [ "${DRY_RUN}" ] ; then
-    _info "🛟 DRY_RUN ${BLUE}These commands would have been executed:${NONE}"
-    [ ! "${ALLOW_EMPTY}" ] && _info "🛟 DRY_RUN ${NONE}${COMMAND_ADD}"
-    _info "🛟 DRY_RUN ${NONE}${COMMAND_COMMIT}"
-    _info "🛟 DRY_RUN ${NONE}${COMMAND_PUSH}"
+      echo
+      _info "󰡾 DRY_RUN ${BLUE}These commands would have been executed:${NONE}"
+      [ ! "${ALLOW_EMPTY}" ] && _info "󰡾 DRY_RUN ${NONE}${COMMAND_ADD}"
+      _info "󰡾 DRY_RUN ${NONE}${COMMAND_COMMIT}"
+      _info "󰡾 DRY_RUN ${NONE}${COMMAND_PUSH}"
+      echo
     else
-    echo "${BLUE}ℹ️ will execute..:${NONE}"
-    [ ! "${ALLOW_EMPTY}" ] && echo "  ${COMMAND_ADD}"
-    echo "  ${COMMAND_COMMIT}"
+      echo "${BLUE} Next commands to execute..:${NONE}"
+      [ ! "${ALLOW_EMPTY}" ] && echo "  ${COMMAND_ADD}"
+      echo "  ${COMMAND_COMMIT}"
 
-    #* add & commit
-    echo -en "\n🔥 ${MAGENTA}Add & commit?${NONE} [Y/n]: " && read -r add_commit_option
-    case "${add_commit_option}" in
-      N|n)
-        echo ; return 0
-        ;;
-      *)
-      if [ ! "${ALLOW_EMPTY}" ] ; then
-        #! add files
-        eval "${COMMAND_ADD}"
-        ADD_RC="$?"
-      fi
-      #! commit files
-      eval "${COMMAND_COMMIT}"
-      COMMIT_RC="$?"
-      ;;
-    esac
-
-    #* push
-    if [ "${COMMIT_RC}" -eq "0" ] ; then
-      echo -en "\n🔥 ${MAGENTA}Push to  ${CYAN}${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: " && read -r push_option
-      case "${push_option}" in
-      N|n)
-        echo ; return 0
-        ;;
-      *)
-        #! push
-        eval "${COMMAND_PUSH}"
-        PUSH_RC="$?"
+      #* add & commit
+      echo -en "\n${YELLOW}󰈸 ${MAGENTA}Add & commit? [Y/n]:${NONE} " && read -r add_commit_option
+      case "${add_commit_option}" in
+        N|n)
+          echo ; return 0
+          ;;
+        *)
+        if [ ! "${ALLOW_EMPTY}" ] ; then
+          #! add files
+          eval "${COMMAND_ADD}"
+          ADD_RC="$?"
+        fi
+        #! commit files
+        eval "${COMMAND_COMMIT}"
+        COMMIT_RC="$?"
         ;;
       esac
-    else
-      return 1
-    fi
 
-    if [ "${PUSH_RC}" -eq "0" ] ; then
-      #* show the commit (git log)
-      echo && git log \
-      --date=relative \
-      --author="$(git config --get user.email)" \
-      --format="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C(reset)" \
-      --color --stat --decorate --graph -1
-    fi
-    echo
+      #* push
+      if [ "${COMMIT_RC}" -eq "0" ] ; then
+        echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to  ${CYAN}${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: " && read -r push_option
+        case "${push_option}" in
+        N|n)
+          echo ; return 0
+          ;;
+        *)
+          #! push
+          eval "${COMMAND_PUSH}"
+          PUSH_RC="$?"
+          ;;
+        esac
+      else
+        return 1
+      fi
+
+      if [ "${PUSH_RC}" -eq "0" ] ; then
+        #* show the commit (git log)
+        echo && git log \
+        --date=relative \
+        --author="$(git config --get user.email)" \
+        --format="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C(reset)" \
+        --color --stat --decorate --graph -1
+      fi
+      echo
     fi
   fi
 }
@@ -741,48 +748,9 @@ EOF
   fi
 }
 #===============================================================
-# search image in docker registry (configured in $ALIASES_WORK)
-function search_image() {
-  if [ ! -r "${ALIASES_WORK}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
-    return
-  else
-    source "${ALIASES_WORK}"
-    source "${SECRETS_FILE}"
-    local IMAGE="${1}"
-    local COUNT="${2:-5}"
-    if [ -z "${1}" ] ; then
-    echo -e "Usage: search_image foo\n"
-    else
-    _info "latest [${COUNT}] versions for image: ${YELLOW}${IMAGE}"
-    curl -su "${DOCKER_REGISTRY_USERNAME}:${DOCKER_REGISTRY_PASSWORD}" \
-      -X GET ${DOCKER_REGISTRY_URI}/v2/${IMAGE}/tags/list \
-      | jq -r '.tags[]' | sort -nr | head -${COUNT}
-    fi
-  fi
-}
-#===============================================================
-function search_chart() {
-# search helm chart in chart repo (configured in $ALIASES_WORK)
-  if [ ! -r "${ALIASES_WORK}" ] || [ ! -r "${SECRETS_FILE}" ] ; then
-    return
-  else
-    source "${ALIASES_WORK}"
-    source "${SECRETS_FILE}"
-    local CHART="${1}"
-    local COUNT="${2:-5}"
-    if [ -z "${1}" ] ; then
-    echo -e "Usage: search_chart foo\n"
-    else
-    _info "latest [${COUNT}] versions for chart: ${YELLOW}${CHART}"
-    curl -su "${CHARTMUSEM_USERNAME}:${CHARTMUSEM_PASSWORD}" ${CHARTMUSEM_URI}/${CHART} | \
-      jq -r '.[] | .version+" (appVersion: "+.appVersion+")"' | sort -nr | column -tx | head -${COUNT}
-    fi
-  fi
-}
-#===============================================================
 # kubectl exec selector
 function kx () {
-  local pod=($(kubectl get pods --no-headers -o wide | fzf | awk '{print $1}'))
+  local pod=($(kubectl get pods --no-headers -o wide | fzf --accept-nth='1'))
   local attr=${@}
   _info "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
   kubectl exec -it ${pod[1]} ${attr} -- ash 2>/dev/null ||
@@ -793,7 +761,7 @@ function kx () {
 #===============================================================
 # kubectl logs selector
 function kl () {
-  local pod=($(kubectl get pods --no-headers -o wide | fzf | awk '{print $1}'))
+  local pod=($(kubectl get pods --no-headers -o wide | fzf --accept-nth='1'))
   local attr=${@:-""}
   _info "kubectl logs --timestamps -f ${attr} ${pod[1]}"
   kubectl logs --timestamps -f ${attr} ${pod[1]}
@@ -961,5 +929,5 @@ EOF
 }
 
 ################################################################
-# Add your custom functions below!
+# Add your custom functions below
 ################################################################
