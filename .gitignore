@@ -1,7 +1,8 @@
+**/*.[1-9999]*
 **/*.bkp
 **/*.disabled
-**/lazy-lock.json
-**/lazyvim.json
+**/.tool-versions
+# **/lazy-lock.json
 **/state.yml
-.DS_Store
-.config/nvim/spell
+**/.DS_Store
+**/spell

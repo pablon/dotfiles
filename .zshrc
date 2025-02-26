@@ -1,17 +1,18 @@
+# shellcheck disable=SC2148
 # get zsh load time - START
 # prefer gnu-date
-[[ "$OSTYPE" =~ "darwin" ]] && ( type gdate &>/dev/null ) && alias date='gdate'
+[[ "$(uname)" == "Darwin" ]] && ( type gdate &>/dev/null ) && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
 
 # zsh
-FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions:${HOME}/.zsh/zsh-completions/src"
+FPATH="${FPATH}:${HOME}/.zsh/zsh-completions/src"
+(type brew &>/dev/null) && FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
 ZSH_PLUGINS=(zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search)
-for plugin in ${ZSH_PLUGINS[@]} ; do
+for plugin in "${ZSH_PLUGINS[@]}" ; do
     [ -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ] &&
     source ${HOME}/.zsh/${plugin}/${plugin}.zsh
 done
-# compinit (if having issues, delete ~/.zcompdump and re-run to rebuild)
-autoload -Uz compinit ; compinit
+
 # load ~/.zshrc_custom
 [ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
 
@@ -22,10 +23,8 @@ eval "$(atuin init zsh --disable-up-arrow)"
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init zsh)"
 
+cookie
 if [ -z "${TMUX}" ] ; then
-  # print random fortune cookie
-  cookie
-  # list tmux sessions
   tmux ls 2>/dev/null | while read session ; do _info "tmux session:${NONE} ${session}" ; done ; echo
 fi
 

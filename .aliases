@@ -1,7 +1,7 @@
-alias reload="reset ; clear ; source ~/.zshrc"
-
 #===============================================================
 # Navigation
+#===============================================================
+
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
@@ -9,6 +9,8 @@ alias .....="cd ../../../.."
 
 #===============================================================
 # brew
+#===============================================================
+
 if ( type brew &>/dev/null ) ; then
   alias brew_prune="brew cleanup --prune=all -v"
   alias brew_update_all="brew update && brew upgrade && brew cleanup --prune=all -v"
@@ -16,18 +18,18 @@ fi
 
 #===============================================================
 # OS metrics
+#===============================================================
+
 alias htop='sudo htop'
-if [[ "$(uname -s)" == "Darwin" ]] ; then
+if [[ "$(uname)" == "Darwin" ]] ; then
   ( type powermetrics &>/dev/null ) && alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
   ( type osx-cpu-temp &>/dev/null ) && alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
 fi
 
 #===============================================================
 # Utilities
-if ( type bat &>/dev/null ) ; then
-  alias bat='bat --style=numbers'
-  alias cat='bat --style=numbers'
-fi
+#===============================================================
+
 alias cdate='echo -n "$(date +%F\ %T\ %Z)" | $_clipboardApp'      # TZ
 alias cdateu='echo -n "$(date -u +%F\ %T\ %Z)" | $_clipboardApp'  # UTC
 alias curl="curl --progress-bar --connect-timeout 3 -m 3 -s -H 'User-Agent: Mozilla/5 Gecko'"
@@ -55,56 +57,51 @@ alias stat='stat -x'
 alias tm='tmux'
 alias tma='tmux a'
 alias tmls='tmux ls'
-alias vi='nvim'
-alias vim='nvim'
+alias vi='vim'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
 ( type yamllint &>/dev/null ) && alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
 
 
 #===============================================================
 # misc
+#===============================================================
+
+alias reload="reset ; source ${HOME}/.zshrc"
 ( type cmatrix &>/dev/null ) && alias cmatrix='cmatrix -abs'
 
 #===============================================================
 # fzf preview/edit
+#===============================================================
+
 alias pf="fzf --preview='less {}' --bind shift-up:preview-page-up,shift-down:preview-page-down"
 alias v="nvim -o \$(fzf -m --preview 'bat --style=numbers --color=always --line-range :500 {}')"
 
 #===============================================================
-# youtube-dl
-if ( type youtube-dl &>/dev/null ) ; then
-  alias ytd="youtube-dl -c --write-description  --merge-output-format mp4"
-  alias ytdf="youtube-dl -c --write-description --write-auto-sub --write-sub --sub-format srt --sub-lang es --merge-output-format mp4"
-  alias ytd_best="youtube-dl -c --write-description -f bestvideo+bestaudio --merge-output-format mp4"
-  alias ytd_get_subs="youtube-dl -c --write-sub --sub-format srt --sub-lang es"
-  alias ytd_list_subs="youtube-dl --list-subs"
-  alias ytd_mp3="youtube-dl -c -x --audio-format mp3"
-fi
-
-#===============================================================
-# AWS
-alias aws_examples="${EDITOR} /usr/local/share/awscli/examples/"
-
-#===============================================================
 # git
+#===============================================================
+
 alias g="git"
 alias ga='git a'
 alias gd='git diff'
+( type gh &>/dev/null ) && alias gh-create='gh repo create --private --source=. --remote=origin && git push -u --all && gh browse'
 alias gll="git log --color --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ar) %C(bold blue)<%an>%C(reset)' --graph --stat --all"
 alias gll="git log --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ar) %C(bold blue)<%an>%C(reset)' --graph --stat"
 alias gs='git status'
 alias gss='git status -s'
+alias gsp='git status --porcelain'
 alias gu='git u'
 alias lp="git lp"
 alias st="git st"
 if ( type lazygit &>/dev/null ) ; then
-  alias gt="lazygit -ucd ~/.config/lazygit"
+  alias gt="lazygit log -ucd ~/.config/lazygit"
 elif ( type gitui &>/dev/null ) ; then
   alias gt="gitui"
 fi
 
 #===============================================================
 # docker
+#===============================================================
+
 if ( type docker &>/dev/null ) ; then
   alias alpine="docker run --rm -it -w /mnt -v $(pwd):/mnt:rw alpine:latest ash"
   alias d="docker"
@@ -123,10 +120,14 @@ fi
 
 #===============================================================
 # ACT - check ~/.actrc
+#===============================================================
+
 ( type act &>/dev/null ) && ( type gh &>/dev/null ) && alias act="act --rm -b --use-new-action-cache --detect-event -s GITHUB_TOKEN=\"$(gh auth token)\""
 
 #===============================================================
 # kubernetes
+#===============================================================
+
 if ( type kubectl &>/dev/null ) ; then
   if ( type kubecolor &>/dev/null ) ; then
     alias k='kubecolor'
@@ -141,9 +142,9 @@ if ( type kubectl &>/dev/null ) ; then
   alias kga='kubectl get all'
   alias kgaa='kubectl get all -A'
   alias kgd='kubectl get deploy'
-  alias kge="kubectl get event --sort-by='.lastTimestamp' -w"
-  alias kgea="kubectl get event --sort-by='.lastTimestamp' -Aw"
-  alias kgee='kubectl events --types=Warning -w'
+  alias kge="kubectl get event --no-headers=true --sort-by='.lastTimestamp' -w"
+  alias kgea="kubectl get event --no-headers=true -Aw"
+  alias kgee='kubectl events --no-headers=true --types=Warning -w'
   alias kgn='kubectl get node --sort-by=".metadata.creationTimestamp"'
   alias kgnl='kubectl get node --sort-by=".metadata.creationTimestamp" --show-labels'
   alias kgns='kubectl get namespace'
@@ -186,11 +187,12 @@ fi
 if ( type minikube &>/dev/null ) ; then
   alias mk='minikube'
   alias mks='minikube profile list && minikube status'
-  alias mktunnel="minikube tunnel --cleanup=true --bind-address='*'"
+  alias mkt="minikube tunnel --cleanup=true --bind-address='*'"
 fi
 
 #===============================================================
-# private browsing
-# alias bbi="/path/to/brave --incognito &"
-# alias cci="/path/to/google-chrome --incognito &"
-# alias ffi="/path/to/firefox --private-window --safe-mode &"
+# private browsing - set one of:
+#   alias pb="$(which brave) --incognito &"
+#   alias pb="$(which google-chrome) --incognito &"
+#   alias pb="$(which firefox) --private-window --safe-mode &"
+#===============================================================

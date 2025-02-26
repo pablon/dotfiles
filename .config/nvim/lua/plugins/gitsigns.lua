@@ -30,11 +30,11 @@ return {
     watch_gitdir = {
       follow_files = true,
     },
-    current_line_blame = false,
+    current_line_blame = true,
     current_line_blame_opts = {
       virt_text = true,
       virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
-      delay = 1000,
+      delay = 300,
       ignore_whitespace = false,
       virt_text_priority = 100,
       use_focus = true,
@@ -70,15 +70,15 @@ return {
       map("n", "<leader>ghu", gs.undo_stage_hunk, "Undo Stage Hunk")
       map("n", "<leader>ghR", gs.reset_buffer, "Reset Buffer")
       map("n", "<leader>ghp", gs.preview_hunk_inline, "Preview Hunk Inline")
-      map("n", "<leader>ghb", function() gs.blame_line({ full = true }) end, "Blame Line")
-      map("n", "<leader>ghB", function() gs.blame() end, "Blame Buffer")
+      map("n", "<leader>gb", function() gs.blame_line({ full = true }) end, "Blame Line")
+      map("n", "<leader>ghb", function() gs.blame() end, "Blame Buffer")
       map("n", "<leader>ghd", gs.diffthis, "Diff This")
       -- Enable wrap in both diff windows
       map("n", "<leader>ghd", function() gs.diffthis() vim.cmd("windo set wrap") end, "Diff This")
       map("n", "<leader>ghD", function() gs.diffthis("~") end, "Diff This ~")
       map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
       -- custom
-      map("n", "<leader>gb", ":Gitsigns toggle_current_line_blame<CR>","Toggle current line blame")
+      -- map("n", "<leader>gb", ":Gitsigns toggle_current_line_blame<CR>","Toggle current line blame")
       map("n", "<leader>gH", ":Gitsigns toggle_linehl<CR>","Toggle line highlight")
     end,
   },

@@ -16,10 +16,9 @@
 " => General
 "===============================================================
 
-" With a map leader it's possible to do extra key combinations
-" like <leader>w saves the current file
-" let mapleader = " "
-let mapleader = "\<Space>"
+" set map leader
+nnoremap <SPACE> <Nop>
+let mapleader = " "
 
 " Fast saving
 nmap <leader>w :w!<cr>
@@ -32,6 +31,7 @@ nmap <leader>Q :qall!<cr>
 command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
 " basic stuff
 set clipboard=unnamed       " will make Vim yank to the clipboard
+set colorcolumn=80          " list of screen columns that are highlighted with ColorColumn
 set fillchars+=vert:\       " Remove unpleasant pipes from vertical splits
 set history=2000            " sets how many lines of history VIM has to remember
 set nocompatible            " yup
@@ -64,8 +64,6 @@ set foldenable                      " enable folding
 set foldmethod=manual               " fold method
 set foldlevelstart=10               " open most folds by default
 set foldnestmax=10                  " 10 nested fold max
-" space open/closes folds
-nnoremap <space> za
 
 augroup filetype_vim
   autocmd!
@@ -126,26 +124,17 @@ nmap <C-Q> :q!<CR>  " quit now
 "===============================================================
 " => VIM user interface
 "===============================================================
-" Set 7 lines to the cursor - when moving vertically using j/k (scrolloff)
-set scrolloff=7
-" Avoid garbled characters in Chinese language windows OS
-let $LANG='en'
-set langmenu=en
+
+set scrolloff=7                " Set 7 lines to the cursor - when moving vertically using j/k (scrolloff)
+let $LANG='en'                 " Avoid garbled characters in Chinese language windows OS
+set langmenu=en                " Language to use for menu translation
 source $VIMRUNTIME/delmenu.vim
 source $VIMRUNTIME/menu.vim
-" Turn on the Wild menu
-set wildmenu
-set wildmode=longest,list,full
-set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx,*.tar,*.gz,*.zip,*.bz2
 
-set wildoptions=fuzzy
-" Ignore compiled files
-set wildignore=*.o,*~,*.pyc,*.swp,*.bak,*.pyc,*.class
-if has("win16") || has("win32")
-  set wildignore+=.git\*,.hg\*,.svn\*
-else
-  set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
-endif
+set wildmenu                   " Turn on the Wild menu
+set wildmode=longest,list,full " Completion mode that is used for  'wildchar'
+set wildignore=*.o,*~,*.pyc,*.swp,*.bak,*.pyc,*.class,*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+set wildoptions=fuzzy          " A list of words that change how cmdline-completion is done
 set backspace=eol,start,indent " Configure backspace so it acts as it should act
 set cmdheight=1                " Height of the command bar
 set hid                        " A buffer becomes hidden when it is abandoned
@@ -204,11 +193,8 @@ if has("gui_running")
   set guitablabel=%M\ %t
 endif
 
-" Set utf8 as standard encoding and en_US as the standard language
-set encoding=utf8
-
-" Use Unix as the standard file type
-set ffs=unix,dos
+set encoding=utf8 " Set utf8 as standard encoding and en_US as the standard language
+set ffs=unix,dos  " Use Unix as the standard file type
 
 "===============================================================
 " => Files, backups and undo
@@ -228,7 +214,7 @@ set nowrap
 set smartindent
 set smarttab
 set tabstop=2 softtabstop=2 shiftwidth=2 " use 2 spaces for tabs
-set textwidth=500
+set textwidth=80
 
 """"""""""""""""""""""""""""""
 " => Visual mode related
@@ -459,6 +445,8 @@ let g:fzf_colors =
 
 " fzf
 set rtp+=/usr/local/opt/fzf
+" highlight ColorColumn
+highlight ColorColumn ctermbg=0 guibg=darkgrey
 " highlight trailing spaces
 highlight ExtraWhiteSpace ctermbg=red guibg=red
 match ExtraWhiteSpace /\s\+$/

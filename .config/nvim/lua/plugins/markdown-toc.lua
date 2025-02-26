@@ -7,9 +7,6 @@ return {
   opts = {
     toc_list = {
       markers = "-",
-      indent_size = function()
-        return vim.bo.shiftwidth
-      end,
     },
     headings = {
       exclude = { "CHANGELOG", "INDEX", "Index", "License" },

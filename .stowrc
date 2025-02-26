@@ -2,7 +2,5 @@
 --ignore=.helm
 --ignore=.pre-commit-config.yaml
 --ignore=.stowrc
---ignore=.zshrc.default
---ignore=README.md
 --ignore=setup
 --ignore=setup.sh

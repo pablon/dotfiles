@@ -4,28 +4,28 @@
 # Author: https://github.com/pablon
 ##########################################################
 
-NERD_FONTS=('Hack' 'JetBrainsMono' 'Ubuntu')
+NERD_FONTS=('Hack' 'JetBrainsMono' 'FiraCode')
 
 PROJECT='ryanoasis/nerd-fonts'
 LATEST="$(curl -s "https://api.github.com/repos/${PROJECT}/releases/latest" | jq -r ".tag_name")"
 
 source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
 
-if [[ "${OSTYPE}" =~ "darwin" ]]; then
-  TARGET_DIR=~/Library/Fonts
-elif [[ "${OSTYPE}" =~ "linux" ]]; then
-  TARGET_DIR=~/.local/share/fonts
+if [[ "$(uname)" == "Darwin" ]]; then
+	TARGET_DIR=~/Library/Fonts
+elif [[ "$(uname)" == "Linux" ]]; then
+	TARGET_DIR=~/.local/share/fonts
 fi
-[ -d ${TARGET_DIR} ] || mkdir -p ${TARGET_DIR}
+[ -d "${TARGET_DIR}" ] || mkdir -p "${TARGET_DIR}"
 
 for font in "${NERD_FONTS[@]}"; do
-  (
-    cd ${TARGET_DIR}/ || exit 1
-    _info "Downloading font ${YELLOW}${font}"
-    \curl -fsSL https://github.com/${PROJECT}/releases/download/${LATEST}/${font}.zip -o ${font}.zip &&
-      unzip -oq ${font}.zip &&
-      rm -f ${font}.zip
-  )
+	(
+		cd "${TARGET_DIR}/" || exit 1
+		_info "Downloading font ${YELLOW}${font}"
+		\curl -fsSL "https://github.com/${PROJECT}/releases/download/${LATEST}/${font}.zip" -o "${font}.zip" &&
+			unzip -oq "${font}.zip" &&
+			rm -f "${font}.zip"
+	)
 done
 
 _info "Runnning fc-cache"

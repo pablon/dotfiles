@@ -6,11 +6,6 @@
 # Requires: curl
 ##########################################################
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
-  echo "This script is for macOS only"
-  exit 0
-fi
-
 source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
 
 # taps: warrensbox/tap # tfswitch
@@ -28,28 +23,31 @@ NONE="\033[0m"
 #===============================================================
 # Detect Apple Silicon chipset + install rosetta
 
-if [[ "$(uname -s)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
-  echo -e "${YELLOW}HEY! I've detected you're running an Apple Silicon Chip - ${CYAN}I will install Rosetta now${NONE}"
-  sleep 2
-  _info "Installing ${YELLOW}rosetta"
-  /usr/sbin/softwareupdate --install-rosetta --agree-to-license
-  echo -e "/usr/sbin/softwareupdate --install-rosetta --agree-to-license${NONE} = ${YELLOW}$?${NONE}"
+if [[ "$(uname)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
+  if (! arch -x86_64 /usr/bin/true 2>/dev/null); then
+    echo -e "${YELLOW}HEY! I've detected you're running an Apple Silicon Chip - ${CYAN}I will install Rosetta2 now${NONE}"
+    sleep 2
+    _info "Installing ${YELLOW}rosetta2"
+    /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+    echo -e "/usr/sbin/softwareupdate --install-rosetta --agree-to-license${NONE} = ${YELLOW}$?${NONE}"
+  fi
 fi
 
 #===============================================================
 # Install Homebrew
-if (! command -v brew &>/dev/null); then
+if (command -v brew &>/dev/null) || [ "$(uname -m)" != "amd64" ]; then
+  exit 0
+else
   _info "Installing ${YELLOW}homebrew"
   NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   # verify
-  if ! (command -v brew config &>/dev/null); then
+  if [ $? -ne 0 ] || (! command -v brew config &>/dev/null); then
     echo "❌ Something went wrong while installing homebrew. Aborting."
-    return 1
+    exit 1
   fi
+  # Disable brew analytics
+  brew analytics off
 fi
-
-# Disable brew analytics
-brew analytics off
 
 #===============================================================
 # Install packages

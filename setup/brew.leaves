@@ -16,7 +16,6 @@ fd
 ffmpeg
 figlet
 findutils
-font-hack-nerd-font
 fortune
 fzf
 gawk
@@ -26,11 +25,8 @@ gitlint
 gitui
 glab
 gnu-sed
-goenv
-golangci-lint
 grep
 hadolint
-hashicorp/tap/vault
 helm-docs
 helmfile
 htop
@@ -51,7 +47,6 @@ libpq
 minikube
 neovim
 netcat
-noahgorstein/tap/jqp
 openssl
 osx-cpu-temp
 pass
@@ -70,7 +65,6 @@ terrascan
 tflint
 tfsec
 tmux
-warrensbox/tap/tfswitch
 watch
 wget
 yamllint

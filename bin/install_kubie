@@ -35,7 +35,7 @@ ME="$(basename ${0})"
 KUBIE_CONFIG="${HOME}/.kube/kubie.yaml"
 
 for program in curl jq; do
-  if ! ( command -v ${program} &>/dev/null ); then
+  if ! (command -v ${program} &>/dev/null); then
     echo -e "${RED}# program ${BOLD}${program}${RED} is needed to run this script.\n# Install it and try again.${NONE}\n"
     exit 1
   fi
@@ -52,24 +52,26 @@ function get_latest_ver() {
 }
 
 function get_system() {
-  if [[ "${OSTYPE}" =~ "linux" ]]; then
+  if [[ "$(uname)" == "Linux" ]]; then
     export THIS_OS='linux'
-  elif [[ "${OSTYPE}" =~ "darwin" ]]; then
+  elif [[ "$(uname)" == "Darwin" ]]; then
     export THIS_OS='darwin'
-    if ( ! command -v brew &>/dev/null ) ; then
+    if (! command -v brew &>/dev/null); then
       echo -e "\n${YELLOW}Homebrew Package Manager for macOS is required to install kubie and fzf.${NONE}"
       read -p "Install homebrew now? [Y/n]: " -s ANSWER
       case "${ANSWER}" in
-        N|n)
-          echo "Bye" ; exit 0
-          ;;
-        *)
-          echo "Installing Homebrew from https://brew.sh/"
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          if [[ $? -ne 0 ]] ; then
-            echo -e "${RED}ERROR installing homebrew${NONE}" ; exit 1
-          fi
-          ;;
+      N | n)
+        echo "Bye"
+        exit 0
+        ;;
+      *)
+        echo "Installing Homebrew from https://brew.sh/"
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        if [[ $? -ne 0 ]]; then
+          echo -e "${RED}ERROR installing homebrew${NONE}"
+          exit 1
+        fi
+        ;;
       esac
     fi
   else
@@ -83,10 +85,10 @@ function get_system() {
 }
 
 function add_bash_completion() {
-  if [[ "$(echo $(basename ${SHELL}))" == "bash" ]] && [[ "${THIS_OS}" = "linux" ]] && [[ ! -f ~/.kube/kubie.bash ]] ; then
+  if [[ "$(echo $(basename ${SHELL}))" == "bash" ]] && [[ "${THIS_OS}" = "linux" ]] && [[ ! -f ~/.kube/kubie.bash ]]; then
     echo -e "==> ${YELLOW}Installing kubie's shell completion${NONE} as ${BOLD}~/.kube/kubie.bash${NONE}"
     curl -fsSL -o ~/.kube/kubie.bash 'https://raw.githubusercontent.com/sbstp/kubie/master/completion/kubie.bash'
-    echo -e "\n# Load kubie's bash completion\n[[ -f ~/.kube/kubie.bash ]] && source ~/.kube/kubie.bash\n" >> ~/.bashrc
+    echo -e "\n# Load kubie's bash completion\n[[ -f ~/.kube/kubie.bash ]] && source ~/.kube/kubie.bash\n" >>~/.bashrc
   fi
 }
 
@@ -97,24 +99,24 @@ function install_update() {
   (
     VERSION_CONTROL=off
     case "${THIS_OS}" in
-      linux)
-          if [[ "${1}" = "kubie" ]] ; then
-            curl -fSL --progress-bar -o ${1} "https://github.com/${GITHUB_PROJECT_KUBIE}/releases/download/${3}/${1}-${THIS_OS}-amd64"
-          elif [[ "${1}" = "fzf" ]] ; then
-            curl -fSL --progress-bar -o ${1}.tgz "https://github.com/${GITHUB_PROJECT_FZF}/releases/download/${2}/${1}-${2}-${THIS_OS}_amd64.tar.gz" && \
-            tar xfz ${1}.tgz || exit 1
-          fi
-          sudo install ${INSTALL_OPTS} ${1} ${INSTALL_TARGET}/
-          ;;
-      darwin)
-          VERB="${ACTION:-install}"
-          echo -e "==> (${MAGENTA}invoking brew for ${VERB}...${NONE})"
-          if [[ "${1}" = "kubie" ]] ; then
-            brew ${VERB} kubie
-          elif [[ "${1}" = "fzf" ]] ; then
-            brew ${VERB} fzf
-          fi
-          ;;
+    linux)
+      if [[ "${1}" = "kubie" ]]; then
+        curl -fSL --progress-bar -o ${1} "https://github.com/${GITHUB_PROJECT_KUBIE}/releases/download/${3}/${1}-${THIS_OS}-amd64"
+      elif [[ "${1}" = "fzf" ]]; then
+        curl -fSL --progress-bar -o ${1}.tgz "https://github.com/${GITHUB_PROJECT_FZF}/releases/download/${2}/${1}-${2}-${THIS_OS}_amd64.tar.gz" &&
+          tar xfz ${1}.tgz || exit 1
+      fi
+      sudo install ${INSTALL_OPTS} ${1} ${INSTALL_TARGET}/
+      ;;
+    darwin)
+      VERB="${ACTION:-install}"
+      echo -e "==> (${MAGENTA}invoking brew for ${VERB}...${NONE})"
+      if [[ "${1}" = "kubie" ]]; then
+        brew ${VERB} kubie
+      elif [[ "${1}" = "fzf" ]]; then
+        brew ${VERB} fzf
+      fi
+      ;;
     esac
   )
   [[ -d ${WORKDIR} ]] && rm -rf "${WORKDIR}"
@@ -122,21 +124,21 @@ function install_update() {
 }
 
 function create_kubie_yaml() {
-  if [[ ! -d ${HOME}/.kube ]] ; then  # JIC...
+  if [[ ! -d ${HOME}/.kube ]]; then # JIC...
     mkdir -vp ${HOME}/.kube
   fi
-  if ( command -v zsh &>/dev/null ) ; then
+  if (command -v zsh &>/dev/null); then
     local KUBIE_SHELL='zsh'
   else
     local KUBIE_SHELL='bash'
     add_bash_completion
   fi
-  if [ -f ${KUBIE_CONFIG} ] ; then
+  if [ -f ${KUBIE_CONFIG} ]; then
     BACKUP_TS="$(date +%Y%m%d-%H%M%S)"
     cp -vf ${KUBIE_CONFIG}{,.${BACKUP_TS}}
     echo -e "==> ${YELLOW}Saving existing config file as${NONE} as ${MAGENTA}${KUBIE_CONFIG}.${BACKUP_TS}${NONE}"
   fi
-  cat << EOF > ${KUBIE_CONFIG}
+  cat <<EOF >${KUBIE_CONFIG}
 # Force kubie to use a particular shell, if unset detect shell currently in use.
 # Possible values: bash, dash, fish, zsh
 # Default: unset
@@ -200,13 +202,13 @@ behavior:
     # Default: auto
     print_context_in_exec: auto
 EOF
-  if [ $? -eq 0 ] ; then
+  if [ $? -eq 0 ]; then
     echo -e "==> Configuration file ${YELLOW}${KUBIE_CONFIG}${NONE} created :-)"
   else
     echo -e "${RED}==> ERROR creating configuration file ${YELLOW}${KUBIE_CONFIG}${NONE} "
   fi
 
-  if [[ ! -d ${HOME}/.kube/configs ]] ; then
+  if [[ ! -d ${HOME}/.kube/configs ]]; then
     mkdir -vp ${HOME}/.kube/configs
     echo -e "==> Now you can store every kubernetes context as a separate YAML file in \n\t${YELLOW}~/.kube/configs/${NONE} dir\n==> Then try running ${GREEN}kubie ctx${NONE}, then ${GREEN}kubie ns${NONE} and enjoy"
   fi
@@ -237,14 +239,14 @@ for i in kubie fzf; do
   fi
 done
 
-if [ ! -r "${KUBIE_CONFIG}" ] ; then
+if [ ! -r "${KUBIE_CONFIG}" ]; then
   create_kubie_yaml
 else
   echo -e "==> ${YELLOW}${KUBIE_CONFIG}${NONE} exists."
   read -p "    Do you wan to update kubie's config file? [Y/n]:  "
   case "${REPLY}" in
-    N|n) true ;;
-    *)   create_kubie_yaml ;;
+  N | n) true ;;
+  *) create_kubie_yaml ;;
   esac
 fi
 
