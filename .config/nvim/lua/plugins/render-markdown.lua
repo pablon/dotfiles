@@ -53,33 +53,68 @@ return {
       position = "overlay",
     },
     callout = {
-      abstract = { raw = "[!ABSTRACT]", rendered = "󰨸 Abstract", highlight = "RenderMarkdownInfo" },
-      attention = { raw = "[!ATTENTION]", rendered = "󰀪 Attention", highlight = "RenderMarkdownWarn" },
       bug = { raw = "[!BUG]", rendered = "󰨰 Bug", highlight = "RenderMarkdownError" },
-      caution = { raw = "[!CAUTION]", rendered = "󰳦 Caution", highlight = "RenderMarkdownError" },
+      note = { raw = "[!NOTE]", rendered = " Note", highlight = "RenderMarkdownInfo" },
+      info = { raw = "[!INFO]", rendered = "󰋽 Info", highlight = "RenderMarkdownInfo" },
+      todo = { raw = "[!TODO]", rendered = "󰗡 Todo", highlight = "RenderMarkdownTodo" },
+      success = { raw = "[!SUCCESS]", rendered = "󰄬 Success", highlight = "RenderMarkdownSuccess" },
       check = { raw = "[!CHECK]", rendered = "󰄬 Check", highlight = "RenderMarkdownSuccess" },
-      cite = { raw = "[!CITE]", rendered = "󱆨 Cite", highlight = "RenderMarkdownQuote" },
-      danger = { raw = "[!DANGER]", rendered = "󱐌 Danger", highlight = "RenderMarkdownError" },
       done = { raw = "[!DONE]", rendered = "󰄬 Done", highlight = "RenderMarkdownSuccess" },
+      tip = { raw = "[!TIP]", rendered = "󰌶 Tip", highlight = "RenderMarkdownSuccess" },
+      hint = { raw = "[!HINT]", rendered = "󰌶 Hint", highlight = "RenderMarkdownSuccess" },
       error = { raw = "[!ERROR]", rendered = "󱐌 Error", highlight = "RenderMarkdownError" },
-      example = { raw = "[!EXAMPLE]", rendered = "󰉹 Example", highlight = "RenderMarkdownHint" },
+      danger = { raw = "[!DANGER]", rendered = "󱐌 Danger", highlight = "RenderMarkdownError" },
+      important = { raw = "[!IMPORTANT]", rendered = " Important", highlight = "RenderMarkdownHint" },
       fail = { raw = "[!FAIL]", rendered = "󰅖 Fail", highlight = "RenderMarkdownError" },
       failure = { raw = "[!FAILURE]", rendered = "󰅖 Failure", highlight = "RenderMarkdownError" },
-      faq = { raw = "[!FAQ]", rendered = "󰘥 Faq", highlight = "RenderMarkdownWarn" },
-      help = { raw = "[!HELP]", rendered = "󰘥 Help", highlight = "RenderMarkdownWarn" },
-      hint = { raw = "[!HINT]", rendered = "󰌶 Hint", highlight = "RenderMarkdownSuccess" },
-      important = { raw = "[!IMPORTANT]", rendered = "󰅾 Important", highlight = "RenderMarkdownHint" },
-      info = { raw = "[!INFO]", rendered = "󰋽 Info", highlight = "RenderMarkdownInfo" },
       missing = { raw = "[!MISSING]", rendered = "󰅖 Missing", highlight = "RenderMarkdownError" },
-      note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
-      question = { raw = "[!QUESTION]", rendered = "󰘥 Question", highlight = "RenderMarkdownWarn" },
-      quote = { raw = "[!QUOTE]", rendered = "󱆨 Quote", highlight = "RenderMarkdownQuote" },
-      success = { raw = "[!SUCCESS]", rendered = "󰄬 Success", highlight = "RenderMarkdownSuccess" },
-      summary = { raw = "[!SUMMARY]", rendered = "󰨸 Summary", highlight = "RenderMarkdownInfo" },
-      tip = { raw = "[!TIP]", rendered = "󰌶 Tip", highlight = "RenderMarkdownSuccess" },
-      tldr = { raw = "[!TLDR]", rendered = "󰨸 Tldr", highlight = "RenderMarkdownInfo" },
-      todo = { raw = "[!TODO]", rendered = "󰗡 Todo", highlight = "RenderMarkdownInfo" },
       warning = { raw = "[!WARNING]", rendered = "󰀪 Warning", highlight = "RenderMarkdownWarn" },
+      caution = { raw = "[!CAUTION]", rendered = "󰀪 Caution", highlight = "RenderMarkdownError" },
+      attention = { raw = "[!ATTENTION]", rendered = "󰀪 Attention", highlight = "RenderMarkdownWarn" },
+      question = { raw = "[!QUESTION]", rendered = "󰘥 Question", highlight = "RenderMarkdownWarn" },
+      help = { raw = "[!HELP]", rendered = "󰘥 Help", highlight = "RenderMarkdownWarn" },
+      faq = { raw = "[!FAQ]", rendered = "󰘥 Faq", highlight = "RenderMarkdownWarn" },
+      example = { raw = "[!EXAMPLE]", rendered = "󰉹 Example", highlight = "RenderMarkdownHint" },
+      summary = { raw = "[!SUMMARY]", rendered = "󰨸 Summary", highlight = "RenderMarkdownInfo" },
+      abstract = { raw = "[!ABSTRACT]", rendered = "󰨸 Abstract", highlight = "RenderMarkdownInfo" },
+      tldr = { raw = "[!TLDR]", rendered = "󰨸 Tldr", highlight = "RenderMarkdownInfo" },
+      quote = { raw = "[!QUOTE]", rendered = "󱆨 Quote", highlight = "RenderMarkdownQuote" },
+      cite = { raw = "[!CITE]", rendered = "󱆨 Cite", highlight = "RenderMarkdownQuote" },
+      -- match custom callouts from .obsidian/snippets/custom.css
+      --
+      -- .callout[data-callout="coffee"] {
+      --   --callout-color: 249, 231, 159;
+      --   --callout-icon: "coffee";
+      -- }
+      coffee = { raw = "[!COFFEE]", rendered = "󰛊 Coffee", highlight = "RenderMarkdownInlineHighlight" },
+      -- .callout[data-callout="decision"] {
+      --   --callout-color: 219, 51, 247;
+      --   --callout-icon: "swords";
+      -- }
+      decision = { raw = "[!DECISION]", rendered = "󰞇 Decision", highlight = "RenderMarkdownBullet" },
+      -- .callout[data-callout="pass"],
+      -- .callout[data-callout="password"] {
+      --   --callout-color: 228, 110, 106;
+      --   --callout-icon: "key-round";
+      -- }
+      pass = { raw = "[!PASS]", rendered = " Pass", highlight = "RenderMarkdownWarn" },
+      password = { raw = "[!PASSWORD]", rendered = " Password", highlight = "RenderMarkdownWarn" },
+      -- .callout[data-callout="auth"],
+      -- .callout[data-callout="login"],
+      -- .callout[data-callout="secret"] {
+      --   --callout-color: 255, 150, 108;
+      --   --callout-icon: "book-lock";
+      -- }
+      auth = { raw = "[!ACCESS]", rendered = " Access", highlight = "RenderMarkdownWarn" },
+      login = { raw = "[!LOGIN]", rendered = "󱚏 Login", highlight = "RenderMarkdownError" },
+      secret = { raw = "[!SECRET]", rendered = "󱚏 Secret", highlight = "RenderMarkdownError" },
+      -- .callout[data-callout="user"],
+      -- .callout[data-callout="me"] {
+      --   --callout-color: 165, 105, 189;
+      --   --callout-icon: "user";
+      -- }
+      user = { raw = "[!USER]", rendered = " User", highlight = "RenderMarkdownH5" },
+      me = { raw = "[!ME]", rendered = " User", highlight = "RenderMarkdownH5" },
     },
     checkbox = {
       enabled = true,
@@ -134,7 +169,7 @@ return {
       language_name = true,
       language_pad = 0,
       min_width = 40,
-      left_pad = 2,
+      left_pad = 0,
       right_pad = 2,
       sign = true,
       style = "full",
@@ -150,7 +185,7 @@ return {
       enabled = true,
       highlight = "RenderMarkdownDash",
       icon = "",
-      width = "full",
+      width = 80,
     },
   },
 }

@@ -76,10 +76,8 @@ vim.keymap.set(
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
--- Start interactive EasyAlign in visual mode (e.g. vipga)
-vim.keymap.set("n", "<leader>al", "<Plug>(EasyAlign)", { desc = " Start EasyAlign" })
--- Start interactive EasyAlign for a motion/text object (e.g. gaip)
-vim.keymap.set("x", "<leader>al", "<Plug>(EasyAlign)", { desc = " Start EasyAlign" })
+-- Start interactive EasyAlign
+vim.keymap.set({ "n", "x" }, "<leader>al", "<Plug>(EasyAlign)", { desc = " Start EasyAlign" })
 
 -- surround word with quotes
 vim.keymap.set("n", "<leader>aq", 'ciw""<Esc>P', { desc = "Add Surround Quotes" })

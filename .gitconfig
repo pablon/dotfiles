@@ -6,140 +6,151 @@
 ; ======  * https://gitlab.com/gitlab-org/cli
 ; =======================================================
 
-[user]
-  ; name =
+; [user]
+;   name       = Name
+;   email      = Email
+;   signingkey = ~/.ssh/id_ed25519.pub
 
 ; ====== Use different config on different Pathspecs:
-; [includeIf "gitdir:~/projects/**"]
-;   path = ~/.gitconfig_work
-;   name = Full Name
-;   email = Work Email
-
 ; [includeIf "gitdir:~/other/dir/**"]
-;   path = ~/.gitconfig_personal
-;   name = foo
-;   email = *******@users.noreply.github.com
+;   path       = ~/.gitconfig_personal
+;   name       = foo
+;   email      = *******@users.noreply.github.com
+;   signingkey = ~/.ssh/id_ed25519.pub
+
+; [includeIf "gitdir:~/projects/**"]
+;   path       = ~/.gitconfig_work
+;   name       = Full Name
+;   email      = Work Email
+;   signingkey = ~/.ssh/id_ed25519_work.pub
 
 [init]
-  defaultBranch = develop
+  defaultBranch = main
+
+[branch]
+  autoSetupRebase = true
 
 [core]
-  pager = less -IFX
-  ; pager = diff-so-fancy | less --tabs=2 -RFX
+  autocrlf = input
+  pager    = "if [ ! -z \"$(type diff-so-fancy)\" ]; then diff-so-fancy | less --tabs=2 -RFX; else less --tabs=2 -RFX; fi"
+
+[diff-so-fancy]
+  stripLeadingSymbols = false
 
 [color]
-  ui = always
-  log = auto
-  diff = auto
+  ui    = always
+  log   = auto
+  diff  = auto
   blame = highlightRecent
 
 [color "branch"]
   current = green bold
-  local = yellow bold
-  remote = magenta
+  local   = yellow bold
+  remote  = magenta
 
 [color "diff"]
-  frag = magenta bold
-  meta = yellow bold
-  new = green bold
-  old = red bold
+  frag       = magenta bold
+  meta       = yellow bold
+  new        = green bold
+  old        = red bold
   whitespace = red reverse
 
 [color "diff-highlight"]
   newHighlight = green bold 22
-  newNormal = green bold
+  newNormal    = green bold
   oldHighlight = red bold 52
-  oldNormal = red bold
+  oldNormal    = red bold
 
 [color "status"]
-  added = green bold
-  changed = yellow bold
+  added     = green bold
+  changed   = yellow bold
   untracked = red bold
 
 [apply]
   whitespace = fix
 
 [alias]
-  a = "!git add $(git ls-files --exclude-standard -m | fzf -m --header='󱞽 Select file(s) to stage' --preview-window='right:60%' --preview 'git diff --color=always {-1}') && git status -uno -s"  ; (fzf) select modified files to add
-  aa = "!git add $(git ls-files --exclude-standard -mo | fzf -m --header='󱞽 Select file(s) to stage' --preview-window='right:60%' --preview 'git diff --color=always {-1}') && git status -uno -s"  ; (fzf) select untracked + modified files to add
-  ad = "!git ls-files -o --exclude-standard --directory | fzf -m --preview 'tree ${1}' --header='󱞽 Select dir(s) to add' | xargs -r git add && git status -s -uno" ; (fzf) select untracked directories to add
-  amend = commit -a --amend
-  au = "!git ls-files -o --exclude-standard | fzf -m --header='󱞽 Select file(s) to add' --preview 'bat --color=always --line-range :500 {}' | xargs -r git add && git status -s -uno" ; (fzf) select untracked files to add
-  ca = commit -am
-  cm = commit -m
-  co = checkout
-  cp = cherry-pick
-  cpa = cherry-pick --abort
-  cpc = cherry-pick --continue
-  db = "!git branch --color=never | awk '!/(develop|main|master)/ {print $NF}' | fzf -0 -m --marker='' --prompt='󱞽 Select local branch(es) to delete ' --preview-window='right:55%' --preview 'git show --color=always {-1}' | xargs -r git branch -D" ; (fzf) interactively delete branches
-  db-remote = "!git branch --color=never -r | awk '!/(develop|main|master)/ {print $NF}' | fzf -0 -m --marker='' --prompt='󱞽 Select remote branch(es) to delete ' --preview-window='right:55%' --preview 'git show --color=always {-1}' | sed 's|origin/||g' | xargs -r git push -d origin" ; (fzf) interactively delete branches
-  default = "!echo ' Updating default branch...' ; git checkout $(git symbolic-ref refs/remotes/origin/HEAD --short | awk -F'/' '{print $NF}') && git pull --stat --tags" ; switch to & pull default branch
-  dif = diff
-  difc = diff --color-words
-  ec = "!${EDITOR} ${HOME}/.gitconfig" ; edit this config file
-  fake = commit --allow-empty -m 'empty commit' ; empty commit - sometimes useful for testing CI
-  fakeskip = commit --allow-empty -m 'empty commit [skip ci]' ; empty commit skipping ci - sometimes useful for testing CI
-  find = "!git ls-files | grep -i"
-  grep = grep -Ii
-  la = "!git config -l | grep alias | sort | cut -c 7- | bat --style=numbers -l sh"  ; list aliases
-  ld = log --color --pretty=format:'%C(red)%h %C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>' --graph --stat
-  le = log --color --graph --pretty=format:'%C(bold red)%h %C(yellow)%d%C(reset) %s %C(green)(%cr) %C(bold blue)<%ae>' --abbrev-commit
-  lg = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all
-  lgt = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' --all
-  ll = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all --decorate --stat
-  log-tree = log --color --graph --oneline --decorate --all
-  logg = log --color --grep
-  lp = log --color --pretty=format:'%C(red)%h %C(yellow)%d%C(reset) %s %C(green)(%cd)' --abbrev-commit --date=rfc
-  lpd = log --color --pretty=format:'%C(green)%cd %C(red)%h %C(yellow)%d%C(reset) %s' --abbrev-commit --date=short
-  lpn = log --color --pretty=format:'%C(red)%h %C(yellow)%d%C(reset) %s %C(green)(%cr) - %C(magenta)%cn' --abbrev-commit --date=relative -n
-  lpu = log --color --pretty=format:'%C(red)%h %C(yellow)%d%C(reset) %s %C(green)(%cr) - %C(magenta)%cn' --abbrev-commit --date=relative
-  lt = describe --tags --abbrev=0 ; get last tag
-  mr = "!glab mr list"
-  nuke = "!git branch -D $@ && git push origin :$@" ; nukes a branch locally and on the origin remote
-  ours = "!f() { git co --ours $@ && git add $@; }; f" ; merge our changes
-  pr = "!gh pr list"
-  pull = pull --stat --tags --verbose
-  resetfull = reset HEAD~  ; reset branch
+  a         = "!git add $(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Select file(s) to stage\n  Press ? to inspect untracked files' --preview-window='right:60%' --preview 'git diff --color=always {-1}' --bind '?:preview:bat --color=always --line-range :500 {-1}') && git status -uno -s"  ; (fzf) select modified+untracked files to stage
+  amend     = commit -a --amend
+  ca        = commit -am
+  cm        = commit -m
+  co        = checkout
+  db        = "!git branch --color=never | awk '!/(develop|main|master)/ {print $NF}' | fzf -0 -m --marker='✘' --prompt='󱞽 Select local branch(es) to delete ' --preview-window='right:55%' --preview 'git show --color=always {-1}' | xargs -r git branch -D" ; (fzf) interactively delete branches
+  db-remote = "!git branch --color=never -r | awk '!/(develop|main|master)/ {print $NF}' | fzf -0 -m --marker='✘' --prompt='󱞽 Select remote branch(es) to delete ' --preview-window='right:55%' --preview 'git show --color=always {-1}' | sed 's|origin/||g' | xargs -r git push -d origin" ; (fzf) interactively delete branches
+  default   = "!echo ' Updating default branch...' ; git checkout $(git symbolic-ref refs/remotes/origin/HEAD --short | awk -F'/' '{print $NF}') && git pull --stat --tags" ; switch to & pull default branch
+  dir       = rev-parse --show-toplevel
+  conf      = "!${EDITOR} ${HOME}/.gitconfig" ; edit this config file
+  fake      = commit --allow-empty -m 'empty commit' ; empty commit - sometimes useful for testing CI
+  fake-skip = commit --allow-empty -m 'empty commit [skip ci]' ; empty commit skipping ci - sometimes useful for testing CI
+  find      = "!git ls-files | grep -i"
+  grep      = grep -Ii
+  la        = "!git config -l | grep alias | sort | cut -c 7- | bat --style=numbers -l sh"  ; list aliases
+  lg        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all
+  ll        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all --decorate --stat
+  lr        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all --date=relative -n
+  lt        = describe --tags --abbrev=0 ; get last tag
+  mr        = "!glab mr list"
+  nuke      = "!git branch -D $@ && git push origin :$@" ; nukes a branch locally and on the origin remote
+  ours      = "!f() { git co --ours $@ && git add $@; }; f" ; merge our changes
+  pf        = push --force-with-lease
+  pr        = "!gh pr list"
+  resethard = "!git reset --hard && git pull --stat --verbose --rebase"  ; discard all changes & rebase default branch
   resetlast = reset HEAD^ --soft ; undo last (local) commit
-  resetm = "!git diff --name-only -m | fzf -m --header='󱞽 Select file(s) to restore' --marker='+' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
-  ra = rebase --abort
-  rc = rebase --continue
-  ri = rebase --interactive
-  rq = rebase --quit
-  rs = rebase --skip
-  send = "!f() { git add -A && git commit -m \"$1\" && git push ; }; f"  ; all-in-one (add/commit/push all)
-  ss = status -uno -s  ; short
-  st = status -uno ; standard
-  staged = "!git diff --name-only --staged | fzf --preview 'bat --color=always --line-range :500 {}'"
-  theirs = "!f() { git co --theirs $@ && git add $@; }; f" ; merge their changes
-  trash = "!git reset --hard && git default"  ; discard all changes & checkout default branch
-  undo = reset HEAD~1 --mixed
-  unstage = "!git restore --staged $(git diff --name-only --cached | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='󱞽 Select file(s) to unstage') && git status -uno" ; (fzf) select files to un-stage
-  up = "!git pull --rebase --prune $@ && git submodule update --init --recursive" ; rebase!
-  vc = "!bat --style=numbers ${HOME}/.gitconfig" ; view this config file
-  wip = commit -am "WIP"
+  resetm    = "!git diff --name-only -m | fzf -m --header='󱞽 Select file(s) to restore' --marker='+' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
+  send      = "!f() { git add -A && git commit -m \"$1\" && git push ; }; f"  ; all-in-one (add/commit/push all)
+  ss        = status -uno -s  ; short
+  st        = status -uno ; standard
+  staged    = "!git diff --name-only --staged | fzf --preview 'bat --color=always --line-range :500 {}'"
+  theirs    = "!f() { git co --theirs $@ && git add $@; }; f" ; merge their changes
+  undo      = reset HEAD~1 --mixed
+  unstage   = "!git restore --staged $(git diff --name-only --cached | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='󱞽 Select file(s) to unstage') && git status -uno" ; (fzf) select files to un-stage
+  wip       = commit -am "WIP"
 
 [filter "lfs"]
-  clean = git-lfs clean -- %f
-  process = git-lfs filter-process
+  clean    = git-lfs clean -- %f
+  process  = git-lfs filter-process
   required = true
-  smudge = git-lfs smudge -- %f
+  smudge   = git-lfs smudge -- %f
 
 [log]
   initialDecorationSet = all
 
-; [pull]
-;   ff = only
+[merge]
+	ff = true
+
+[pull]
+  ff      = only
+  rebase  = true
+  stat    = true
+  verbose = true
 
 [push]
   autoSetupRemote = true
-  default = current
+  default         = current
 
 [rebase]
   autoStash = true
+  stat      = true
+
+[status]
+  showStash = true
 
 [advice]
-  addEmptyPathspec = false
+  addEmptyPathspec   = false
+  skippedCherryPicks = false
 
 [interactive]
-  diffFilter = diff-so-fancy --patch
+  diffFilter = "if [ ! -z \"$(type diff-so-fancy)\" ]; then diff-so-fancy --patch; fi"
+  singleKey  = true
+
+; [commit]
+;   gpgsign = true
+;
+; [gpg]
+;   format = ssh
+;
+; [url "git@github.com"]
+;   insteadOf = https://github.com
+;
+; [url "git@gitlab.com"]
+;   insteadOf = https://gitlab.com

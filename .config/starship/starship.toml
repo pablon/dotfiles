@@ -1,9 +1,17 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = false
-command_timeout = 500
+command_timeout = 2000
 follow_symlinks = false
 palette = 'catppuccin_mocha' # nord onedark catppuccin_mocha
+
+# Output the current git config email only for git repository
+# [custom.git_config_email]
+# description = "Output the current git user's configured email address."
+# command = "git config user.email"
+# format = "\n[$symbol( $output)]($style)"
+# when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
+# style = "text"
 
 [directory]
 home_symbol = '~'
@@ -79,15 +87,13 @@ format = '[$symbol($version )]($style)'
 [aws]
 symbol = " "
 style = 'bold peach'
-format = '[\($symbol $profile\)]($style) '
-# format = '[\($symbol $profile|$region\)]($style) '
+format = '[\($symbol $profile\)]($style) ' # $profile|$region
 # disabled = true
 
 [gcloud]
 symbol = ""
 style = 'bold blue'
-format = '[\($symbol $account\)]($style) '
-# format = '[\($symbol $account)|($region)\)]($style) '
+format = '[\($symbol $project\)]($style) ' # $account $domain $region $project
 disabled = true
 
 [docker_context]
@@ -104,7 +110,7 @@ number_threshold = 1
 format = '[$symbol]($style)'
 
 [cmd_duration]
-min_time = 500
+# min_time = 500
 style = 'fg:gray'
 format = ' [$duration]($style)'
 

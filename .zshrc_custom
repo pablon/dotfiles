@@ -1,12 +1,17 @@
+# compinit (if having issues, delete ~/.zcompdump and re-run to rebuild)
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+
 ######################################################################
 # Colors:
-export BOLD="\033[1;37m"
-export RED="\033[1;31m"
-export GREEN="\033[1;92m"
-export YELLOW="\033[1;93m"
 export BLUE="\033[1;94m"
-export MAGENTA="\033[1;95m"
+export BOLD="\033[1;37m"
 export CYAN="\033[1;96m"
+export GREEN="\033[1;92m"
+export MAGENTA="\033[1;95m"
+export PURPLE="\033[1;35m"
+export RED="\033[1;31m"
+export YELLOW="\033[1;93m"
 export NONE="\033[0m"
 
 ######################################################################
@@ -70,8 +75,24 @@ if [[ -n "${ITERM_SESSION_ID}" ]] && [[ -f "${HOME}/.config/iterm2/shell_integra
   source "${HOME}/.config/iterm2/shell_integration.zsh"
 fi
 
+# TERM
+export TERM=xterm-256color
+
 # export PATH
-export PATH="${PATH}:/usr/local/sbin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:${HOME}/bin:${HOME}/.krew/bin:${HOME}/.docker/bin:/usr/games"
+ADDL_PATH=(
+  "/usr/games"
+  "/usr/local/sbin"
+  "${HOME}/.asdf/shims"
+  "${HOME}/.docker/bin"
+  "${HOME}/.krew/bin"
+  "${HOME}/.local/bin"
+  "${HOME}/bin"
+  "${HOME}/go/bin"
+)
+for i in "${ADDL_PATH[@]}"; do
+  [ -d "${i}" ] && PATH+=":${i}"
+done
+export PATH="${PATH}"
 
 # You may need to manually set your MANPATH
 export MANPATH="/usr/local/man:${MANPATH}"
@@ -95,58 +116,41 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # fzf
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
-# https://thevaluable.dev/fzf-shell-integration/
-# https://vitormv.github.io/fzf-themes/
-export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude .git"
+# NTH: ◆ ←   ▶ ▶  ❯   󰸞            ✘   
 
-export FZF_DEFAULT_OPTS="--color=fg:#d0d0d0,fg+:#d0d0d0,bg:-1,bg+:#262626
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude '.git' --exclude 'node_modules' --one-file-system"
+
+export FZF_COLORS="--color=fg:#d0d0d0,fg+:#d0d0d0,bg:-1,bg+:#262626
     --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
     --color=prompt:#d7005f,spinner:cyan,pointer:#d7005f,header:#87afaf
     --color=border:#262626,label:#aeaeae,query:#d9d9d9
-    --color=label:italic:yellow,preview-bg:#121212
-    --border='rounded' --border-label='' --preview-window='border-double'
+    --color=label:italic:yellow,preview-bg:#121212"
+
+export FZF_DEFAULT_OPTS="${FZF_COLORS} --border='rounded' --border-label=''
+    --preview-window='border-double'
     --bind='ctrl-p:change-preview-window(50%,down|50%,right)'
-    --marker='❯' --pointer='❯' --separator='─'
-    --scrollbar='│' --info=inline"
+    --marker='󰸞' --pointer='❯' --separator='─'
+    --scrollbar='│'"
 
-    # --prompt='> '
-    # --color=prompt:#d7005f,spinner:#af5fff,pointer:#af5fff,header:#87afaf
-    # --color=prompt:#d7005f,spinner:cyan,pointer:yellow,header:#87afaf
-    # symbols: ◆ ←   ▶ ▶  ❯   󰸞               
-
-export FZF_COMPLETION_OPTS='--border --info=inline'
-export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
-
-# Preview file content using bat (https://github.com/sharkdp/bat)
 export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target
     --preview 'bat -n --color=always {}'
     --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
-# CTRL-Y to copy the command into clipboard using pbcopy
-export FZF_CTRL_R_OPTS="--bind 'ctrl-y:execute-silent(echo -n {2..} | $_clipboardApp)+abort'
-    --color header:italic
-    --header 'ctrl-y copy command to clipboard'"
+export FZF_COMPLETION_OPTS='--border'
+export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
 
 ######################################################################
 # asdf
 if ( command -v asdf &>/dev/null ) ; then
-  case "${OSTYPE}" in
-    darwin*)
-      ASDF_SCRIPT="$(brew --prefix asdf)/libexec/asdf.sh" ;;
-    linux-gnu)
-      ASDF_SCRIPT="/opt/asdf-vm/asdf.sh" ;;
+  case "$(uname)" in
+    Linux)
+      ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
+      [ -x "${ASDF_SCRIPT}" ] && source "${ASDF_SCRIPT}"
+      ;;
   esac
-  [ -f "${ASDF_SCRIPT}" ] && source "${ASDF_SCRIPT}"
 fi
-
-######################################################################
-# vagrant completion
-# do the same as: vagrant autocomplete install
-# adds completion code to >>>> ~/.zshrc
-# if ( command -v vagrant &>/dev/null ) ; then
-#   VAGRANT_VERSION="$(vagrant version --no-tty --no-color | awk '/^Installed/ {print $NF}')"
-#   fpath=(/opt/vagrant/embedded/gems/gems/vagrant-${VAGRANT_VERSION}/contrib/zsh $fpath)
-# fi
 
 ######################################################################
 # less tweaks
@@ -178,25 +182,15 @@ for app in gh glab ; do
     ( command -v ${app} &>/dev/null ) && source <(${app} completion -s zsh)
 done ; unset app
 
-# load fzf keybindings
-( command -v fzf &>/dev/null ) && source <(fzf --zsh)
-
-# 1p
+# 1password
 ( type op &>/dev/null ) && eval "$(\op completion zsh)"; compdef _op op
 
-# https://kubernetes.io/es/docs/tasks/tools/included/optional-kubectl-configs-zsh/
-# Make all kubectl completion fzf
-# command -v fzf >/dev/null 2>&1 && {
-# 	source <(kubectl completion zsh | sed 's#${requestComp} 2>/dev/null#${requestComp} 2>/dev/null | head -n -1 | fzf --multi=0 #g')
-# }
-autoload bashcompinit && bashcompinit
-autoload -Uz compinit && compinit
 
 ( type aws_completer &>/dev/null ) && complete -C "$(which aws_completer)" aws
 ( type kops &>/dev/null ) && source <(kops completion zsh)
 
 ######################################################################
 # ssh-add
-[[ "$(uname -s)" == "Darwin" ]] && ssh-add --apple-load-keychain &>/dev/null
+[[ "$(uname)" == "Darwin" ]] && ssh-add --apple-load-keychain &>/dev/null
 
 ######################################################################
