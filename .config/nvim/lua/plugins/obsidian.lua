@@ -1,5 +1,17 @@
 -- https://github.com/epwalsh/obsidian.nvim
 -- A Neovim plugin for writing and navigating Obsidian vaults, written in Lua.
+
+-- make sure vault_path exists
+local function bootstrap_dir(dir)
+  if vim.fn.isdirectory(dir) == 0 then
+    vim.fn.mkdir(dir, "p")
+  end
+end
+local vault_path = os.getenv("OBSIDIAN_VAULT_DIR") or "~/obsidian-vault"
+local vault_name = vim.fs.basename(vault_path)
+vault_path = vim.fn.expand(vault_path)
+bootstrap_dir(vault_path)
+
 return {
   "epwalsh/obsidian.nvim",
   version = "*",
@@ -8,20 +20,14 @@ return {
   requires = {
     "nvim-lua/plenary.nvim",
   },
-  config = function()
-    local vault_path = os.getenv("OBSIDIAN_VAULT_DIR") or vim.fn.expand("~/obsidian-vault")
-    if vim.fn.isdirectory(vault_path) == 0 then
-      vim.fn.mkdir(vault_path, "p")
-    end
-  end,
   opts = {
     notes_subdir = "new",
     new_notes_location = "notes_subdir",
 
     workspaces = {
       {
-        name = "obsidian-vault",
-        path = "~/obsidian-vault",
+        name = vault_name,
+        path = vault_path,
       },
     },
 
@@ -74,7 +80,7 @@ return {
     },
 
     daily_notes = {
-      folder = "101-Daily",
+      folder = "daily",
       date_format = "%Y-%m-%d",
       default_tags = { "daily" },
       template = "daily.md",
