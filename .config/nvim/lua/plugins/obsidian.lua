@@ -21,7 +21,7 @@ return {
     "nvim-lua/plenary.nvim",
   },
   opts = {
-    notes_subdir = "new",
+    notes_subdir = "inbox",
     new_notes_location = "notes_subdir",
 
     workspaces = {
