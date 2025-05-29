@@ -20,6 +20,7 @@ opt.hlsearch = true
 opt.ignorecase = true
 opt.incsearch = true
 opt.isfname:append("@-@")
+opt.laststatus = 3 -- avante: views can only be fully collapsed with the global statusline
 opt.list = true -- show tab characters and trailing whitespace
 opt.listchars = "tab:»\\ ,extends:›,precedes:‹,nbsp:·,trail:·" -- show tab characters and trailing whitespace
 opt.number = true
