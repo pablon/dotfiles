@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#############################################
+# Description: sync Obsidian notes to git repository
+#
+# Author:      https://github.com/pablon
+#############################################
+
+VAULT_DIR="${OBSIDIAN_VAULT_DIR:-${HOME}/obsidian-vault}"
+
+function obsidian_sync() {
+  [ "${1}" == "-d" ] && local DEBUG='1'
+  (
+    cd "${VAULT_DIR}/" || exit 1
+    source "${HOME}/.functions" 2>/dev/null || exit 1
+
+    if [ ! -d "./.obsidian" ]; then
+      _error "${VAULT_DIR} is not an Obsidian vault - bye"
+      exit 1
+    elif [ ! -n "$(git remote -v)" ]; then
+      _error "${VAULT_DIR} is not a git repo - bye"
+      exit 1
+    else
+      local CURRENT_BRANCH="$(git branch --show-current --no-color)"
+      local CHANGED_FILES="$(git status --porcelain | wc -l | xargs)"
+      if [ ${CHANGED_FILES} -gt 0 ]; then
+        local AFFECTED_FILES="$(git status -s --porcelain | awk '{$1="";print substr($0,2)}' | sort | uniq)"
+        local COMMIT_MESSAGE="vault backup (${CURRENT_BRANCH}): $(date +%F\ %T) [${CHANGED_FILES}] from $(uname -n)"
+        local COMMIT_DETAILS="Affected files:\n${AFFECTED_FILES}"
+        if [ ! "${DEBUG}" ]; then
+          git add . &&
+            _info "New commit --> ${CYAN}${COMMIT_MESSAGE}" &&
+            git commit -m "${COMMIT_MESSAGE}" -m "$(echo -e "${COMMIT_DETAILS}")" &&
+            git push -u origin "${CURRENT_BRANCH}" &&
+            _success "Done" ||
+            _error "Something failed!"
+          exit 1
+        else
+          _warning "[DRY-RUN] ${CHANGED_FILES} files to add:${NONE} $(echo "${AFFECTED_FILES}" | xargs)"
+          _warning "[DRY-RUN] Nothing has been changed - bye"
+        fi
+      fi
+    fi
+  )
+}
+obsidian_sync "${1}"
