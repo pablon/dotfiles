@@ -13,35 +13,52 @@ return {
   opts = {
     system_prompt = os.getenv("SYSTEM_PROMPT")
       or "You are an expert DevOps engineer specialized in cloud services, infrastructure as code, containers, helm, helmfile and kubernetes. You have a technical yet practical approach, with clear and applicable explanations, always providing useful examples for intermediate and advanced DevOps professionals. You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor. You avoid excessive formalities and use direct language, but technical when required.",
-    ---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
-    provider = "copilot", -- openai, claude, copilot
     ---@alias Mode "agentic" | "legacy"
     mode = "agentic", -- The default mode for interaction. "agentic" uses tools to automatically generate code, "legacy" uses the old planning method to generate code.
     -- WARNING: Since auto-suggestions are a high-frequency operation and therefore expensive,
     -- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
     -- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
-    auto_suggestions_provider = "copilot",
     cursor_applying_provider = nil, -- The provider used in the applying phase of Cursor Planning Mode, defaults to nil, when nil uses Config.provider as the provider for the applying phase
-    openai = {
-      endpoint = "https://api.openai.com/v1",
-      model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
-      timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
-      temperature = 0,
-      max_completion_tokens = 4096, -- Increase this to include reasoning tokens (for reasoning models)
-      --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-    },
-    claude = {
-      endpoint = "https://api.anthropic.com",
-      model = "claude-3-5-sonnet-20241022",
-      -- model = "claude-3-5-haiku-20241022",
-      -- model = "claude-3-7-sonnet-20250219",
-      -- model = "claude-sonnet-4-20250514",
-      -- model = "claude-opus-4-20250514",
-      temperature = 0,
-      max_tokens = 4096,
-    },
-    copilot = {
-      model = "claude-3.5-sonnet", -- o1-preview | o1-mini | claude-3.7-sonnet
+    auto_suggestions_provider = "copilot",
+    ---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
+    provider = "copilot", -- openai, claude, copilot
+    providers = {
+      openai = {
+        endpoint = "https://api.openai.com/v1",
+        model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
+        timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
+        extra_request_body = {
+          temperature = 0,
+          max_completion_tokens = 4096, -- Increase this to include reasoning tokens (for reasoning models)
+          reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+        },
+      },
+      claude = {
+        endpoint = "https://api.anthropic.com",
+        model = "claude-3-5-sonnet-20241022",
+        -- model = "claude-3-5-haiku-20241022",
+        -- model = "claude-3-7-sonnet-20250219",
+        -- model = "claude-sonnet-4-20250514",
+        -- model = "claude-opus-4-20250514",
+        extra_request_body = {
+          temperature = 0,
+          max_tokens = 4096,
+        },
+      },
+      copilot = {
+        model = "claude-3.5-sonnet", -- o1-preview | o1-mini | claude-3.7-sonnet
+      },
+      -- ollama = {
+      --   endpoint = "http://127.0.0.1:11434",
+      --   timeout = 30000, -- Timeout in milliseconds
+      --   extra_request_body = {
+      --     options = {
+      --       temperature = 0.75,
+      --       num_ctx = 20480,
+      --       keep_alive = "5m",
+      --     },
+      --   },
+      -- },
     },
     ---Specify the special dual_boost mode
     ---1. enabled: Whether to enable dual_boost mode. Default to false.
