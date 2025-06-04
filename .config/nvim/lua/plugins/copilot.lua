@@ -2,7 +2,7 @@
 -- pure lua replacement for https://github.com/github/copilot.vim
 return {
   "zbirenbaum/copilot.lua",
-  optional = true,
+  -- optional = true,
   opts = {
     filetypes = {
       filetypes = {
