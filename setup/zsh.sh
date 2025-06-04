@@ -9,8 +9,12 @@ ZSH_PLUGINS=(zsh-completions zsh-autosuggestions zsh-syntax-highlighting zsh-his
 source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
 
 for plugin in "${ZSH_PLUGINS[@]}"; do
-  [ -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ] ||
+  if [ ! -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ]; then
     git clone https://github.com/zsh-users/${plugin} ${HOME}/.zsh/${plugin} 2>/dev/null
+  else
+    _info "Updating plugin ${YELLOW}${plugin}"
+    (cd "${HOME}/.zsh/${plugin}/" && git pull --rebase)
+  fi
 done
 
 # Install iTerm2 Shell Integration

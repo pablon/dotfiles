@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2076,SC2119,SC2120,SC2199
 #############################################
-# Description: Git Commit Helper
+# Description: An interactive Git commit helper with enhanced features
 #  * Detects conventional-commit type in branch name
 #  * Detects ticket pattern in branch name
 #  * Automates git commands
@@ -25,72 +25,77 @@ PRETTY_FORMAT="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C
 
 # functions
 function _info() {
-  echo -e "==> ${CYAN} ${BOLD}${1}${NONE}"
+	if [ "${DRY_RUN}" ]; then
+		echo -e "==> ${RED}󰡾${MAGENTA} DRY_RUN${NONE} ${BOLD}${1}${NONE}"
+	else
+		echo -e "==> ${CYAN} ${BOLD}${1}${NONE}"
+	fi
 }
 
 function _warning() {
-  echo -e "==> ${YELLOW} ${1}${NONE}"
+	echo -e "==> ${YELLOW} ${1}${NONE}"
 }
 
 function _success() {
-  echo -e "==> ${GREEN}✔ ${NONE}${1}"
+	echo -e "==> ${GREEN}✔ ${NONE}${1}"
 }
 
 function _error() {
-  echo -e "==> ${RED}✘ ${MAGENTA}${1}${NONE}\n"
-  exit "${2:-1}"
+	echo -e "==> ${RED}✘ ${MAGENTA}${1}${NONE}\n"
+	exit "${2:-1}"
 }
 
 function divider() {
-  local COLUMNS=80
-  eval "printf '⎯%.0s' {1..$COLUMNS}"
-  echo
+	[[ "${COLUMNS}" ]] || local COLUMNS=80
+	eval "printf '─%.0s' {1..$COLUMNS}"
+	echo
 }
 
 function _help() {
-  cat <<EOF
-  git add+commit+push helper
+	cat <<EOF
+  Interactive Git commit helper with enhanced features:
 
   Usage:
-  $(basename "${0}") [-d] [-c] [-s]
+    $(basename "${0}") [-d] [-c] [-s]
 
   Options:
-  -d     dry-run mode (no changes will be made)
-  -c     override conventional commit type detection
-  -s     append '[skip ci]' to commit message
+    -d  dry-run mode (no changes will be made)
+    -c  override conventional commit type detection
+    -s  append '[skip ci]' to commit message
 
 EOF
-exit "${1:-0}"
+	exit "${1:-0}"
 }
 
 function is_in_git_repo() {
-  [ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
+	[ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
 }
-
-# check if this is a git repo
-is_in_git_repo || _error "Not in a git repo"
 
 divider
 
 # validate input
 while getopts cdsh Option; do
-  case "${Option}" in
-    c)
-      CHANGE_CC_TYPE=1
-      ;;
-    d)
-      DRY_RUN=1
-      _warning "${RED}󰡾${MAGENTA} DRY_RUN mode"
-      ;;
-    s)
-      SKIP_CI=" [skip ci]"
-      _warning "󱌣 SKIP_CI mode"
-      ;;
-    *)
-      _help
-      ;;
-  esac
+	case "${Option}" in
+	c)
+		CHANGE_CC_TYPE=1
+		;;
+	d)
+		DRY_RUN="${RED}󰡾${MAGENTA} DRY_RUN ${NONE}"
+		_info "mode, simulating all commands"
+		sleep 1
+		;;
+	s)
+		SKIP_CI=" [skip ci]"
+		_warning "󱌣 SKIP_CI mode"
+		;;
+	*)
+		_help
+		;;
+	esac
 done
+
+# check if this is a git repo
+is_in_git_repo || _error "Not in a git repo"
 
 # get remote
 GIT_REMOTE="$(git remote get-url --push origin)"
@@ -103,24 +108,24 @@ ADDED_FILES="$(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Sel
 
 # empty-commit? no problem ¯\_(ツ)_/¯
 if [ -z "${ADDED_FILES}" ]; then
-  divider
-  _warning "No files were added!"
-  echo -en "==> ${YELLOW} Create an ${MAGENTA}empty-commit${YELLOW}?${NONE} [y/N]: "
-  read -r empty_option
-  case "${empty_option}" in
-    Y | y)
-      ALLOW_EMPTY='--allow-empty '
-      ;;
-    *)
-      _error "Cancelled" 0
-      ;;
-  esac
+	divider
+	_warning "No files were added!"
+	echo -en "==> ${YELLOW} Create an ${MAGENTA}empty-commit${YELLOW}?${NONE} [y/N]: "
+	read -r empty_option
+	case "${empty_option}" in
+	Y | y)
+		ALLOW_EMPTY='--allow-empty '
+		;;
+	*)
+		_error "Cancelled" 0
+		;;
+	esac
 else
-  _info "Files added: ${GREEN}${ADDED_FILES}"
+	_info "Files to add: ${GREEN}${ADDED_FILES}"
 fi
 
 # list of conventional commits types
-CC_LIST=('feat' 'feature' 'fix' 'test' 'chore' 'docs' 'refactor' 'ci' 'style' 'perf' 'build' 'revert')
+CC_LIST=('feat' 'fix' 'test' 'chore' 'docs' 'refactor' 'ci' 'style' 'perf' 'build' 'revert')
 
 # list of conventional commits types with description
 CC_TYPES=('feat       - A new feature' 'fix        - A bug fix' 'test       - Adding missing tests or correcting existing ones' 'chore      - Other changes that dont modify src or test files' 'docs       - Documentation only changes' 'refactor   - A code change that neither fixes a bug nor adds a feature' 'ci         - Changes to our CI configuration files and scripts' 'style      - Formatting changes that do not affect the meaning of the code' 'perf       - A code change that improves performance' 'build      - Changes that affect the build system or external dependencies' 'revert     - Reverts a previous commit')
@@ -130,108 +135,108 @@ CC_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F/ '{print $1}')"
 
 # ..and check that out:
 if [[ "${CC_LIST[@]}" =~ "${CC_GUESS}" ]] && [ -z "${CHANGE_CC_TYPE}" ]; then
-  # set conventional commit type as the branch prefix
-  THIS_CC_TYPE="${CC_GUESS}"
+	# set conventional commit type as the branch prefix
+	THIS_CC_TYPE="${CC_GUESS}"
 else
-  # select conventional commit type with fzf explorer
-  THIS_CC_TYPE="$(for i in "${CC_TYPES[@]}"; do echo "${i}"; done | fzf --accept-nth='1' --prompt '❯ Select conventional commit type (ESC to cancel)')"
+	# select conventional commit type with fzf explorer
+	THIS_CC_TYPE="$(for i in "${CC_TYPES[@]}"; do echo "${i}"; done | fzf --accept-nth='1' --prompt '❯ Select conventional commit type (ESC to cancel)')"
 fi
 
 if [ -z "${THIS_CC_TYPE}" ]; then
-  _error "No conventional commit type was specified" 1
+	_error "No conventional commit type was specified" 1
 else
-  # conventional commit scope - uses env var $SCOPE if set in your shell
-  if [ -n "${SCOPE}" ]; then
-    THIS_CC_SCOPE="${SCOPE}"
-    _info "Scope ${CYAN}${SCOPE}${BOLD} will be used"
-  else
-    echo -en "${MAGENTA}❯ Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
-  fi
+	# conventional commit scope - uses env var $SCOPE if set in your shell
+	if [ -n "${SCOPE}" ]; then
+		THIS_CC_SCOPE="${SCOPE}"
+		_info "Scope ${CYAN}${SCOPE}${BOLD} will be used"
+	else
+		echo -en "${MAGENTA}❯ Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
+	fi
 
-  # detect ticket string in branch name (after first '/')
-  TICKET="$(echo "${CURRENT_BRANCH}" | awk -F'/' 'match($2,/^([A-Z][A-Z0-9]*-[0-9]+|[0-9]+)/){printf "%s", substr($2, RSTART, RLENGTH)}')"
-  if [ -n "${TICKET}" ]; then
-    if [[ "${GIT_REMOTE,,}" =~ "azure" ]]; then
-      # Azure Devops syntax
-      THIS_TICKET="#${TICKET} "
-    else
-      # Jira+Misc syntax (default)
-      THIS_TICKET="[${TICKET}] "
-    fi
-    _info "Ticket ${GREEN}${TICKET}${BOLD} will be prepended in the commit message, do not type it ;-)\n"
-    THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | sed -e "s|^.*${TICKET}-||" -e 's|[_-]| |g')"
-  else
-    THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F'/' '{print $NF}' | sed -e 's|[_-]| |g')"
-  fi
-  echo -en "${MAGENTA}❯ Hit ENTER to accept '${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}' or type a commit message:${NONE} " && read -r COMMIT_MESSAGE
-  [ -z "${COMMIT_MESSAGE}" ] && COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
+	# detect ticket string in branch name (after first '/')
+	TICKET="$(echo "${CURRENT_BRANCH}" | awk -F'/' 'match($2,/^([A-Z][A-Z0-9]*-[0-9]+|[0-9]+)/){printf "%s", substr($2, RSTART, RLENGTH)}')"
+	if [ -n "${TICKET}" ]; then
+		if [[ "${GIT_REMOTE,,}" =~ "azure" ]]; then
+			# Azure Devops syntax
+			THIS_TICKET="#${TICKET} "
+		else
+			# Jira+Misc syntax (default)
+			THIS_TICKET="[${TICKET}] "
+		fi
+		_info "Ticket ${GREEN}${TICKET}${BOLD} will be prepended in the commit message, do not type it ;-)\n"
+		THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | sed -e "s|^.*${TICKET}-||" -e 's|[_-]| |g')"
+	else
+		THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F'/' '{print $NF}' | sed -e 's|[_-]| |g')"
+	fi
+	echo -en "${MAGENTA}❯ Hit ENTER to accept '${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}' or type a commit message:${NONE} " && read -r COMMIT_MESSAGE
+	[ -z "${COMMIT_MESSAGE}" ] && COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
 
-  # create add/commit/push commands
-  [ -n "${THIS_CC_SCOPE}" ] && ADDED_SCOPE="(${THIS_CC_SCOPE})"
-  [ -n "$(git config --get user.signingkey)" ] && SIGN_COMMIT="-S "
-  COMMAND_COMMIT="git commit ${SIGN_COMMIT}${ALLOW_EMPTY}-m '${THIS_CC_TYPE}${ADDED_SCOPE}: ${THIS_TICKET}${COMMIT_MESSAGE}${SKIP_CI}'"
-  COMMAND_ADD="git add ${ADDED_FILES}"
-  COMMAND_PUSH="git push -u origin ${CURRENT_BRANCH}"
+	# create add/commit/push commands
+	[ -n "${THIS_CC_SCOPE}" ] && ADDED_SCOPE="(${THIS_CC_SCOPE})"
+	[ -n "$(git config --get user.signingkey)" ] && SIGN_COMMIT="-S "
+	COMMAND_COMMIT="git commit ${SIGN_COMMIT}${ALLOW_EMPTY}-m '${THIS_CC_TYPE}${ADDED_SCOPE}: ${THIS_TICKET}${COMMIT_MESSAGE}${SKIP_CI}'"
+	COMMAND_ADD="git add ${ADDED_FILES}"
+	COMMAND_PUSH="git push -u origin ${CURRENT_BRANCH}"
 
-  # dry-run info
-  if [ "${DRY_RUN}" ]; then
-    divider
-    _info "${RED}󰡾${MAGENTA} DRY_RUN ${BLUE}These commands would have been executed:${NONE}"
-    [ ! "${ALLOW_EMPTY}" ] && _info "${RED}󰡾${MAGENTA} DRY_RUN   ${NONE}${COMMAND_ADD}"
-    _info "${RED}󰡾${MAGENTA} DRY_RUN   ${NONE}${COMMAND_COMMIT}"
-    _info "${RED}󰡾${MAGENTA} DRY_RUN   ${NONE}${COMMAND_PUSH}"
-    divider
-    echo
-  else
-    _info "Next commands to execute..:"
-    [ ! "${ALLOW_EMPTY}" ] && echo -e "\t${COMMAND_ADD}"
-    echo -e "\t${COMMAND_COMMIT}"
+	# dry-run info
+	if [ "${DRY_RUN}" ]; then
+		divider
+		_info "${MAGENTA}These commands would have been executed:${NONE}"
+		[ ! "${ALLOW_EMPTY}" ] && _info "  ${COMMAND_ADD}"
+		_info "  ${COMMAND_COMMIT}"
+		_info "  ${COMMAND_PUSH}"
+		divider
+		echo
+	else
+		_info "Next commands to execute..:"
+		[ ! "${ALLOW_EMPTY}" ] && echo -e "\t${COMMAND_ADD}"
+		echo -e "\t${COMMAND_COMMIT}"
 
-    # add & commit
-    echo -en "\n${YELLOW}󰈸 ${MAGENTA}Add & commit? [Y/n]:${NONE} " && read -r add_commit_opt
-    case "${add_commit_opt}" in
-      N | n)
-        _error "Cancelled" 0
-        ;;
-      *)
-        if [ ! "${ALLOW_EMPTY}" ]; then
-          # add files
-          eval "${COMMAND_ADD}"
-        fi
-        # commit files
-        eval "${COMMAND_COMMIT}"
-        COMMIT_RC="$?"
-        ;;
-    esac
+		# add & commit
+		echo -en "\n${YELLOW}󰈸 ${MAGENTA}Add & commit? [Y/n]:${NONE} " && read -r add_commit_opt
+		case "${add_commit_opt}" in
+		N | n)
+			_error "Cancelled" 0
+			;;
+		*)
+			if [ ! "${ALLOW_EMPTY}" ]; then
+				# add files
+				eval "${COMMAND_ADD}"
+			fi
+			# commit files
+			eval "${COMMAND_COMMIT}"
+			COMMIT_RC="$?"
+			;;
+		esac
 
-    # push
-    if [ "${COMMIT_RC}" -eq "0" ]; then
-      echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to ${CYAN} ${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: "
-      read -r push_option
-      case "${push_option}" in
-        N | n)
-          _error "Cancelled" 0
-          ;;
-        *)
-          # push
-          eval "${COMMAND_PUSH}"
-          PUSH_RC="$?"
-          ;;
-      esac
-    else
-      _error "Commit failed with code = ${COMMIT_RC}" 2
-    fi
+		# push
+		if [ "${COMMIT_RC}" -eq "0" ]; then
+			echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to ${CYAN}󰘬 ${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: "
+			read -r push_option
+			case "${push_option}" in
+			N | n)
+				_error "Cancelled" 0
+				;;
+			*)
+				# push
+				eval "${COMMAND_PUSH}"
+				PUSH_RC="$?"
+				;;
+			esac
+		else
+			_error "Commit failed with code = ${COMMIT_RC}" 2
+		fi
 
-    if [ "${PUSH_RC}" -eq "0" ]; then
-      # show the commit (git log)
-      echo && git log \
-        --date=relative \
-        --author="$(git config --get user.email)" \
-        --format="${PRETTY_FORMAT}" \
-        --color --stat --decorate --graph -1
-    else
-      _error "Push failed with code = ${PUSH_RC}" 3
-    fi
-    echo
-  fi
-  fi
+		if [ "${PUSH_RC}" -eq "0" ]; then
+			# show the commit (git log)
+			echo && git log \
+				--date=relative \
+				--author="$(git config --get user.email)" \
+				--format="${PRETTY_FORMAT}" \
+				--color --stat --decorate --graph -1
+		else
+			_error "Push failed with code = ${PUSH_RC}" 3
+		fi
+		echo
+	fi
+fi

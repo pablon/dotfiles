@@ -1,4 +1,4 @@
-# shellcheck disable=SC2155,SC2086,SC2034
+# shellcheck disable=SC2068,SC2296
 #===============================================================
 _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
 #===============================================================
@@ -21,8 +21,8 @@ function _error() {
 alias _fail='_error'
 
 function divider() {
-  [[ "${COLUMNS}" ]] || COLUMNS=80
-  eval "printf '⎯%.0s' {1..$COLUMNS}"
+  [[ "${COLUMNS}" ]] || local COLUMNS=80
+  eval "printf '─%.0s' {1..$COLUMNS}"
   echo
 }
 #===============================================================
@@ -110,7 +110,7 @@ function cp_tar() {
 #===============================================================
 # quick backup of files/dirs w/timestamp
 function bkp() {
-  for i in ${@} ; do
+  for i in "${@}" ; do
     BKP="${i}.$(date +%Y%m%d.%H%M%S)"
     if [ -d ${i} ] ; then
       cp -rpf "${i}" "${BKP}"
@@ -145,7 +145,7 @@ function escape() {
 # Decode \x{ABCD}-style Unicode escape sequences
 function unidecode() {
   if ( command -v perl &>/dev/null ) ; then
-    perl -e "binmode(STDOUT, ':utf8'); print \"$@\""
+    perl -e "binmode(STDOUT, ':utf8'); print \"$*\""
     echo # newline
   fi
 }
@@ -186,7 +186,7 @@ function cookie() {
   array=(koala luke-koala moofasa moose sheep skeleton small three-eyes tux vader vader-koala www)
   size=${#array[@]}
   index=$((RANDOM % size))
-  echo -e "${CYAN}" ; fortune -s | cowsay -f "${array[${index}]}" | sed 's|^|  |' ; echo "${NONE}"
+  echo -e "${CYAN}" ; fortune -s | LC_ALL=C cowsay -f "${array[${index}]}" | sed 's|^|  |' ; echo "${NONE}"
 }
 #===============================================================
 # left trim
@@ -276,7 +276,7 @@ function vagrant_snapshot() {
       vagrant snapshot ${1} --no-tty "${VM_NAME}" "${VM_SNAPSHOT_NAME}"
       ;;
     restore)
-      if [[ "$(vagrant snapshot list | sed 1d &>/dev/null | wc -l)" -gt "0" ]] ; then
+      if [[ "$(vagrant snapshot list | sed 1d | wc -l)" -gt "0" ]] ; then
         local SNAPSHOT="$(vagrant snapshot list | sed 1d | fzf --header='^-- Select snapshot to restore')"
         vagrant snapshot ${1}  --no-tty --no-start "${VM_NAME}" "${SNAPSHOT}" 2>/dev/null
       else
@@ -284,7 +284,7 @@ function vagrant_snapshot() {
       fi
       ;;
     delete)
-      if [[ "$(vagrant snapshot list | sed 1d &>/dev/null | wc -l)" -gt "0" ]] ; then
+      if [[ "$(vagrant snapshot list | sed 1d | wc -l)" -gt "0" ]] ; then
         for i in $(vagrant snapshot list | sed 1d | fzf -m --header='^-- Select snapshot(s) to delete - use TAB for multiple selection' | xargs) ; do vagrant snapshot ${1} --no-tty  "${i}" ; done
       else
         _info "[${VM_NAME}] no snapshots to ${1}"
@@ -325,7 +325,6 @@ function drmi() {
 
 #===============================================================
 # required aliases/vars:
-alias glNoGraph='git log --color --date=format:"%F %H:%M" --format="%C(auto)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>%C(reset)" --graph "$@"'
 _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
 _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | bat --style=numbers'"
 _viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
@@ -341,14 +340,20 @@ function gitexport(){
   fi
 }
 #===============================================================
-# gls - git commit browser with previews and vim integration
+# git commit browser with previews and vim integration
+function glNoGraph() {
+  git log --color --date=format:"%F %H:%M" \
+  --format="%C(auto)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>%C(reset)" \
+  --graph "$@"
+}
+
 function git-log() {
   is_in_git_repo || return
   glNoGraph |
     fzf --no-sort --reverse --tiebreak=index --no-multi --exact \
     --ansi --preview-window='right:50%' --preview="$_viewGitLogLine" \
     --header "enter: view, ctrl-y: copy hash, ctrl-e: edit" \
-    --border-label=' git-log Preview' \
+    --border-label='󰘬 git-log Preview' \
     --bind "ctrl-u:preview-page-up" \
     --bind "ctrl-d:preview-page-down" \
     --bind "enter:execute:$_viewGitLogLine | less -R" \
@@ -358,6 +363,7 @@ function git-log() {
     # --color=label:italic:yellow,preview-bg:#343434 \
 }
 alias gls=git-log
+
 #===============================================================
 function stash-explorer() {
   while out=$(git stash list "$@" |
@@ -448,7 +454,7 @@ function rebaser() {
 
 #===============================================================
 function is_in_git_repo() {
-	[ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
+  [ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
 }
 
 #===============================================================
@@ -536,9 +542,9 @@ function git-br() {
   is_in_git_repo || return
   local tags branches target
   tags=$(git tag | awk '{print "tag\t" $1}') || return
-  branches=$(git branch --all | grep -v HEAD | sed "s/.* //" | sed "s#remotes/[^/]*/##" |
+  branches=$(git branch --all --no-color | grep -v HEAD | sed "s/.* //" | sed "s#remotes/[^/]*/##" |
   sort -u | awk '{print "branch\t" $1}') || return
-  target=$((echo "$tags"; echo "$branches") |
+  target=$( (echo "$tags"; echo "$branches") |
     fzf --no-hscroll --no-multi --delimiter="\t" -n 2 \
     --ansi --preview="git log -200 --pretty=format:%s $(echo {+2..} |  sed 's/$/../' )" ) || return
     echo $(echo "$target" | awk -F "\t" '{print $2}')
