@@ -6,19 +6,20 @@
 ; ======  * https://gitlab.com/gitlab-org/cli
 ; =======================================================
 
-; [user]
-;   name       = Name
-;   email      = Email
-;   signingkey = ~/.ssh/id_ed25519.pub
+[user]
+  name       = Name
+  email      = Email
+  signingkey = ~/.ssh/id_ed25519.pub
 
 ; ====== Use different config on different Pathspecs:
-; [includeIf "gitdir:~/other/dir/**"]
+
+; [includeIf "gitdir:~/projects/personal/**"]
 ;   path       = ~/.gitconfig_personal
 ;   name       = foo
 ;   email      = *******@users.noreply.github.com
 ;   signingkey = ~/.ssh/id_ed25519.pub
 
-; [includeIf "gitdir:~/projects/**"]
+; [includeIf "gitdir:~/projects/work/**"]
 ;   path       = ~/.gitconfig_work
 ;   name       = Full Name
 ;   email      = Work Email
@@ -28,7 +29,7 @@
   defaultBranch = main
 
 [branch]
-  autoSetupRebase = true
+  autoSetupRebase = always
 
 [core]
   autocrlf = input
@@ -96,7 +97,7 @@
   pr        = "!gh pr list"
   resethard = "!git reset --hard && git pull --stat --verbose --rebase"  ; discard all changes & rebase default branch
   resetlast = reset HEAD^ --soft ; undo last (local) commit
-  resetm    = "!git diff --name-only -m | fzf -m --header='󱞽 Select file(s) to restore' --marker='+' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
+  resetm    = "!git diff --name-only -m | fzf -m --header='󱞽 Select file(s) to restore' --marker='✘' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
   send      = "!f() { git add -A && git commit -m \"$1\" && git push ; }; f"  ; all-in-one (add/commit/push all)
   ss        = status -uno -s  ; short
   st        = status -uno ; standard
@@ -106,17 +107,14 @@
   unstage   = "!git restore --staged $(git diff --name-only --cached | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='󱞽 Select file(s) to unstage') && git status -uno" ; (fzf) select files to un-stage
   wip       = commit -am "WIP"
 
-[filter "lfs"]
-  clean    = git-lfs clean -- %f
-  process  = git-lfs filter-process
-  required = true
-  smudge   = git-lfs smudge -- %f
+[help]
+  autocorrect = prompt
 
 [log]
   initialDecorationSet = all
 
 [merge]
-	ff = true
+  ff = only
 
 [pull]
   ff      = only
@@ -126,14 +124,20 @@
 
 [push]
   autoSetupRemote = true
-  default         = current
+  default         = simple
+
+[rerere]
+  enabled    = true
+  autoupdate = true
 
 [rebase]
-  autoStash = true
-  stat      = true
+  autoSquash = true
+  autoStash  = true
+  updateRefs = true
 
 [status]
-  showStash = true
+  showStash        = true
+  submoduleSummary = true
 
 [advice]
   addEmptyPathspec   = false
@@ -143,14 +147,14 @@
   diffFilter = "if [ ! -z \"$(type diff-so-fancy)\" ]; then diff-so-fancy --patch; fi"
   singleKey  = true
 
+[gpg]
+  format = ssh
+
 ; [commit]
 ;   gpgsign = true
-;
-; [gpg]
-;   format = ssh
-;
+
 ; [url "git@github.com"]
 ;   insteadOf = https://github.com
-;
+
 ; [url "git@gitlab.com"]
 ;   insteadOf = https://gitlab.com

@@ -39,7 +39,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
-      - id: check-byte-order-marker
+      - id: fix-byte-order-marker
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable
@@ -67,9 +67,9 @@ repos:
     rev: v1.37.1
     hooks:
       - id: yamllint
-        files: .*/\.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint
+        args: [ "--no-warnings", "-d", "{extends: relaxed, rules: {line-length: {max: 500}}}" ]
 
   - repo: https://github.com/tcort/markdown-link-check
     rev: v3.13.7

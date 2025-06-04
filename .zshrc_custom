@@ -116,23 +116,22 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # fzf
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
-# NTH: ◆ ←   ▶ ▶  ❯   󰸞            ✘   
+# icons: ◆ ← ▶ ❯ ✘
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude '.git' --exclude 'node_modules' --one-file-system"
 
-export FZF_COLORS="--color=fg:#d0d0d0,fg+:#d0d0d0,bg:-1,bg+:#262626
+export FZF_COLORS="--color=fg:#cdd6f4,fg+:#f9e2af,bg:#121212,bg+:#313244
     --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
-    --color=prompt:#d7005f,spinner:cyan,pointer:#d7005f,header:#87afaf
-    --color=border:#262626,label:#aeaeae,query:#d9d9d9
-    --color=label:italic:yellow,preview-bg:#121212"
+    --color=preview-fg:#f5e0dc,preview-bg:#2E3440,label:#cba6f7,spinner:cyan
+    --color=header:#cba6f7,prompt:#cba6f7,pointer:#cba6f7,scrollbar:#fab387"
 
 export FZF_DEFAULT_OPTS="${FZF_COLORS} --border='rounded' --border-label=''
     --preview-window='border-double'
     --bind='ctrl-p:change-preview-window(50%,down|50%,right)'
-    --marker='󰸞' --pointer='❯' --separator='─'
-    --scrollbar='│'"
+    --marker='✘' --pointer='❯' --separator='─'
+    --scrollbar='│' --tmux 95% --style=full"
 
 export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target
     --preview 'bat -n --color=always {}'

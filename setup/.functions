@@ -22,7 +22,7 @@ function _error() {
 }
 
 function divider() {
-  [[ "${COLUMNS}" ]] || COLUMNS=80
-  eval "printf '=%.0s' {1..$COLUMNS}"
+  [[ "${COLUMNS}" ]] || local COLUMNS=80
+  eval "printf '─%.0s' {1..$COLUMNS}"
   echo
 }
