@@ -2,19 +2,13 @@
 -- pure lua replacement for https://github.com/github/copilot.vim
 return {
   "zbirenbaum/copilot.lua",
-  optional = true,
+  -- optional = true,
   opts = {
     filetypes = {
       filetypes = {
+        help = true,
+        markdown = true,
         yaml = true,
-        markdown = false,
-        help = false,
-        gitcommit = false,
-        gitrebase = false,
-        hgcommit = false,
-        svn = false,
-        cvs = false,
-        ["."] = false,
       },
     },
   },

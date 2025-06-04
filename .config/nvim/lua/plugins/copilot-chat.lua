@@ -29,6 +29,9 @@ local prompts = {
   Concise = "Please rewrite the following text to make it more concise.", -- Prompt to make text concise
 }
 
+-- Define user name
+local user_name = os.getenv("USER") or "User"
+
 -- Copilot Chat plugin configuration
 -- This table contains the configuration for various plugins used in Neovim.
 return {
@@ -41,12 +44,12 @@ return {
     model = "gpt-4o", -- Default model to use, see ':CopilotChatModels' for available models (can be specified manually in prompt via $).
     agent = "copilot", -- Default agent to use, see ':CopilotChatAgents' for available agents (can be specified manually in prompt via @).
     context = { "buffer", "git:staged" }, -- Default context or array of contexts to use (can be specified manually in prompt via #).
-    question_header = " Me ", -- Header to use for user questions
+    question_header = " " .. user_name .. " ", -- Header to use for user questions
     answer_header = " Copilot ", -- Header to use for AI answers
     error_header = "✘ Error ", -- Header to use for errors
     separator = "───", -- Separator to use in chat
     window = {
-      layout = "float", -- 'vertical', 'horizontal', 'float', 'replace', or a function that returns the layout
+      layout = "vertical", -- 'vertical', 'horizontal', 'float', 'replace', or a function that returns the layout
     },
   },
 }
