@@ -348,7 +348,7 @@ function git-log() {
     fzf --no-sort --reverse --tiebreak=index --no-multi --exact \
     --ansi --preview-window='right:50%' --preview="$_viewGitLogLine" \
     --header "enter: view, ctrl-y: copy hash, ctrl-e: edit" \
-    --border-label=' git-log Preview' \
+    --border-label='󰘬 git-log Preview' \
     --bind "ctrl-u:preview-page-up" \
     --bind "ctrl-d:preview-page-down" \
     --bind "enter:execute:$_viewGitLogLine | less -R" \
@@ -448,7 +448,7 @@ function rebaser() {
 
 #===============================================================
 function is_in_git_repo() {
-	[ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
+  [ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
 }
 
 #===============================================================

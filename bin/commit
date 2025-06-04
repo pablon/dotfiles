@@ -60,7 +60,7 @@ function _help() {
   -s     append '[skip ci]' to commit message
 
 EOF
-exit "${1:-0}"
+  exit "${1:-0}"
 }
 
 function is_in_git_repo() {
@@ -120,7 +120,7 @@ else
 fi
 
 # list of conventional commits types
-CC_LIST=('feat' 'feature' 'fix' 'test' 'chore' 'docs' 'refactor' 'ci' 'style' 'perf' 'build' 'revert')
+CC_LIST=('feat' 'fix' 'test' 'chore' 'docs' 'refactor' 'ci' 'style' 'perf' 'build' 'revert')
 
 # list of conventional commits types with description
 CC_TYPES=('feat       - A new feature' 'fix        - A bug fix' 'test       - Adding missing tests or correcting existing ones' 'chore      - Other changes that dont modify src or test files' 'docs       - Documentation only changes' 'refactor   - A code change that neither fixes a bug nor adds a feature' 'ci         - Changes to our CI configuration files and scripts' 'style      - Formatting changes that do not affect the meaning of the code' 'perf       - A code change that improves performance' 'build      - Changes that affect the build system or external dependencies' 'revert     - Reverts a previous commit')
@@ -206,7 +206,7 @@ else
 
     # push
     if [ "${COMMIT_RC}" -eq "0" ]; then
-      echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to ${CYAN} ${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: "
+      echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to ${CYAN}󰘬 ${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: "
       read -r push_option
       case "${push_option}" in
         N | n)
@@ -234,4 +234,4 @@ else
     fi
     echo
   fi
-  fi
+fi
