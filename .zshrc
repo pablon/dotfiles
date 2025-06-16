@@ -4,23 +4,21 @@
 [[ "$(uname)" == "Darwin" ]] && ( type gdate &>/dev/null ) && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
 
-# zsh
-FPATH="${FPATH}:${HOME}/.zsh/zsh-completions/src"
-(type brew &>/dev/null) && FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
+# load ~/.zshrc_custom
+[ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
+
+# zsh plugins
 ZSH_PLUGINS=(zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search)
 for plugin in "${ZSH_PLUGINS[@]}" ; do
     [ -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ] &&
     source ${HOME}/.zsh/${plugin}/${plugin}.zsh
 done
 
-# load ~/.zshrc_custom
-[ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
-
 # atuin
 eval "$(atuin init zsh --disable-up-arrow)"
 
 # starship
-export STARSHIP_CONFIG=~/.config/starship/starship.toml
+export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
 eval "$(starship init zsh)"
 
 cookie
