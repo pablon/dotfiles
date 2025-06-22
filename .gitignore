@@ -2,7 +2,7 @@
 **/*.bkp
 **/*.disabled
 **/.tool-versions
-# **/lazy-lock.json
+**/lazy-lock.json
 **/state.yml
 **/.DS_Store
 **/spell

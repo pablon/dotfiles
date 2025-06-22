@@ -43,13 +43,29 @@ function f() {
 function asdf_install() {
   local PLUGIN="${1}"
   # https://asdf-vm.com/guide/getting-started.html
-  [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list all | fzf --reverse --accept-nth=1)"
+  [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list all | fzf --reverse --accept-nth=1 --prompt="Select plugin > ")"
   [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
   asdf plugin add ${PLUGIN} || return 1
-  local VERSION="$(asdf list all ${PLUGIN} | sed 's/^$/latest/' | fzf --reverse --tac --prompt="Select ${PLUGIN} version to install" | xargs)"
+  local VERSION="$(asdf list all ${PLUGIN} | sed 's/^$/latest/' | fzf -e --reverse --tac --prompt="Select ${PLUGIN} version to install > " | xargs)"
   [ -z "${VERSION}" ] && echo "No version provided" && return 1
+  if [[ "$(pwd)" == "${HOME}" ]]; then
+    local SCOPE="-u" # global
+  else
+    PARENT="$(while [[ ! -f '.tool-versions' ]] && [[ "${PWD}" != "/" ]]; do \cd ..; done; if [[ -f '.tool-versions' ]]; then echo "${PWD}/.tool-versions";fi)"
+    if [ -z "${PARENT}" ] || [[ "$(dirname "${PARENT}")" == "$(pwd)" ]] || [[ "$(dirname "${PARENT}")" == "${HOME}" ]] ; then
+      local SCOPE="$(echo -e "here\t-- in $(pwd)/.tool-versions\nglobal\t-- in ${HOME}/.tool-versions" | fzf -e --reverse --accept-nth=1 --prompt="Select scope > ")"
+    else
+      local SCOPE="$(echo -e "here\t-- in $(pwd)/.tool-versions\nparent\t-- in existing file ${PARENT}\nglobal\t-- in ${HOME}/.tool-versions" | fzf -e --reverse --accept-nth=1 --prompt="Select scope > ")"
+    fi
+    [ -z "${SCOPE}" ] && echo "No scope provided" && return 1
+    case "${SCOPE}" in
+      here)   local SCOPE="" ;;   # this dir
+      parent) local SCOPE="-p" ;; # closest existing .tool-versions in parent dir
+      *)      local SCOPE="-u" ;; # global
+    esac
+  fi
   asdf install ${PLUGIN} ${VERSION}
-  asdf set ${PLUGIN} ${VERSION}
+  asdf set ${SCOPE} ${PLUGIN} ${VERSION}
   asdf current ${PLUGIN}
   _success "Done"
 }
@@ -58,6 +74,7 @@ function asdf_uninstall() {
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
   [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
   local VERSION="$(asdf list ${PLUGIN} | sed 's/\*//' | fzf --reverse --tac --prompt="Select ${PLUGIN} version to remove" | xargs)"
+  [ -z "${VERSION}" ] && echo "No version provided" && return 1
   asdf uninstall ${PLUGIN} ${VERSION}
   _success "Done"
 }
@@ -65,14 +82,10 @@ function asdf_remove() {
   local PLUGIN="${1}"
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
   [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
-  echo -en " ${YELLOW}Completely remove ALL ${PLUGIN} versions? [y/N]:${NONE} " ; read -r confirm
+  echo -en "${YELLOW}⁈ Completely remove ALL ${PLUGIN} versions? [y/N]:${NONE} " ; read -r confirm
   case "${confirm}" in
-    [yY]*)
-    true
-    ;;
-    *)
-    return 0
-    ;;
+    [yY]*) true ;;
+    *)     return 0 ;;
   esac
   asdf plugin remove ${PLUGIN}
   _success "Done"
