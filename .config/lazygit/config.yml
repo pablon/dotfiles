@@ -7,7 +7,7 @@ gui:
 git:
   paging:
     colorArg: always
-    pager: "diff-so-fancy"
+    pager: "delta -n --paging=never --tabs=2"
   commit:
     signOff: true
   commitPrefix:

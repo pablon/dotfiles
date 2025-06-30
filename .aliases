@@ -97,6 +97,9 @@ if ( type lazygit &>/dev/null ) ; then
 elif ( type gitui &>/dev/null ) ; then
   alias gt="gitui"
 fi
+if (type delta &>/dev/null) ; then
+  alias delta="delta -n"
+fi
 
 #===============================================================
 # docker

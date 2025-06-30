@@ -30,13 +30,26 @@
 
 [branch]
   autoSetupRebase = always
+  sort            = -committerdate
 
 [core]
   autocrlf = input
-  pager    = "if [ ! -z \"$(type diff-so-fancy)\" ]; then diff-so-fancy | less --tabs=2 -RFX; else less --tabs=2 -RFX; fi"
+  pager    = "if [ ! -z \"$(type delta)\" ] ; then delta ; else less --tabs=2 -RFX ; fi"
 
-[diff-so-fancy]
-  stripLeadingSymbols = false
+[delta]
+  color-only   = true
+  dark         = true
+  line-numbers = true
+  navigate     = true
+  syntax-theme = TwoDark
+  tabs         = 2
+  zero-style   = "dim syntax"
+
+[diff]
+  algorithm      = histogram
+  colorMoved     = plain
+  mnemonicPrefix = true
+  renames        = true
 
 [color]
   ui    = always
@@ -67,6 +80,9 @@
   changed   = yellow bold
   untracked = red bold
 
+[column]
+  ui = auto
+
 [apply]
   whitespace = fix
 
@@ -92,17 +108,16 @@
   lt        = describe --tags --abbrev=0 ; get last tag
   mr        = "!glab mr list"
   nuke      = "!git branch -D $@ && git push origin :$@" ; nukes a branch locally and on the origin remote
-  ours      = "!f() { git co --ours $@ && git add $@; }; f" ; merge our changes
   pf        = push --force-with-lease
   pr        = "!gh pr list"
   resethard = "!git reset --hard && git pull --stat --verbose --rebase"  ; discard all changes & rebase default branch
   resetlast = reset HEAD^ --soft ; undo last (local) commit
   resetm    = "!git diff --name-only -m | fzf -m --header='󱞽 Select file(s) to restore' --marker='✘' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
-  send      = "!f() { git add -A && git commit -m \"$1\" && git push ; }; f"  ; all-in-one (add/commit/push all)
   ss        = status -uno -s  ; short
   st        = status -uno ; standard
   staged    = "!git diff --name-only --staged | fzf --preview 'bat --color=always --line-range :500 {}'"
   theirs    = "!f() { git co --theirs $@ && git add $@; }; f" ; merge their changes
+  ours      = "!f() { git co --ours $@ && git add $@; }; f" ; merge our changes
   undo      = reset HEAD~1 --mixed
   unstage   = "!git restore --staged $(git diff --name-only --cached | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='󱞽 Select file(s) to unstage') && git status -uno" ; (fzf) select files to un-stage
   wip       = commit -am "WIP"
@@ -111,10 +126,16 @@
   autocorrect = prompt
 
 [log]
+  date                 = iso
   initialDecorationSet = all
 
 [merge]
   ff = only
+
+[fetch]
+  all       = true
+  prune     = true
+  pruneTags = true
 
 [pull]
   ff      = only
@@ -144,14 +165,15 @@
   skippedCherryPicks = false
 
 [interactive]
-  diffFilter = "if [ ! -z \"$(type diff-so-fancy)\" ]; then diff-so-fancy --patch; fi"
+  diffFilter = "if [ ! -z \"$(type delta)\" ] ; then delta ; fi"
   singleKey  = true
 
 [gpg]
   format = ssh
 
-; [commit]
-;   gpgsign = true
+[commit]
+  verbose = true
+  ; gpgsign = true
 
 ; [url "git@github.com"]
 ;   insteadOf = https://github.com
