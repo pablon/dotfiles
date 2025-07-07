@@ -102,8 +102,8 @@
   find      = "!git ls-files | grep -i"
   grep      = grep -Ii
   la        = "!git config -l | grep alias | sort | cut -c 7- | bat --style=numbers -l sh"  ; list aliases
-  lg        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all
-  ll        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all --decorate --stat
+  lg        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' --all
+  ll        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' --all --decorate --stat
   lr        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all --date=relative -n
   lt        = describe --tags --abbrev=0 ; get last tag
   mr        = "!glab mr list"

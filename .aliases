@@ -84,8 +84,7 @@ alias g="git"
 alias ga='git a'
 alias gd='git diff'
 ( type gh &>/dev/null ) && alias gh-create='gh repo create --private --source=. --remote=origin && git push -u --all && gh browse'
-alias gll="git log --color --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ar) %C(bold blue)<%an>%C(reset)' --graph --stat --all"
-alias gll="git log --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ar) %C(bold blue)<%an>%C(reset)' --graph --stat"
+alias gll="git log --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ai) %C(bold blue)<%an>%C(reset)' --graph --stat"
 alias gs='git status'
 alias gss='git status -s'
 alias gsp='git status --porcelain'
