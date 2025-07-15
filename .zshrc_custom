@@ -19,7 +19,7 @@ _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( 
 ALIASES_WORK="${HOME}/.aliases_work"
 SECRETS_FILE="${HOME}/.secrets"
 for file in ${HOME}/{.aliases,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}" ; do
-    [ -r "${file}" ] && source "${file}"
+  [ -r "${file}" ] && source "${file}"
 done ; unset file
 
 ######################################################################
@@ -68,7 +68,7 @@ zstyle ':completion:*' verbose true
 export XDG_CONFIG_HOME="${HOME}/.config"
 
 # TERM
-export TERM=xterm-256color
+export TERM="xterm-256color"
 
 # export PATH
 PATH_DIRS=(
@@ -150,6 +150,8 @@ if ( type fzf &>/dev/null ) ; then
   --preview 'bat -n --color=always {}'
   --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
+  export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git . | awk -F'/' '{print NF-1, \$0}' | sort -n | cut -d' ' -f2-"
+
   export FZF_COMPLETION_OPTS='--border'
   export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
 fi
@@ -180,21 +182,21 @@ export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 export LESS_TERMCAP_us=$'\E[04;38;5;111m'   # begin underline
 
 ######################################################################
-
 # auto completion
 AUTO_COMPLETION=(docker helm kubectl)
 for app in ${AUTO_COMPLETION} ; do
-    ( type ${app} &>/dev/null ) && source <(${app} completion zsh)
+  ( type ${app} &>/dev/null ) && source <(${app} completion zsh)
 done ; unset app
 
 for app in gh glab ; do
-    ( type ${app} &>/dev/null ) && source <(${app} completion -s zsh)
+  ( type ${app} &>/dev/null ) && source <(${app} completion -s zsh)
 done ; unset app
 
 ( type aws_completer &>/dev/null ) && complete -C "$(which aws_completer)" aws
 ( type kops &>/dev/null ) && source <(kops completion zsh)
 ( type op &>/dev/null ) && eval "$(\op completion zsh)"; compdef _op op
 ( type stern &>/dev/null ) && source <(stern --completion zsh)
+( type zoxide &>/dev/null ) && eval "$(zoxide init zsh)"
 
 ######################################################################
 # ssh-add

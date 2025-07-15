@@ -69,3 +69,4 @@ watch
 wget
 yamllint
 yq
+zoxide

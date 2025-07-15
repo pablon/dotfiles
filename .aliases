@@ -60,6 +60,10 @@ alias tmls='tmux ls'
 alias vi='vim'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
 ( type yamllint &>/dev/null ) && alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
+if ( type zoxide &>/dev/null ); then
+  alias cd="z"
+  alias cdi="zi"
+fi
 
 
 #===============================================================
