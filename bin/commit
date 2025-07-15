@@ -103,8 +103,15 @@ GIT_REMOTE="$(git remote get-url --push origin)"
 # get current branch
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 
+# set GIT_PAGER
+if (type delta &>/dev/null); then
+	export GIT_PAGER='delta'
+elif (type diff-so-fancy &>/dev/null); then
+	export GIT_PAGER='diff-so-fancy'
+fi
+
 # add files with fzf explorer
-ADDED_FILES="$(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Select file(s) to stage\n  Press ? to inspect untracked files' --preview-window='right:60%' --preview 'git diff --color=always {-1}' --bind '?:preview:bat --color=always --line-range :500 {-1}' | xargs)"
+ADDED_FILES="$(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Select file(s) to stage\n  Press ? to inspect untracked files' --preview-window='right:60%' --preview 'git diff --color=always {-1} | ${GIT_PAGER:-less}' --bind '?:preview:bat --color=always --line-range :500 {-1}' | xargs)"
 
 # empty-commit? no problem ¯\_(ツ)_/¯
 if [ -z "${ADDED_FILES}" ]; then
