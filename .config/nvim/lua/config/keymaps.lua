@@ -22,12 +22,7 @@ end)
 
 -- enable/disable completion
 vim.keymap.set("n", "<leader>p", '<cmd>lua require("cmp").setup { enabled = true }<cr>', { desc = "Enable completion" })
-vim.keymap.set(
-  "n",
-  "<leader>P",
-  '<cmd>lua require("cmp").setup { enabled = false }<cr>',
-  { desc = "Disable completion" }
-)
+vim.keymap.set("n", "<leader>P", '<cmd>lua require("cmp").setup { enabled = false }<cr>', { desc = "Disable completion" })
 
 -- buffer resize
 vim.keymap.set("n", "<leader><left>", ":vertical resize +20<cr>", { desc = "Vertical resize +20" })
@@ -65,12 +60,7 @@ vim.keymap.set("n", "<leader>k", "<cmd>Screenkey<cr>", { desc = "Screenkey toggl
 
 -- convert Current line to title cases
 -- vim.keymap.set("n", "<leader>rlt", "<cmd>s/<./\u&/g<cr>", { desc = "Replace Line Title" })
-vim.keymap.set(
-  "n",
-  "<leader>rlt",
-  "<cmd>lua require('textcase').current_word('to_title_case')<CR>",
-  { desc = "Replace Line Title" }
-)
+vim.keymap.set("n", "<leader>rlt", "<cmd>lua require('textcase').current_word('to_title_case')<CR>", { desc = "Replace Line Title" })
 
 -- these keep the cursor in the middle when scrolling with C-d and C-u
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
@@ -83,21 +73,21 @@ vim.keymap.set({ "n", "x" }, "<leader>al", "<Plug>(EasyAlign)", { desc = " Start
 vim.keymap.set("n", "<leader>aq", 'ciw""<Esc>P', { desc = "Add Surround Quotes" })
 
 -- Obsidian
-vim.keymap.set(
-  "n",
-  "<leader>oc",
-  "<cmd>lua require('obsidian').util.toggle_checkbox()<CR>",
-  { desc = "Obsidian Checkbox" }
-)
-vim.keymap.set("n", "<leader>oN", "<cmd>ObsidianNewFromTemplate<CR>", { desc = "Create New Note From Template" })
-vim.keymap.set("n", "<leader>ob", "<cmd>ObsidianBacklinks<CR>", { desc = "Show ObsidianBacklinks" })
-vim.keymap.set("n", "<leader>od", "<cmd>ObsidianDailies<CR>", { desc = "Insert new Daily note" })
-vim.keymap.set("n", "<leader>ol", "<cmd>ObsidianLinks<CR>", { desc = "Show ObsidianLinks" })
-vim.keymap.set("n", "<leader>on", "<cmd>ObsidianNew<CR>", { desc = "Create New Note" })
-vim.keymap.set("n", "<leader>oo", "<cmd>ObsidianOpen<CR>", { desc = "Open in Obsidian App" })
-vim.keymap.set("n", "<leader>oq", "<cmd>ObsidianQuickSwitch<CR>", { desc = "Quick Switch" })
-vim.keymap.set("n", "<leader>os", "<cmd>ObsidianSearch<CR>", { desc = "Search Obsidian" })
-vim.keymap.set("n", "<leader>ot", "<cmd>ObsidianTemplate<CR>", { desc = "Insert Obsidian Template" })
+-- vim.keymap.set("n", "<leader>oc", "<cmd>lua require('obsidian').util.toggle_checkbox()<CR>", { desc = "Obsidian Checkbox" })
+vim.keymap.set("n", "<leader>onN", "<cmd>Obsidian new_from_template<CR>", { desc = "Create New Note From Template" })
+vim.keymap.set("n", "<leader>ob", "<cmd>Obsidian backlinks<CR>", { desc = "Show picker list of backlinks" })
+vim.keymap.set("n", "<leader>oc", "<cmd>Obsidian toggle_checkbox<CR>", { desc = "Cycle through checkbox options" })
+vim.keymap.set("n", "<leader>od", "<cmd>Obsidian dailies<CR>", { desc = "Insert new Daily note" })
+vim.keymap.set("n", "<leader>oe", "<cmd>Obsidian extract_note<CR>", { desc = "Extract selected text into a new note" })
+vim.keymap.set("n", "<leader>of", "<cmd>Obsidian follow_link vsplit_force<CR>", { desc = "Follow a note reference under the cursor" })
+vim.keymap.set("n", "<leader>ol", "<cmd>Obsidian links<CR>", { desc = "Collect all links in the current buffer" })
+vim.keymap.set("n", "<leader>onn", "<cmd>Obsidian new<CR>", { desc = "Create New Note" })
+vim.keymap.set("n", "<leader>oo", "<cmd>Obsidian open<CR>", { desc = "Open in Obsidian App" })
+vim.keymap.set("n", "<leader>op", "<cmd>Obsidian template<CR>", { desc = "Insert Obsidian Template" })
+vim.keymap.set("n", "<leader>oq", "<cmd>Obsidian quick_switch<CR>", { desc = "Quick Switch" })
+vim.keymap.set("n", "<leader>oss", "<cmd>Obsidian search<CR>", { desc = "Search Obsidian" })
+vim.keymap.set("n", "<leader>ost", "<cmd>Obsidian tags<CR>", { desc = "Search Obsidian notes by Tags" })
+vim.keymap.set("n", "<leader>oT", "<cmd>Obsidian toc<CR>", { desc = "Load the table of contents into a picker list" })
 
 -------------------------------------------------------------------------------
 -- markdown section
