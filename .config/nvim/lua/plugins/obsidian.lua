@@ -1,4 +1,4 @@
--- https://github.com/epwalsh/obsidian.nvim
+-- https://github.com/obsidian-nvim/obsidian.nvim
 -- A Neovim plugin for writing and navigating Obsidian vaults, written in Lua.
 
 -- make sure vault_path exists
@@ -13,7 +13,7 @@ vault_path = vim.fn.expand(vault_path)
 bootstrap_dir(vault_path)
 
 return {
-  "epwalsh/obsidian.nvim",
+  "obsidian-nvim/obsidian.nvim",
   version = "*",
   lazy = false,
   ft = "markdown",
@@ -61,8 +61,6 @@ return {
       end
       return out
     end,
-
-    mappings = {},
 
     templates = {
       subdir = "templates",
