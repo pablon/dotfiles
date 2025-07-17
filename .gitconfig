@@ -6,18 +6,12 @@
 ; ======  * https://gitlab.com/gitlab-org/cli
 ; =======================================================
 
-[user]
-  name       = Name
-  email      = Email
-  signingkey = ~/.ssh/id_ed25519.pub
+; [user]
+;   name       = Name
+;   email      = Email
+;   signingkey = ~/.ssh/id_ed25519.pub
 
 ; ====== Use different config on different Pathspecs:
-
-; [includeIf "gitdir:~/projects/personal/**"]
-;   path       = ~/.gitconfig_personal
-;   name       = foo
-;   email      = *******@users.noreply.github.com
-;   signingkey = ~/.ssh/id_ed25519.pub
 
 ; [includeIf "gitdir:~/projects/work/**"]
 ;   path       = ~/.gitconfig_work
@@ -33,8 +27,9 @@
   sort            = -committerdate
 
 [core]
-  autocrlf = input
-  pager    = "if [ ! -z \"$(type delta)\" ] ; then delta ; else less --tabs=2 -RFX ; fi"
+  autocrlf     = input
+  excludesfile = ~/.gitignore
+  pager        = "if [ ! -z \"$(type delta)\" ] ; then delta ; else less --tabs=2 -RFX ; fi"
 
 [delta]
   color-only   = true
@@ -102,9 +97,9 @@
   find      = "!git ls-files | grep -i"
   grep      = grep -Ii
   la        = "!git config -l | grep alias | sort | cut -c 7- | bat --style=numbers -l sh"  ; list aliases
-  lg        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' --all
-  ll        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' --all --decorate --stat
-  lr        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --all --date=relative -n
+  lg        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)'
+  ll        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' --decorate --stat
+  lr        = log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ar) %C(bold blue)<%an>%C(reset)' --date=relative -n
   lt        = describe --tags --abbrev=0 ; get last tag
   mr        = "!glab mr list"
   nuke      = "!git branch -D $@ && git push origin :$@" ; nukes a branch locally and on the origin remote
@@ -130,7 +125,8 @@
   initialDecorationSet = all
 
 [merge]
-  ff = only
+  conflictStyle = zdiff3
+  ff            = only
 
 [fetch]
   all       = true
@@ -174,6 +170,9 @@
 [commit]
   verbose = true
   ; gpgsign = true
+
+; [format]
+;   signOff = true
 
 ; [url "git@github.com"]
 ;   insteadOf = https://github.com
