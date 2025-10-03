@@ -14,7 +14,11 @@ for plugin in "${ZSH_PLUGINS[@]}" ; do
     source ${HOME}/.zsh/${plugin}/${plugin}.zsh
 done
 
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # atuin
+[ -d "${HOME}/.atuin/bin" ] && source "${HOME}/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
 
 # starship

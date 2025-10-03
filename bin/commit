@@ -8,12 +8,14 @@
 #  * FZF pickers
 #  * Easy AF
 #
+# Requirements: git, gawk, sed, fzf
+#
 # Author:      https://github.com/pablon
 #############################################
 
 # colors
 BLUE="\033[1;94m"
-BOLD="\033[1;37m"
+STRONG="\033[1;37m"
 CYAN="\033[1;96m"
 GREEN="\033[1;92m"
 MAGENTA="\033[1;95m"
@@ -26,9 +28,9 @@ PRETTY_FORMAT="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C
 # functions
 function _info() {
 	if [ "${DRY_RUN}" ]; then
-		echo -e "==> ${RED}󰡾${MAGENTA} DRY_RUN${NONE} ${BOLD}${1}${NONE}"
+		echo -e "==> ${RED}󰡾${MAGENTA} DRY_RUN${NONE} ${STRONG}${1}${NONE}"
 	else
-		echo -e "==> ${CYAN} ${BOLD}${1}${NONE}"
+		echo -e "==> ${CYAN} ${STRONG}${1}${NONE}"
 	fi
 }
 
@@ -155,9 +157,9 @@ else
 	# conventional commit scope - uses env var $SCOPE if set in your shell
 	if [ -n "${SCOPE}" ]; then
 		THIS_CC_SCOPE="${SCOPE}"
-		_info "Scope ${CYAN}${SCOPE}${BOLD} will be used"
+		_info "Scope ${CYAN}${SCOPE}${STRONG} will be used"
 	else
-		echo -en "${MAGENTA}❯ Specify the scope for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (ENTER to Skip):${NONE} " && read -r THIS_CC_SCOPE
+		echo -en "${MAGENTA}❯ Enter the ${STRONG}scope${MAGENTA} for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (hit ENTER to skip):${NONE} " && read -r THIS_CC_SCOPE
 	fi
 
 	# detect ticket string in branch name (after first '/')
@@ -170,17 +172,17 @@ else
 			# Jira+Misc syntax (default)
 			THIS_TICKET="[${TICKET}] "
 		fi
-		_info "Ticket ${GREEN}${TICKET}${BOLD} will be prepended in the commit message, do not type it ;-)\n"
+		_info "Ticket ${GREEN}${TICKET}${STRONG} will be prepended in the commit message, do not type it ;-)\n"
 		THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | sed -e "s|^.*${TICKET}-||" -e 's|[_-]| |g')"
 	else
 		THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F'/' '{print $NF}' | sed -e 's|[_-]| |g')"
 	fi
-	echo -en "${MAGENTA}❯ Hit ENTER to accept '${BOLD}${THIS_COMMENT_GUESS}${MAGENTA}' or type a commit message:${NONE} " && read -r COMMIT_MESSAGE
+	echo -en "${MAGENTA}❯ Enter the ${STRONG}commit message${MAGENTA} (hit ENTER to accept '${STRONG}${THIS_COMMENT_GUESS}${MAGENTA}'):${NONE} " && read -r COMMIT_MESSAGE
 	[ -z "${COMMIT_MESSAGE}" ] && COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
 
 	# create add/commit/push commands
 	[ -n "${THIS_CC_SCOPE}" ] && ADDED_SCOPE="(${THIS_CC_SCOPE})"
-	[ -n "$(git config --get user.signingkey)" ] && SIGN_COMMIT="-S "
+	[ -n "$(git config --get user.signingkey)" ] && SIGN_COMMIT="-s "
 	COMMAND_COMMIT="git commit ${SIGN_COMMIT}${ALLOW_EMPTY}-m '${THIS_CC_TYPE}${ADDED_SCOPE}: ${THIS_TICKET}${COMMIT_MESSAGE}${SKIP_CI}'"
 	COMMAND_ADD="git add ${ADDED_FILES}"
 	COMMAND_PUSH="git push -u origin ${CURRENT_BRANCH}"

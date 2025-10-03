@@ -1,7 +1,7 @@
 ######################################################################
 # Colors:
 export BLUE="\033[1;94m"
-export BOLD="\033[1;37m"
+export STRONG="\033[1;37m"
 export CYAN="\033[1;96m"
 export GREEN="\033[1;92m"
 export MAGENTA="\033[1;95m"
@@ -75,6 +75,7 @@ PATH_DIRS=(
   "/usr/games"
   "/usr/local/sbin"
   "${HOME}/.asdf/shims"
+  "${HOME}/.atuin/bin"
   "${HOME}/.docker/bin"
   "${HOME}/.krew/bin"
   "${HOME}/.local/bin"
@@ -86,15 +87,20 @@ for i in "${PATH_DIRS[@]}"; do
 done
 export PATH="${PATH}"
 
+# shell completion
+# export CARAPACE_BRIDGES='zsh'
+# zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+# source <(carapace _carapace)
+
 # export FPATH
 FPATH_DIRS=(
-  "$(brew --prefix)/share/zsh/site-functions"
   "${HOME}/.docker/completions"
   "${HOME}/.zsh/zsh-completions/src"
 )
 for i in "${FPATH_DIRS[@]}"; do
   [ -d "${i}" ] && FPATH+=":${i}"
 done
+(type brew &>/dev/null) && FPATH+=":$(brew --prefix)/share/zsh/site-functions"
 export FPATH="${FPATH}"
 
 # compinit (if having issues, delete ~/.zcompdump and re-run to rebuild)
@@ -112,8 +118,10 @@ export EDITOR='nvim'
 export VISUAL="${EDITOR}"
 
 # homebrew stuff
-export HOMEBREW_NO_ENV_HINTS=1
-export HOMEBREW_NO_ANALYTICS=1
+if (type brew &>/dev/null); then
+  export HOMEBREW_NO_ENV_HINTS=1
+  export HOMEBREW_NO_ANALYTICS=1
+fi
 
 # iTerm2 Shell Integration
 if [[ -n "${ITERM_SESSION_ID}" ]] && [[ -f "${HOME}/.config/iterm2/shell_integration.zsh" ]] ; then
@@ -129,8 +137,7 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 # fzf
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
 if ( type fzf &>/dev/null ) ; then
-
-  source <(fzf --$(basename $SHELL) 2>/dev/null)
+  source <(fzf --zsh 2>/dev/null)
 
   export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude '.git' --exclude 'node_modules' --one-file-system"
 
@@ -138,17 +145,16 @@ if ( type fzf &>/dev/null ) ; then
   --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
   --color=preview-fg:#f5e0dc,preview-bg:#2E3440,label:#cba6f7,spinner:cyan
   --color=header:#cba6f7,prompt:#cba6f7,pointer:#cba6f7,scrollbar:#fab387"
+  # icons: ◆ ← ▶ ❯ ✔ ✘   
 
-  # icons: ◆ ← ▶ ❯ ✘
   export FZF_DEFAULT_OPTS="${FZF_COLORS} --border='rounded' --border-label=''
   --preview-window='border-double'
-  --bind='ctrl-p:change-preview-window(50%,down|50%,right)'
+  --bind='ctrl-p:change-preview-window(down|hidden|)'
   --marker='✘' --pointer='❯' --separator='─'
   --scrollbar='│' --style=full --cycle"
 
   export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target
-  --preview 'bat -n --color=always {}'
-  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+  --preview 'bat -n --color=always {}'"
 
   export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git . | awk -F'/' '{print NF-1, \$0}' | sort -n | cut -d' ' -f2-"
 
