@@ -1,5 +1,6 @@
 -- https://github.com/yetone/avante.nvim
 -- Neovim plugin designed to emulate the behaviour of the Cursor AI IDE.
+-- config.lua: https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
 --
 -- https://platform.openai.com/docs/models
 -- https://docs.anthropic.com/es/docs/about-claude/models/overview
@@ -19,25 +20,28 @@ return {
     -- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
     -- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
     cursor_applying_provider = nil, -- The provider used in the applying phase of Cursor Planning Mode, defaults to nil, when nil uses Config.provider as the provider for the applying phase
-    auto_suggestions_provider = "copilot",
+    auto_suggestions_provider = "copilot", -- default copilot
     ---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
     provider = "copilot", -- openai, claude, copilot
+    -- providers
     providers = {
       openai = {
         endpoint = "https://api.openai.com/v1",
-        model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
+        model = "gpt-5", -- your desired model (or use gpt-4o, etc.)
         timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
+        context_window = 128000, -- Number of tokens to send to the model for context
         extra_request_body = {
-          temperature = 0,
-          max_completion_tokens = 4096, -- Increase this to include reasoning tokens (for reasoning models)
+          temperature = 0.75,
+          max_completion_tokens = 16384, -- Increase this to include reasoning tokens (for reasoning models) - default 16384 , 4096
           reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
         },
       },
       claude = {
         endpoint = "https://api.anthropic.com",
-        model = "claude-3-5-sonnet-20241022",
+        -- model = "claude-sonnet-4-20250514",
+        model = "claude-3-7-sonnet-20250219",
+        -- model = "claude-3-5-sonnet-20241022",
         -- model = "claude-3-5-haiku-20241022",
-        -- model = "claude-3-7-sonnet-20250219",
         -- model = "claude-sonnet-4-20250514",
         -- model = "claude-opus-4-20250514",
         extra_request_body = {
@@ -47,6 +51,19 @@ return {
       },
       copilot = {
         model = "claude-3.5-sonnet", -- o1-preview | o1-mini | claude-3.7-sonnet
+        -- model = "claude-sonnet-4", -- o1-preview | o1-mini | claude-3.7-sonnet
+      },
+      gemini = {
+        endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
+        model = "gemini-2.5-flash",
+        timeout = 30000, -- Timeout in milliseconds
+        context_window = 1048576,
+        use_ReAct_prompt = true,
+        extra_request_body = {
+          generationConfig = {
+            temperature = 0.75,
+          },
+        },
       },
       -- ollama = {
       --   endpoint = "http://127.0.0.1:11434",
@@ -70,7 +87,7 @@ return {
     --- When dual_boost is enabled, avante will generate two responses from the first_provider and second_provider respectively. Then use the response from the first_provider as provider1_output and the response from the second_provider as provider2_output. Finally, avante will generate a response based on the prompt and the two reference outputs, with the default Provider as normal.
     ---Note: This is an experimental feature and may not work as expected.
     dual_boost = {
-      enabled = false,
+      enabled = true,
       first_provider = "openai",
       second_provider = "claude",
       prompt = "Based on the two reference outputs below, generate a response that incorporates elements from both but reflects your own judgment and unique perspective. Do not provide any explanation, just give the response directly. Reference Output 1: [{{provider1_output}}], Reference Output 2: [{{provider2_output}}]",
@@ -151,7 +168,6 @@ return {
       },
     },
     highlights = {
-      ---@type AvanteConflictHighlights
       diff = {
         current = "DiffText",
         incoming = "DiffAdd",

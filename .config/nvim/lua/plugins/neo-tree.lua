@@ -19,7 +19,10 @@ return {
           -- ".localized",
           -- "thumbs.db",
         },
-        never_show = { ".git" },
+        never_show = {
+          ".git",
+          ".ansible",
+        },
       },
     },
   },

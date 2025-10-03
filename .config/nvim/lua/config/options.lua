@@ -8,6 +8,7 @@ local g = vim.g -- global
 
 -- all
 opt.autoindent = true -- copy indentation on new line
+opt.backspace = "indent,eol,start" -- backspace behavior
 opt.backup = false -- no backup
 opt.colorcolumn = "80"
 opt.completeopt = "menuone,noselect"
@@ -46,7 +47,7 @@ opt.writebackup = false -- no backup
 opt.foldenable = true
 opt.foldmethod = "expr"
 -- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()"
+opt.foldexpr = "v:lua.require'lazyvim.util'.treesitter.foldexpr()"
 
 -- browser
 -- g.mkdp_browser = "safari"

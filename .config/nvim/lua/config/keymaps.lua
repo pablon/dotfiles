@@ -22,7 +22,12 @@ end)
 
 -- enable/disable completion
 vim.keymap.set("n", "<leader>p", '<cmd>lua require("cmp").setup { enabled = true }<cr>', { desc = "Enable completion" })
-vim.keymap.set("n", "<leader>P", '<cmd>lua require("cmp").setup { enabled = false }<cr>', { desc = "Disable completion" })
+vim.keymap.set(
+  "n",
+  "<leader>P",
+  '<cmd>lua require("cmp").setup { enabled = false }<cr>',
+  { desc = "Disable completion" }
+)
 
 -- buffer resize
 vim.keymap.set("n", "<leader><left>", ":vertical resize +20<cr>", { desc = "Vertical resize +20" })
@@ -55,12 +60,14 @@ vim.keymap.set("n", "<leader>tgc", "<cmd>Telescope git_commits<cr>", { desc = "T
 -- telescope-symbols
 vim.keymap.set("n", "<leader>fs", "<cmd>Telescope symbols<cr>", { desc = "Find Symbols" })
 
--- Screenkey toggle
-vim.keymap.set("n", "<leader>k", "<cmd>Screenkey<cr>", { desc = "Screenkey toggle" })
-
 -- convert Current line to title cases
 -- vim.keymap.set("n", "<leader>rlt", "<cmd>s/<./\u&/g<cr>", { desc = "Replace Line Title" })
-vim.keymap.set("n", "<leader>rlt", "<cmd>lua require('textcase').current_word('to_title_case')<CR>", { desc = "Replace Line Title" })
+vim.keymap.set(
+  "n",
+  "<leader>rlt",
+  "<cmd>lua require('textcase').current_word('to_title_case')<CR>",
+  { desc = "Replace Line Title" }
+)
 
 -- these keep the cursor in the middle when scrolling with C-d and C-u
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
@@ -79,7 +86,12 @@ vim.keymap.set("n", "<leader>ob", "<cmd>Obsidian backlinks<CR>", { desc = "Show 
 vim.keymap.set("n", "<leader>oc", "<cmd>Obsidian toggle_checkbox<CR>", { desc = "Cycle through checkbox options" })
 vim.keymap.set("n", "<leader>od", "<cmd>Obsidian dailies<CR>", { desc = "Insert new Daily note" })
 vim.keymap.set("n", "<leader>oe", "<cmd>Obsidian extract_note<CR>", { desc = "Extract selected text into a new note" })
-vim.keymap.set("n", "<leader>of", "<cmd>Obsidian follow_link vsplit_force<CR>", { desc = "Follow a note reference under the cursor" })
+vim.keymap.set(
+  "n",
+  "<leader>of",
+  "<cmd>Obsidian follow_link vsplit_force<CR>",
+  { desc = "Follow a note reference under the cursor" }
+)
 vim.keymap.set("n", "<leader>ol", "<cmd>Obsidian links<CR>", { desc = "Collect all links in the current buffer" })
 vim.keymap.set("n", "<leader>onn", "<cmd>Obsidian new<CR>", { desc = "Create New Note" })
 vim.keymap.set("n", "<leader>oo", "<cmd>Obsidian open<CR>", { desc = "Open in Obsidian App" })
@@ -97,9 +109,9 @@ vim.keymap.set("n", "<leader>oT", "<cmd>Obsidian toc<CR>", { desc = "Load the ta
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Markdown Preview" })
 
 -- markdown-toc
-vim.keymap.set("n", "<leader>ti", "<cmd>Mtoc insert<cr>", { desc = "Markdown TOC Insert" })
-vim.keymap.set("n", "<leader>tu", "<cmd>Mtoc update<cr>", { desc = "Markdown TOC Update" })
-vim.keymap.set("n", "<leader>tr", "<cmd>Mtoc remove<cr>", { desc = "Markdown TOC Remove" })
+vim.keymap.set("n", "<leader>mti", "<cmd>Mtoc insert<cr>", { desc = "Markdown TOC Insert" })
+vim.keymap.set("n", "<leader>mtu", "<cmd>Mtoc update<cr>", { desc = "Markdown TOC Update" })
+vim.keymap.set("n", "<leader>mtr", "<cmd>Mtoc remove<cr>", { desc = "Markdown TOC Remove" })
 
 -- render-markdown
 vim.keymap.set("n", "<leader>mt", "<cmd>RenderMarkdown toggle<cr>", { desc = "RenderMarkdown toggle" })
@@ -135,7 +147,7 @@ local function set_foldmethod_expr()
   -- doesn't have them set
   if vim.fn.has("nvim-0.10") == 1 then
     vim.opt.foldmethod = "expr"
-    vim.opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()"
+    vim.opt.foldexpr = "v:lua.require'lazyvim.util'.treesitter.foldexpr()"
     vim.opt.foldtext = ""
   else
     vim.opt.foldmethod = "indent"
