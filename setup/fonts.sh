@@ -9,13 +9,15 @@ NERD_FONTS=('Hack' 'JetBrainsMono' 'FiraCode')
 PROJECT='ryanoasis/nerd-fonts'
 LATEST="$(curl -s "https://api.github.com/repos/${PROJECT}/releases/latest" | jq -r ".tag_name")"
 
-source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
+source "$(dirname "${0}")/.functions" || exit 1
 
-if [[ "$(uname)" == "Darwin" ]]; then
-	TARGET_DIR=~/Library/Fonts
-elif [[ "$(uname)" == "Linux" ]]; then
-	TARGET_DIR=~/.local/share/fonts
-fi
+case "$(uname)" in
+  'Darwin')
+    TARGET_DIR=~/Library/Fonts ;;
+  'Linux')
+    TARGET_DIR=~/.local/share/fonts ;;
+esac
+
 [ -d "${TARGET_DIR}" ] || mkdir -p "${TARGET_DIR}"
 
 for font in "${NERD_FONTS[@]}"; do

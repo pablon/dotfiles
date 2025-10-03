@@ -6,7 +6,7 @@
 
 ZSH_PLUGINS=(zsh-completions zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search)
 
-source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
+source "$(dirname "${0}")/.functions" || exit 1
 
 for plugin in "${ZSH_PLUGINS[@]}"; do
   if [ ! -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ]; then
