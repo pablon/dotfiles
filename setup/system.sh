@@ -4,7 +4,7 @@
 # Borrowed from https://mths.be/macos
 ##########################################################
 
-source "$(git rev-parse --show-toplevel)/setup/.functions" &>/dev/null
+source "$(dirname "${0}")/.functions" || exit 1
 
 function do_darwin() {
 	# Ask for the administrator password upfront
@@ -387,6 +387,5 @@ function do_darwin() {
 # TODO: add function do_linux
 
 if [[ "$(uname)" != "Darwin" ]]; then
-	echo "This script is for macOS only"
 	exit 0
 fi
