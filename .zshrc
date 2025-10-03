@@ -14,7 +14,11 @@ for plugin in "${ZSH_PLUGINS[@]}" ; do
     source ${HOME}/.zsh/${plugin}/${plugin}.zsh
 done
 
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # atuin
+[ -d "${HOME}/.atuin/bin" ] && source "${HOME}/.atuin/bin/env"
 eval "$(atuin init zsh --disable-up-arrow)"
 
 # starship
@@ -30,3 +34,6 @@ fi
 _zsh_end="$(date +%s%3N)"
 printf " %.3f s\\n" "$(( ${_zsh_end} - ${_zsh_start} ))e-3"
 unset _zsh_start _zsh_end
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/pnazar/.cache/lm-studio/bin"

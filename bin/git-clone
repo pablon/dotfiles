@@ -14,7 +14,7 @@ PRETTY_FORMAT='%C(auto)%h%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>'
 
 # colors
 BLUE="\033[1;94m"
-BOLD="\033[1;37m"
+STRONG="\033[1;37m"
 CLEAR="\033[0m"
 GREEN="\033[1;92m"
 MAGENTA="\033[1;95m"
@@ -22,7 +22,7 @@ RED="\033[1;31m"
 YELLOW="\033[1;93m"
 
 function _info() {
-	echo -e "${BLUE}==> ${BOLD}${1}${CLEAR}"
+	echo -e "${BLUE}==> ${STRONG}${1}${CLEAR}"
 }
 
 WORKDIR=${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}
@@ -36,11 +36,11 @@ if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
 		_info "  Project already exists in ${CLEAR}${REPO_DIR}"
 		echo
 	else
-		_info "${RED}${BOLD} Cloning ${CLEAR}${CLONE_URL}${BOLD} ..."
+		_info "${RED}${STRONG} Cloning ${CLEAR}${CLONE_URL}${STRONG} ..."
 		mkdir -p "${CLONE_PATH}" &&
 			git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
-			_info "${GREEN} ${BOLD} Cloned to ${YELLOW}${REPO_DIR}" &&
-			_info "${BLUE} ${BOLD} Latest changes:" &&
+			_info "${GREEN} ${STRONG} Cloned to ${YELLOW}${REPO_DIR}" &&
+			_info "${BLUE} ${STRONG} Latest changes:" &&
 			git -C "${REPO_DIR}/" log --color --decorate --format="${PRETTY_FORMAT}" --all | head -5
 		echo
 	fi

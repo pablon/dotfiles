@@ -84,14 +84,14 @@
 [alias]
   a         = "!git add $(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Select file(s) to stage\n  Press ? to inspect untracked files' --preview-window='right:60%' --preview 'git diff --color=always {-1}' --bind '?:preview:bat --color=always --line-range :500 {-1}') && git status -uno -s"  ; (fzf) select modified+untracked files to stage
   amend     = commit -a --amend
-  ca        = commit -am
-  cm        = commit -m
+  ca        = commit -asm
+  cm        = commit -sm
   co        = checkout
+  conf      = "!${EDITOR} ${HOME}/.gitconfig" ; edit this config file
   db        = "!git branch --color=never | awk '!/(develop|main|master)/ {print $NF}' | fzf -0 -m --marker='✘' --prompt='󱞽 Select local branch(es) to delete ' --preview-window='right:55%' --preview 'git show --color=always {-1}' | xargs -r git branch -D" ; (fzf) interactively delete branches
   db-remote = "!git branch --color=never -r | awk '!/(develop|main|master)/ {print $NF}' | fzf -0 -m --marker='✘' --prompt='󱞽 Select remote branch(es) to delete ' --preview-window='right:55%' --preview 'git show --color=always {-1}' | sed 's|origin/||g' | xargs -r git push -d origin" ; (fzf) interactively delete branches
   default   = "!echo ' Updating default branch...' ; git checkout $(git symbolic-ref refs/remotes/origin/HEAD --short | awk -F'/' '{print $NF}') && git pull --stat --tags" ; switch to & pull default branch
   dir       = rev-parse --show-toplevel
-  conf      = "!${EDITOR} ${HOME}/.gitconfig" ; edit this config file
   fake      = commit --allow-empty -m 'empty commit' ; empty commit - sometimes useful for testing CI
   fake-skip = commit --allow-empty -m 'empty commit [skip ci]' ; empty commit skipping ci - sometimes useful for testing CI
   find      = "!git ls-files | grep -i"
@@ -103,16 +103,16 @@
   lt        = describe --tags --abbrev=0 ; get last tag
   mr        = "!glab mr list"
   nuke      = "!git branch -D $@ && git push origin :$@" ; nukes a branch locally and on the origin remote
+  ours      = "!f() { git co --ours $@ && git add $@; }; f" ; merge our changes
   pf        = push --force-with-lease
   pr        = "!gh pr list"
   resethard = "!git reset --hard && git pull --stat --verbose --rebase"  ; discard all changes & rebase default branch
   resetlast = reset HEAD^ --soft ; undo last (local) commit
   resetm    = "!git diff --name-only -m | fzf -m --header='󱞽 Select file(s) to restore' --marker='✘' --preview 'git diff --color=always {-1}' | xargs -r git restore" ; (fzf) select modified files to restore
   ss        = status -uno -s  ; short
-  st        = status -uno ; standard
+  st        = status
   staged    = "!git diff --name-only --staged | fzf --preview 'bat --color=always --line-range :500 {}'"
   theirs    = "!f() { git co --theirs $@ && git add $@; }; f" ; merge their changes
-  ours      = "!f() { git co --ours $@ && git add $@; }; f" ; merge our changes
   undo      = reset HEAD~1 --mixed
   unstage   = "!git restore --staged $(git diff --name-only --cached | fzf -m --preview 'bat --color=always --line-range :500 {}' --header='󱞽 Select file(s) to unstage') && git status -uno" ; (fzf) select files to un-stage
   wip       = commit -am "WIP"

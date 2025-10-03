@@ -2,9 +2,8 @@
 
 Your dotfiles are how you personalize your system - These are mine.
 
-Simplicity is divine
-
-![Linux](https://img.shields.io/badge/-Linux-gray.svg?style=plastic&logo=Linux) ![macOS](https://img.shields.io/badge/-macOS-gray.svg?style=plastic&logo=apple)
+![Linux](https://img.shields.io/badge/-Linux-gray.svg?style=plastic&logo=Linux)
+![macOS](https://img.shields.io/badge/-macOS-gray.svg?style=plastic&logo=apple)
 
 </div>
 
@@ -22,7 +21,7 @@ Fresh installation:
 ./setup.sh
 ```
 
-.. or just link the files:
+.. or just re-link:
 
 ```bash
 ( type stow &>/dev/null ) && ( cd ~/dotfiles/ && stow -v . )

@@ -19,13 +19,14 @@
 " set map leader
 nnoremap <SPACE> <Nop>
 let mapleader = " "
+nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
 
 " Fast saving
 nmap <leader>w :w!<cr>
 nmap <leader>W :wall!<cr>
 " Fast quit
 nmap <leader>q :q!<cr>
-nmap <leader>Q :qall!<cr>
+nmap <leader>qq :qall!<cr>
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
 command! W w !sudo tee % > /dev/null " :W sudo saves the file when the file is open in readonly mode
@@ -69,6 +70,10 @@ augroup filetype_vim
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
+" YAML
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType yml setlocal ts=2 sts=2 sw=2 expandtab
+
 
 " highlight last inserted text
 nnoremap gV `[v`]
@@ -168,12 +173,6 @@ syntax enable
 if $COLORTERM == 'gnome-terminal'
   set t_Co=256
 endif
-
-try
-  " To see a list of ready-to-use themes: :colorscheme [space] [Ctrl+d]
-  colorscheme catppuccin_mocha
-catch
-endtry
 
 set background=dark                 " my eyes say thank you
 set cursorline cursorcolumn         " highlight current line & column
@@ -473,12 +472,19 @@ call plug#begin('~/.vim/autoload/plugged')
   Plug 'nathanaelkane/vim-indent-guides'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'preservim/nerdtree'
+  Plug 'liuchengxu/vim-which-key'
   Plug 'ryanoasis/vim-devicons'
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-fugitive'
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
 call plug#end()
+
+"===============================================================
+" Theme
+"===============================================================
+" To see a list of ready-to-use themes: :colorscheme [space] [Ctrl+d]
+colorscheme catppuccin_mocha
 
 "===============================================================
 " Airline

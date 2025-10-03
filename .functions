@@ -4,7 +4,7 @@ _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( 
 #===============================================================
 # multi purpose banners
 function _info() {
-  echo -e "${CYAN}==>  ${BOLD}${1}${NONE}"
+  echo -e "${CYAN}==>  ${STRONG}${1}${NONE}"
 }
 
 function _warning() {
@@ -59,6 +59,7 @@ function asdf_install() {
     fi
     [ -z "${SCOPE}" ] && echo "No scope provided" && return 1
     case "${SCOPE}" in
+      # asdf set --help
       here)   local SCOPE="" ;;   # this dir
       parent) local SCOPE="-p" ;; # closest existing .tool-versions in parent dir
       *)      local SCOPE="-u" ;; # global
@@ -69,6 +70,22 @@ function asdf_install() {
   asdf current ${PLUGIN}
   _success "Done"
 }
+
+function asdf_upgrade() {
+  # update all refs
+  asdf plugin update --all
+  # TODO:
+  # asdf plugin update ${1}
+  echo
+  # TODO: all
+  # asdf plugin update --all
+  asdf latest --all | awk '/missing/ {print $1}' | while read i ; do
+    asdf install $i latest 2>/dev/null &&
+    asdf set -u $i latest &&
+    _success "${i} done"
+  done
+}
+
 function asdf_uninstall() {
   local PLUGIN="${1}"
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
@@ -78,6 +95,7 @@ function asdf_uninstall() {
   asdf uninstall ${PLUGIN} ${VERSION}
   _success "Done"
 }
+
 function asdf_remove() {
   local PLUGIN="${1}"
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
@@ -322,14 +340,24 @@ function da() {
   [ -n "$cid" ] && docker start "$cid" && docker attach "$cid"
 }
 #===============================================================
-# Select running docker container(s) to stop
+# Select running container(s) to stop
 function ds() {
-  docker ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='1' | xargs -r docker rm -f
+  if (type docker &>/dev/null); then
+    local CLI="docker"
+  elif (type crictl &>/dev/null); then
+    local CLI="crictl"
+  fi
+  ${CLI} ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='1' | xargs -r ${CLI} rm -f
 }
 #===============================================================
-# Select a docker image(s) to remove
+# Select container image(s) to remove
 function drmi() {
-  docker images | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' | xargs -r docker rmi -f
+  if (type docker &>/dev/null); then
+    local CLI="docker"
+  elif (type crictl &>/dev/null); then
+    local CLI="crictl"
+  fi
+  ${CLI} images | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' | xargs -r ${CLI} rmi -f
 }
 
 ################################################################
@@ -629,6 +657,12 @@ function kexport() {
 }
 
 #===============================================================
+# k8s: decode secret data
+function decode_secret() {
+  kubectl get secret ${@} -o json | jq '.data | map_values(@base64d)'
+}
+
+#===============================================================
 # k8s: list node count+version
 function get-node-versions() {
   date
@@ -754,7 +788,7 @@ EOF
   local CURRENT_CONTEXT="$(\kubectl config current-context)"
 
   [ -n "${CURRENT_CONTEXT}" ] && divider ; _info "Cluster:   ${GREEN}${CURRENT_CONTEXT}" ; _info "Namespace: ${GREEN}${NAMESPACE}${NONE}" ; divider
-  echo -e "Match: ${BOLD}${POD_COUNT}${NONE} Pod(s)"
+  echo -e "Match: ${STRONG}${POD_COUNT}${NONE} Pod(s)"
 
   echo "${ALL_PODS}" | while read -r THIS_POD THIS_POD_NODE ; do
     local THIS_PVC="$(\kubectl -n ${NAMESPACE} describe pod/${THIS_POD} | awk '/ClaimName/ {print $2}')"
@@ -770,7 +804,7 @@ EOF
       local THIS_PV_INFO="driver:$(\kubectl get pv/${THIS_PV} -o yaml 2>/dev/null | yq '.spec.csi| (.driver, .volumeHandle, .fsType)' | xargs)"
     fi
     divider
-    echo -e "    Pod: ${CYAN}${THIS_POD}${NONE}\n   Node: ${THIS_POD_NODE}\tip:${BOLD}${THIS_POD_NODE_EXTERNAL_IP}${NONE}\n    PVC: ${THIS_PVC}\tclass:${BOLD}${THIS_PVC_CLASS}${NONE}\n     PV: ${THIS_PV} size:${BOLD}${THIS_SIZE}${NONE}\nDetails: ${YELLOW}${THIS_PV_INFO}${NONE}"
+    echo -e "    Pod: ${CYAN}${THIS_POD}${NONE}\n   Node: ${THIS_POD_NODE}\tip:${STRONG}${THIS_POD_NODE_EXTERNAL_IP}${NONE}\n    PVC: ${THIS_PVC}\tclass:${STRONG}${THIS_PVC_CLASS}${NONE}\n     PV: ${THIS_PV} size:${STRONG}${THIS_SIZE}${NONE}\nDetails: ${YELLOW}${THIS_PV_INFO}${NONE}"
     fi
   done
   divider

@@ -53,6 +53,7 @@ alias monitor="tail -f /var/log/*.log"
 ( type socat &>/dev/null ) && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
 ( type python3 &>/dev/null ) && alias python="$(which python3)"
 ( type gsed &>/dev/null ) && alias sed="$(which gsed)"
+alias nvc="(cd "${XDG_CONFIG_HOME:-~/.config}/nvim" && nvim .)"
 alias stat='stat -x'
 alias tm='tmux'
 alias tma='tmux a'
@@ -64,6 +65,8 @@ if ( type zoxide &>/dev/null ); then
   alias cd="z"
   alias cdi="zi"
 fi
+( type nc &>/dev/null ) && alias nc="nc -vvv -w3"
+
 
 
 #===============================================================
@@ -141,7 +144,10 @@ if ( type kubectl &>/dev/null ) ; then
   else
     alias k='kubectl'
   fi
-  ( type k9s &>/dev/null ) && alias k9s='k9s --headless --logoless'
+
+  # check if it works 
+  (type complete &>/dev/null) && complete -o default -F __start_kubectl k
+
   alias kcp='kubectl cp'
   alias kdel='kubectl delete'
   alias keti='kubectl exec -t -i'
@@ -169,6 +175,7 @@ if ( type kubectl &>/dev/null ) ; then
   alias ksd='kubectl scale deployment'
   alias ktn='kubectl top node --use-protocol-buffers=true'
   alias ktnc='kubectl top node --show-capacity=true --use-protocol-buffers=true'
+  alias get_taints='kubectl get node -o name | while read node ; do echo -en "$(basename ${node})\t" ; kubectl describe ${node} | grep Taint | column -tx ; done'
   # krew stuff
   ( type kubeconform &>/dev/null ) && alias kubeconform='kubeconform -output pretty -summary -strict -verbose'
   # custom pods
@@ -193,6 +200,7 @@ fi
 if ( type minikube &>/dev/null ) ; then
   alias mk='minikube'
   alias mks='minikube profile list && minikube status'
+  alias mkstart='start --addons=storage-provisioner,metallb --delete-on-failure=true --cni=calico && mks'
   alias mkt="minikube tunnel --cleanup=true --bind-address='*'"
 fi
 
