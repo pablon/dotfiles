@@ -1,5 +1,5 @@
 # Colors:
-export BOLD="\033[1;37m"
+export STRONG="\033[1;37m"
 export RED="\033[1;31m"
 export GREEN="\033[1;92m"
 export YELLOW="\033[1;93m"
@@ -8,21 +8,95 @@ export MAGENTA="\033[1;95m"
 export CYAN="\033[1;96m"
 export NONE="\033[0m"
 
+# pkg managers cli opts
+export APT_OPTS="-yqq"
+export DEBIAN_FRONTEND="noninteractive"
+export PACMAN_OPTS="--noconfirm --noprogressbar --needed --color always"
+
+[[ "$(id -u)" -ne "0" ]] && export SUDO="sudo"
+
 # multi purpose banners
 function _info() {
-  echo -e "${BLUE}==> ${BOLD}${1}${NONE}"
+  echo -e "${BLUE}==>  ${STRONG}${1}${NONE}"
+}
+
+function _warning() {
+  echo -e "${YELLOW}==>  ${1}${NONE}"
 }
 
 function _success() {
-  echo -e "${GREEN}==> ${BOLD}${1}${NONE}"
+  echo -e "${GREEN}==> ✔ ${1}${NONE}"
 }
 
 function _error() {
-  echo -e "${RED}==> ${MAGENTA}${1}${NONE}"
+  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NONE}\n"
 }
 
 function divider() {
   [[ "${COLUMNS}" ]] || local COLUMNS=80
   eval "printf '─%.0s' {1..$COLUMNS}"
   echo
+}
+
+# detect os
+
+function detect_os() {
+  case "$(uname)" in
+    Darwin)
+      export OS="darwin"
+      ;;
+    Linux)
+      source /etc/os-release || exit 1
+      case "${ID}" in
+      arch | debian | ubuntu)
+        export OS="${ID}"
+        ;;
+      *)
+        echo "${ID} OS not supported"
+        exit 1
+        ;;
+      esac
+      ;;
+  esac
+}
+
+is_wsl() {
+	case "$(uname -r)" in
+    'Microsoft'|'microsoft') true ;;
+    *) false;;
+	esac
+}
+
+function install_pkg_darwin() {
+  brew install "${@}"
+}
+
+function install_pkg_debian() {
+	${SUDO} apt-get update ${APT_OPTS} &&
+	${SUDO} apt-get install ${APT_OPTS} "${@}"
+}
+
+install_pkg_ubuntu() {
+	install_pkg_debian "$@"
+}
+
+function install_pkg_arch() {
+	${SUDO} pacman ${PACMAN_OPTS} -Syy &>/dev/null &&
+	${SUDO} pacman ${PACMAN_OPTS} -Sy "${@}"
+}
+
+function install_pkg_asdf() {
+  local SCOPE="-u"
+  asdf plugin add ${@} 2>/dev/null
+  local LATEST="latest"
+  echo
+  _info "ASDF :: installing ${YELLOW}${@} ${GREEN}${LATEST}"
+  asdf install ${@} ${LATEST} || {
+    # get the latest plugin version
+    local LATEST="$(asdf list all ${@} | sort -nr | head -1 | xargs)"
+    echo
+    _info "ASDF :: installing ${YELLOW}${@} ${CYAN}${LATEST}"
+    asdf install ${@} ${LATEST} || _error "Could not install ${YELLOW}${@} ${CYAN}${LATEST}"
+  }
+  asdf set ${SCOPE} ${@} ${LATEST}
 }
