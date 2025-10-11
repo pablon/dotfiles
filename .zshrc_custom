@@ -76,6 +76,7 @@ PATH_DIRS=(
   "/usr/local/sbin"
   "${HOME}/.asdf/shims"
   "${HOME}/.atuin/bin"
+  "${HOME}/.cache/lm-studio/bin"
   "${HOME}/.docker/bin"
   "${HOME}/.krew/bin"
   "${HOME}/.local/bin"
