@@ -3,6 +3,9 @@
 --
 -- This file contains the configuration for integrating GitHub Copilot and Copilot Chat plugins in Neovim.
 
+-- Define user name
+local user_name = os.getenv("USER") or "User"
+
 -- Define prompts for Copilot
 -- This table contains various prompts that can be used to interact with Copilot.
 local prompts = {
@@ -28,9 +31,6 @@ local prompts = {
   Wording = "Please improve the grammar and wording of the following text.", -- Prompt to improve wording
   Concise = "Please rewrite the following text to make it more concise.", -- Prompt to make text concise
 }
-
--- Define user name
-local user_name = os.getenv("USER") or "User"
 
 -- Copilot Chat plugin configuration
 -- This table contains the configuration for various plugins used in Neovim.
