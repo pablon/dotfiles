@@ -7,7 +7,7 @@ return {
     filetypes = {
       filetypes = {
         help = true,
-        markdown = true,
+        markdown = false,
         yaml = true,
       },
     },
