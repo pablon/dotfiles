@@ -6,14 +6,28 @@
 -- https://docs.anthropic.com/es/docs/about-claude/models/overview
 -- https://docs.github.com/en/copilot/using-github-copilot/ai-models
 
+-- Define user name
+local user_name = os.getenv("USER") or "User"
+
+-- Cache the system prompt lookup
+local DEFAULT_SYSTEM_PROMPT = table.concat({
+  "You are an expert DevOps engineer specialized in cloud services,",
+  "infrastructure as code, containers, helm, helmfile and kubernetes.",
+  "You have a technical yet practical approach, with clear and applicable explanations,",
+  "always providing useful examples for intermediate and advanced DevOps professionals.",
+  "You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor.",
+  "You avoid excessive formalities and use direct language, but technical when required.",
+}, " ")
+
+local system_prompt = os.getenv("SYSTEM_PROMPT") or DEFAULT_SYSTEM_PROMPT
+
 return {
   "yetone/avante.nvim",
   event = "VeryLazy",
   lazy = false,
   version = false, -- set this if you want to always pull the latest change
   opts = {
-    system_prompt = os.getenv("SYSTEM_PROMPT")
-      or "You are an expert DevOps engineer specialized in cloud services, infrastructure as code, containers, helm, helmfile and kubernetes. You have a technical yet practical approach, with clear and applicable explanations, always providing useful examples for intermediate and advanced DevOps professionals. You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor. You avoid excessive formalities and use direct language, but technical when required.",
+    system_prompt = system_prompt,
     ---@alias Mode "agentic" | "legacy"
     mode = "agentic", -- The default mode for interaction. "agentic" uses tools to automatically generate code, "legacy" uses the old planning method to generate code.
     -- WARNING: Since auto-suggestions are a high-frequency operation and therefore expensive,
@@ -38,20 +52,23 @@ return {
       },
       claude = {
         endpoint = "https://api.anthropic.com",
-        -- model = "claude-sonnet-4-20250514",
-        model = "claude-3-7-sonnet-20250219",
-        -- model = "claude-3-5-sonnet-20241022",
-        -- model = "claude-3-5-haiku-20241022",
-        -- model = "claude-sonnet-4-20250514",
-        -- model = "claude-opus-4-20250514",
+        -- -- models:
+        -- -- https://docs.claude.com/es/docs/about-claude/models/overview
+        -- model = "claude-sonnet-4-5-20250929",
+        model = "claude-sonnet-4-20250514",
+        -- model = "claude-3-7-sonnet-20250219",
         extra_request_body = {
           temperature = 0,
           max_tokens = 4096,
         },
       },
       copilot = {
-        model = "claude-3.5-sonnet", -- o1-preview | o1-mini | claude-3.7-sonnet
-        -- model = "claude-sonnet-4", -- o1-preview | o1-mini | claude-3.7-sonnet
+        -- use "GCP Vertex AI" id from:
+        -- -- https://docs.claude.com/es/docs/about-claude/models/overview
+        -- o1-preview | o1-mini | claude-3.5-sonnet | claude-3.7-sonnet | claude-sonnet-4-5
+        -- model = "claude-sonnet-4-5",
+        model = "claude-sonnet-4",
+        -- model = "claude-3.7-sonnet",
       },
       gemini = {
         endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
