@@ -6,7 +6,25 @@
 -- Define user name
 local user_name = os.getenv("USER") or "User"
 
--- Define prompts for Copilot
+-- Cache the system prompt lookup
+local DEFAULT_SYSTEM_PROMPT = table.concat({
+  "You are an expert DevOps engineer specialized in cloud services,",
+  "infrastructure as code, containers, helm, helmfile and kubernetes.",
+  "You have a technical yet practical approach, with clear and applicable explanations,",
+  "always providing useful examples for intermediate and advanced DevOps professionals.",
+  "You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor.",
+  "You avoid excessive formalities and use direct language, but technical when required.",
+}, " ")
+
+local system_prompt = os.getenv("SYSTEM_PROMPT") or DEFAULT_SYSTEM_PROMPT
+
+-- Constants for better maintainability
+local HEADERS = {
+  user = " " .. user_name .. " ",
+  copilot = "  Copilot ",
+  error = "✘ Error ",
+}
+
 -- This table contains various prompts that can be used to interact with Copilot.
 local prompts = {
   Explain = {
@@ -33,21 +51,18 @@ local prompts = {
 }
 
 -- Copilot Chat plugin configuration
--- This table contains the configuration for various plugins used in Neovim.
 return {
-  "CopilotC-Nvim/CopilotChat.nvim", -- Load the Copilot Chat plugin
+  "CopilotC-Nvim/CopilotChat.nvim",
   opts = {
     prompts = prompts,
-    -- System prompt to use (can be specified manually in prompt via /).
-    system_prompt = os.getenv("SYSTEM_PROMPT")
-      or "You are an expert DevOps engineer specialized in cloud services, infrastructure as code, containers, helm, helmfile and kubernetes. You have a technical yet practical approach, with clear and applicable explanations, always providing useful examples for intermediate and advanced DevOps professionals. You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor. You avoid excessive formalities and use direct language, but technical when required.",
-    model = "gpt-4o", -- Default model to use, see ':CopilotChatModels' for available models (can be specified manually in prompt via $).
-    agent = "copilot", -- Default agent to use, see ':CopilotChatAgents' for available agents (can be specified manually in prompt via @).
-    context = { "buffer", "git:staged" }, -- Default context or array of contexts to use (can be specified manually in prompt via #).
-    question_header = " " .. user_name .. " ", -- Header to use for user questions
-    answer_header = " Copilot ", -- Header to use for AI answers
-    error_header = "✘ Error ", -- Header to use for errors
-    separator = "───", -- Separator to use in chat
+    system_prompt = system_prompt,
+    model = "claude-sonnet-4",
+    agent = "copilot",
+    context = { "buffer", "git:staged" },
+    question_header = HEADERS.user,
+    answer_header = HEADERS.copilot,
+    error_header = HEADERS.error,
+    separator = "───",
     window = {
       layout = "vertical", -- 'vertical', 'horizontal', 'float', 'replace', or a function that returns the layout
     },
