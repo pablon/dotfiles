@@ -811,6 +811,19 @@ EOF
   echo
 }
 
+function kdescribe() {
+  local QUERY="${1}"
+  local RES_NAME="$(kubectl api-resources | awk "/(^${QUERY}|\ ${QUERY}\ |${QUERY}$) / {print \$1}" 2>/dev/null)"
+  if [ -z "${RES_NAME}" ]; then
+    _error "Can't find cluster resources of type '${QUERY}'"
+    return 1
+  fi
+  _info "Describing all ${GREEN}${RES_NAME}"
+  for i in $(kubectl get ${RES_NAME} -o name | xargs) ; do divider ; kubectl describe ${i} ; done
+  divider
+}
+alias kdesc=kdescribe
+
 ################################################################
 # Add your custom functions below
 ################################################################
