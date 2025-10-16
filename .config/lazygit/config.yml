@@ -10,8 +10,12 @@ git:
     pager: "delta -n --paging=never --tabs=2"
   commit:
     signOff: true
+  # Branch name detection to automatically create commits in a standardized format
+  # branch name must be in the format: <conventional-commit-type>/<ticket-number>-<semantic-description>
   commitPrefix:
+    # common/jira pattern: <conventional-commit-type>/<alpha+ticket-number>-<semantic-description>
     - pattern: "^([a-z]+)\\/([A-Z][A-Z0-9]+-\\d+)-([a-z0-9]+(?:-[a-z0-9]+)*)$"
       replace: "$1: [$2] $3"
+      # azure devops pattern: <conventional-commit-type>/<ticket-number>-<semantic-description>
     - pattern: "^([a-z]+)\\/(\\d+)-([a-z0-9]+(?:-[a-z0-9]+)*)$"
       replace: "$1: #$2 $3"
