@@ -27,7 +27,7 @@ function _info() {
 
 WORKDIR=${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}
 CLONE_URL="${1:?missing git clone url}"
-PATTERN='^(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+).git$'
+PATTERN='(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+).git$'
 
 if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
 	REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
@@ -37,9 +37,10 @@ if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
 		echo
 	else
 		_info "${RED}${STRONG} Cloning ${CLEAR}${CLONE_URL}${STRONG} ..."
-		mkdir -p "${CLONE_PATH}" &&
+		_info "${GREEN} ${STRONG} into ${YELLOW}$(echo "${REPO_DIR}" | sed -e "s|${HOME}|~|") ..." &&
+			mkdir -p "${CLONE_PATH}" &&
 			git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
-			_info "${GREEN} ${STRONG} Cloned to ${YELLOW}${REPO_DIR}" &&
+			_info "${GREEN} ${STRONG} Done!" &&
 			_info "${BLUE} ${STRONG} Latest changes:" &&
 			git -C "${REPO_DIR}/" log --color --decorate --format="${PRETTY_FORMAT}" --all | head -5
 		echo
