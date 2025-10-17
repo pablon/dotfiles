@@ -1,8 +1,11 @@
 **/*.[1-9999]*
 **/*.bkp
 **/*.disabled
+**/.DS_Store
+**/.aliases_work
+**/.secrets
 **/.tool-versions
 **/lazy-lock.json
-**/state.yml
-**/.DS_Store
 **/spell
+**/state.yml
+.github/*-instructions.md
