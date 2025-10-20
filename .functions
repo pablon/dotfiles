@@ -203,6 +203,13 @@ function flushdns() {
   _info "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
 }
 #===============================================================
+# check host for dns availability
+function checkdns() {
+  local HOST="${1}"
+  until (host ${HOST} &>/dev/null); do echo -e "[$(date +%F\ %T)] $(host ${HOST})" ; sleep 5 ; done
+  _info "${HOST} is alive\n$(host ${HOST})"
+}
+#===============================================================
 # print random fortune with cowsay & fortune
 function cookie() {
   for program in cowsay fortune ; do
