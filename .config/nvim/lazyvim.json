@@ -14,10 +14,9 @@
     "lazyvim.plugins.extras.lang.markdown",
     "lazyvim.plugins.extras.lang.yaml",
     "lazyvim.plugins.extras.lsp.none-ls",
-    "lazyvim.plugins.extras.ui.alpha",
     "lazyvim.plugins.extras.ui.mini-animate"
   ],
-  "install_version": 7,
+  "install_version": 8,
   "news": {
     "NEWS.md": "11866"
   },

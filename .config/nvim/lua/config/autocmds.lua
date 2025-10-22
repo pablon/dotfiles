@@ -6,3 +6,18 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+vim.filetype.add({
+  pattern = {
+    [".*/*.yaml.gotmpl"] = "yaml",
+  },
+})
+
+vim.api.nvim_create_autocmd("BufRead", {
+  group = vim.api.nvim_create_augroup("detect_gitconfig", { clear = true }),
+  desc = "Set filetype for gitconfig-* files",
+  pattern = { ".gitconfig-*", ".gitconfig_*" },
+  callback = function()
+    vim.cmd("set filetype=gitconfig")
+  end,
+})

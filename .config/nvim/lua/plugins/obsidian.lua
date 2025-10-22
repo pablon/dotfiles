@@ -22,7 +22,7 @@ return {
   },
   opts = {
     notes_subdir = "inbox",
-    new_notes_location = "notes_subdir",
+    new_notes_location = "inbox",
 
     workspaces = {
       {
@@ -31,10 +31,10 @@ return {
       },
     },
 
-    completion = {
-      nvim_cmp = true,
-      min_chars = 2,
-    },
+    -- completion = {
+    --   nvim_cmp = false,
+    --   min_chars = 2,
+    -- },
 
     note_id_func = function(title)
       -- Create note IDs in a Zettelkasten format:
@@ -42,8 +42,8 @@ return {
       if title ~= nil then
         suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
         -- else
-        --   -- If title is nil, just add 4 random uppercase letters to the suffix.
-        --   for _ = 1, 4 do
+        --   -- If title is nil, just add 8 random uppercase letters to the suffix.
+        --   for _ = 1, 8 do
         --     suffix = suffix .. string.char(math.random(65, 90))
         --   end
         return tostring(os.date("%Y-%m-%d")) .. "-" .. suffix

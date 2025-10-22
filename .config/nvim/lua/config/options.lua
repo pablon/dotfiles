@@ -46,7 +46,6 @@ opt.writebackup = false -- no backup
 -- folding
 opt.foldenable = true
 opt.foldmethod = "expr"
--- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldexpr = "v:lua.require'lazyvim.util'.treesitter.foldexpr()"
 
 -- browser
