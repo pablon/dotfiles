@@ -4,18 +4,20 @@
 # Author: https://github.com/pablon
 ##########################################################
 
+source "$(dirname "${0}")/.functions" || exit 1
+
 NERD_FONTS=('Hack' 'JetBrainsMono' 'FiraCode')
 
 PROJECT='ryanoasis/nerd-fonts'
 LATEST="$(curl -s "https://api.github.com/repos/${PROJECT}/releases/latest" | jq -r ".tag_name")"
 
-source "$(dirname "${0}")/.functions" || exit 1
-
 case "$(uname)" in
-  'Darwin')
-    TARGET_DIR=~/Library/Fonts ;;
-  'Linux')
-    TARGET_DIR=~/.local/share/fonts ;;
+'Darwin')
+	TARGET_DIR=~/Library/Fonts
+	;;
+'Linux')
+	TARGET_DIR=~/.local/share/fonts
+	;;
 esac
 
 [ -d "${TARGET_DIR}" ] || mkdir -p "${TARGET_DIR}"
