@@ -8,17 +8,24 @@ ZSH_PLUGINS=(zsh-completions zsh-autosuggestions zsh-syntax-highlighting zsh-his
 
 source "$(dirname "${0}")/.functions" || exit 1
 
+_info "Changing default shell to ${CYAN}zsh"
+sudo chsh -s /bin/zsh "$(whoami)" && _success "Done"
+[ -f "${HOME}/.zshrc" ] && mv -f "${HOME}/.zshrc" "${HOME}/.zshrc.bak"
+
+[ -d "${HOME}/.zsh" ] || mkdir -p "${HOME}/.zsh"
+
 for plugin in "${ZSH_PLUGINS[@]}"; do
   if [ ! -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ]; then
-    git clone https://github.com/zsh-users/${plugin} ${HOME}/.zsh/${plugin} 2>/dev/null
+    git clone https://github.com/zsh-users/${plugin} ${HOME}/.zsh/${plugin} 2>/dev/null ||
+      exit 1
   else
-    _info "Updating plugin ${YELLOW}${plugin}"
+    _info "Updating zsh plugin ${YELLOW}${plugin}"
     (cd "${HOME}/.zsh/${plugin}/" && git pull --rebase)
   fi
 done
 
 # Install iTerm2 Shell Integration
 [ -n "${ITERM_SESSION_ID}" ] &&
-  curl --create-dirs -o "${HOME}/.config/iterm2/shell_integration.zsh" -L https://iterm2.com/shell_integration/zsh
+  curl ${GITHUB_AUTH} --create-dirs -o "${HOME}/.config/iterm2/shell_integration.zsh" -L https://iterm2.com/shell_integration/zsh
 
 _success "Done ${0}"
