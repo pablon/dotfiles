@@ -146,7 +146,7 @@ if ( type fzf &>/dev/null ) ; then
   --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
   --color=preview-fg:#f5e0dc,preview-bg:#2E3440,label:#cba6f7,spinner:cyan
   --color=header:#cba6f7,prompt:#cba6f7,pointer:#cba6f7,scrollbar:#fab387"
-  # icons: ◆ ← ▶ ❯ ✔ ✘   
+  # icons: ◆ ← ▶ ❯ ✔ ✘  
 
   export FZF_DEFAULT_OPTS="${FZF_COLORS} --border='rounded' --border-label=''
   --preview-window='border-double'

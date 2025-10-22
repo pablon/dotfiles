@@ -73,6 +73,14 @@ fi
 # misc
 #===============================================================
 
+# open dotfiles
+alias dots='[ -d ~/dotfiles/ ] && _info "Entering dotfiles config! 🚀" && (cd ~/dotfiles/ && nvim .)'
+
+# obsidian open
+alias oo="( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim . )"
+# obsidian search
+alias os="( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c ObsidianSearch )"
+
 alias reload="reset ; source ${HOME}/.zshrc"
 ( type cmatrix &>/dev/null ) && alias cmatrix='cmatrix -abs'
 
@@ -145,7 +153,7 @@ if ( type kubectl &>/dev/null ) ; then
     alias k='kubectl'
   fi
 
-  # check if it works 
+  # check if it works
   (type complete &>/dev/null) && complete -o default -F __start_kubectl k
 
   alias kcp='kubectl cp'
