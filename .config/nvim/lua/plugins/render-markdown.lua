@@ -12,7 +12,7 @@ return {
   opts = {
     heading = {
       enabled = true,
-      preset = "obsidian",
+      -- preset = "obsidian",
       sign = true,
       position = "overlay",
       -- icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " }, -- rounded
@@ -50,7 +50,7 @@ return {
       highlight = "RenderMarkdownBullet",
       left_pad = 2,
       render_modes = false,
-      position = "overlay",
+      -- position = "overlay",
     },
     callout = {
       bug = { raw = "[!BUG]", rendered = "󰨰 Bug", highlight = "RenderMarkdownError" },
@@ -119,7 +119,7 @@ return {
     checkbox = {
       enabled = true,
       left_pad = 2,
-      position = "overlay",
+      -- position = "overlay",
       unchecked = { icon = "󰄱", highlight = "RenderMarkdownUnchecked", scope_highlight = nil },
       checked = { icon = "󰱒", highlight = "RenderMarkdownChecked", scope_highlight = "@markup.strikethrough" },
       custom = {
