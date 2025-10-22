@@ -4,14 +4,16 @@
 # Author: https://github.com/pablon
 ##########################################################
 
-(type vim &>/dev/null) || install_pkg_${OS} vim
-
 source "$(dirname "${0}")/.functions" || exit 1
 
+(type vim &>/dev/null) || install_pkg_${OS} vim
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
 mkdir -p "${HOME}/.vim/autoload/plugged"
-curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+curl -fLo "${HOME}/.vim/autoload/plug.vim" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ||
+	exit 1
 
 # install plugins
-vim -E -s -u "${HOME}/.vimrc" +PlugInstall +qall
+vim -E -s -u "${REPO_ROOT}/.vimrc" +PlugInstall +qall
 
 _success "Done ${0}"

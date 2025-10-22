@@ -1,3 +1,10 @@
+set -a
+
+# https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting
+if [ "${GITHUB_TOKEN}" ]; then
+	# export GITHUB_AUTH="-H 'Authorization: Bearer ${GITHUB_TOKEN}'"
+	export GITHUB_AUTH="-H 'Authorization: token ${GITHUB_TOKEN}'"
+fi
 # Colors:
 export STRONG="\033[1;37m"
 export RED="\033[1;31m"
@@ -11,16 +18,20 @@ export NONE="\033[0m"
 # pkg managers cli opts
 export APT_OPTS="-yqq"
 export DEBIAN_FRONTEND="noninteractive"
-export PACMAN_OPTS="--noconfirm --noprogressbar --needed --color always"
+export DNF_OPTS="--skip-broken -y"
+export PACMAN_OPTS="--noconfirm --noprogressbar --needed --color always --disable-download-timeout"
 
+# this allows us to debug as root when SUDOis not set
 [[ "$(id -u)" -ne "0" ]] && export SUDO="sudo"
 
 # multi purpose banners
 function _info() {
+  divider
   echo -e "${BLUE}==>  ${STRONG}${1}${NONE}"
 }
 
 function _warning() {
+  divider
   echo -e "${YELLOW}==>  ${1}${NONE}"
 }
 
@@ -33,13 +44,12 @@ function _error() {
 }
 
 function divider() {
-  [[ "${COLUMNS}" ]] || local COLUMNS=80
+  local COLUMNS=80
   eval "printf '─%.0s' {1..$COLUMNS}"
   echo
 }
 
 # detect os
-
 function detect_os() {
   case "$(uname)" in
     Darwin)
@@ -48,18 +58,19 @@ function detect_os() {
     Linux)
       source /etc/os-release || exit 1
       case "${ID}" in
-      arch | debian | ubuntu)
-        export OS="${ID}"
-        ;;
-      *)
-        echo "${ID} OS not supported"
-        exit 1
-        ;;
+        arch|debian|ubuntu|fedora|rocky|almalinux)
+          export OS="${ID}"
+          ;;
+        *)
+          echo "${ID} OS not supported"
+          exit 1
+          ;;
       esac
       ;;
   esac
 }
 
+# detect swl
 is_wsl() {
 	case "$(uname -r)" in
     'Microsoft'|'microsoft') true ;;
@@ -67,6 +78,7 @@ is_wsl() {
 	esac
 }
 
+# standard pkg install for each os flavour
 function install_pkg_darwin() {
   brew install "${@}"
 }
@@ -85,18 +97,38 @@ function install_pkg_arch() {
 	${SUDO} pacman ${PACMAN_OPTS} -Sy "${@}"
 }
 
+function install_pkg_manjaro() {
+	install_pkg_arch "$@"
+}
+
+function install_pkg_rhel() {
+	${SUDO} dnf install ${DNF_OPTS} "${@}"
+}
+
+function install_pkg_fedora() {
+	install_pkg_rhel "$@"
+}
+
+function install_pkg_rocky() {
+	install_pkg_rhel "$@"
+}
+
+function install_pkg_almalinux() {
+	install_pkg_rhel "$@"
+}
+
 function install_pkg_asdf() {
   local SCOPE="-u"
-  asdf plugin add ${@} 2>/dev/null
+  asdf plugin add ${*} 2>/dev/null
   local LATEST="latest"
   echo
-  _info "ASDF :: installing ${YELLOW}${@} ${GREEN}${LATEST}"
-  asdf install ${@} ${LATEST} || {
+  _info "ASDF :: installing ${YELLOW}${*} ${GREEN}${LATEST}"
+  asdf install "${@}" ${LATEST} || {
     # get the latest plugin version
-    local LATEST="$(asdf list all ${@} | sort -nr | head -1 | xargs)"
+    local LATEST="$(asdf list all "${@}" | sort -nr | head -1 | xargs)"
     echo
-    _info "ASDF :: installing ${YELLOW}${@} ${CYAN}${LATEST}"
-    asdf install ${@} ${LATEST} || _error "Could not install ${YELLOW}${@} ${CYAN}${LATEST}"
+    _info "ASDF :: installing ${YELLOW}${*} ${CYAN}${LATEST}"
+    asdf install "${@}" ${LATEST} || _error "Could not install ${YELLOW}${*} ${CYAN}${LATEST}"
   }
-  asdf set ${SCOPE} ${@} ${LATEST}
+  asdf set ${SCOPE} "${@}" ${LATEST}
 }

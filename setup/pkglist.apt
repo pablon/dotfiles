@@ -1,4 +1,6 @@
 7zip
+ansible
+apache2-utils
 bash
 bc
 binutils
@@ -21,13 +23,19 @@ git-delta
 gpg
 gzip
 htop
-imagemagick
 iftop
+imagemagick
 iotop
 jq
+locales
 lolcat
 lua5.1
 man-db
+manpages
+manpages-dev
+manpages-es
+manpages-es-dev
+nala
 neovim
 nodejs
 npm
@@ -46,7 +54,6 @@ unzip
 vim
 wget
 xclip
-xh
 yq
 zoxide
 zsh
