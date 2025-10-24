@@ -1,4 +1,5 @@
 --ignore=.DS_Store
+--ignore=.gitconfig
 --ignore=.helm
 --ignore=.pre-commit-config.yaml
 --ignore=.stowrc
