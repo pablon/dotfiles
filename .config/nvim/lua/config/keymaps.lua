@@ -1,6 +1,8 @@
 -- Keymaps are automatically loaded on the VeryLazy event
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
+--
+-- See also: ../plugins/snacks.lua#L57
 
 -- Generic function to toggle any vim.opt
 local function vim_opt_toggle(opt, on, off, name)

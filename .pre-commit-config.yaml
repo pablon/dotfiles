@@ -52,6 +52,7 @@ repos:
         args:
           - --fix=lf
       - id: trailing-whitespace
+        exclude: snacks.lua
 
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.10.0
@@ -69,7 +70,12 @@ repos:
       - id: yamllint
         types: [file, yaml]
         entry: yamllint
-        args: [ "--no-warnings", "-d", "{extends: relaxed, rules: {line-length: {max: 500}}}" ]
+        args:
+          [
+            "--no-warnings",
+            "-d",
+            "{extends: relaxed, rules: {line-length: {max: 500}}}",
+          ]
 
   - repo: https://github.com/tcort/markdown-link-check
     rev: v3.13.7

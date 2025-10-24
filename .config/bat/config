@@ -1,6 +1,6 @@
 # https://github.com/sharkdp/bat#customization
-
 --pager="less -RF --tabs=2 --mouse"
 --map-syntax='*.conf:INI'
 --map-syntax '*.gotmpl:YAML'
 --map-syntax '.ignore:Git Ignore'
+--theme="Catppuccin Mocha"

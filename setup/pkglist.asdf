@@ -3,6 +3,7 @@ argocd
 bat
 eza
 fzf
+ghostty
 git-lfs
 golang
 golangci-lint
