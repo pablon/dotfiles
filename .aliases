@@ -30,8 +30,8 @@ fi
 # Utilities
 #===============================================================
 
-alias cdate='echo -n "$(date +%F\ %T\ %Z)" | $_clipboardApp'      # TZ
-alias cdateu='echo -n "$(date -u +%F\ %T\ %Z)" | $_clipboardApp'  # UTC
+alias cdate='echo -n "$(date +%F\ %T\ %Z)" | $_clipboardApp'     # full-date local TZ
+alias cdateu='echo -n "$(date -u +%F\ %T\ %Z)" | $_clipboardApp' # full-date UTC
 alias curl="curl --progress-bar --connect-timeout 3 -m 3 -s -H 'User-Agent: Mozilla/5 Gecko'"
 ( type colordiff &>/dev/null ) && alias diff='colordiff'
 alias egrep="egrep --color=auto"
@@ -53,7 +53,7 @@ alias monitor="tail -f /var/log/*.log"
 ( type socat &>/dev/null ) && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
 ( type python3 &>/dev/null ) && alias python="$(which python3)"
 ( type gsed &>/dev/null ) && alias sed="$(which gsed)"
-alias nvc="(cd "${XDG_CONFIG_HOME:-~/.config}/nvim" && nvim .)"
+alias nvc="_info '📝 Opening Neovim Config' ; ([ -d "${XDG_CONFIG_HOME:-~/.config}/nvim" ] && cd "${XDG_CONFIG_HOME:-~/.config}/nvim" && nvim .)"
 alias stat='stat -x'
 alias tm='tmux'
 alias tma='tmux a'
@@ -77,9 +77,9 @@ fi
 alias dots='[ -d ~/dotfiles/ ] && _info "Entering dotfiles config! 🚀" && (cd ~/dotfiles/ && nvim .)'
 
 # obsidian open
-alias oo="( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim . )"
+alias oo="_info '📝 Opening Obsidian' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim . )"
 # obsidian search
-alias os="( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c ObsidianSearch )"
+alias os="_info '🔎 Opening ObsidianSearch' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c ObsidianSearch )"
 
 alias reload="reset ; source ${HOME}/.zshrc"
 ( type cmatrix &>/dev/null ) && alias cmatrix='cmatrix -abs'
@@ -128,7 +128,7 @@ if ( type docker &>/dev/null ) ; then
   alias di='docker images'
   alias dils="docker image ls --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.Size}}'"
   alias dirm='docker image rm'
-  alias dps='docker ps -a'
+  alias dps='watch -d -n 0.5 "docker ps -a"'
   alias dr='docker run -ti --rm'
   alias dsta='docker stop $(docker ps -q)'
   alias dvprune='docker volume prune'
@@ -198,7 +198,7 @@ if ( type kubie &>/dev/null ) ; then
 fi
 # stern
 if ( type stern &>/dev/null ) ; then
-  alias stern="stern --only-log-lines -td -H '(?i)debug|info|warn[i][n][g]|auth|fail[e][d]|error|critical|unknown'"
+  alias stern="stern --only-log-lines -td -H '(?i)debug|info|warn[i][n][g]|auth|fail[e][d]|error|critical|unknown|unhealthy'"
 fi
 # helm
 if ( type helm-docs &>/dev/null ) ; then
@@ -210,6 +210,7 @@ if ( type minikube &>/dev/null ) ; then
   alias mks='minikube profile list && minikube status'
   alias mkstart='start --addons=storage-provisioner,metallb --delete-on-failure=true --cni=calico && mks'
   alias mkt="minikube tunnel --cleanup=true --bind-address='*'"
+  alias mku="minikube update-context"
 fi
 
 #===============================================================

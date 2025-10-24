@@ -25,6 +25,7 @@ fortune
 fzf
 gawk
 gh
+ghostty
 git
 gitlint
 gitui
@@ -50,6 +51,7 @@ kubecolor
 kubeconform
 kubie
 libpq
+mermaid-cli
 minikube
 neovim
 netcat
