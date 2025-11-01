@@ -83,6 +83,7 @@ alias os="_info '🔎 Opening ObsidianSearch' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/ob
 
 alias reload="reset ; source ${HOME}/.zshrc"
 ( type cmatrix &>/dev/null ) && alias cmatrix='cmatrix -abs'
+( type ghostty &>/dev/null ) && alias boo='ghostty +boo'
 
 #===============================================================
 # fzf preview/edit
