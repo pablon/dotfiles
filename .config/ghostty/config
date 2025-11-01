@@ -1,0 +1,17 @@
+# common
+background-blur         = 20
+background-opacity      = 0.9
+font-family             = "JetBrainsMono"
+font-size               = 13
+mouse-hide-while-typing = true
+theme                   = TokyoNight
+window-decoration       = true
+# keybindings
+keybind                 = super+-=decrease_font_size:2
+keybind                 = super+bracket_right=increase_font_size:1
+keybind                 = global:super+escape=toggle_quick_terminal
+keybind                 = super+l=clear_screen
+keybind                 = super+w=close_tab:this
+# colors
+selection-background   = #f1e89d
+selection-foreground   = #000000
