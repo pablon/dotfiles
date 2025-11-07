@@ -29,19 +29,25 @@ return {
     indent = { enabled = true },
     input = { enabled = true },
     git = { enabled = true },
+    explorer = {
+      cycle = true,
+      auto_close = false,
+      jump = { close = false },
+      layout = { preview = "main" },
+    },
     picker = {
       enabled = true,
       hidden = true,
       ignored = true,
       ui_select = false,
-      sources = {
-        explorer = {
-          cycle = true,
-          auto_close = false,
-          jump = { close = false },
-          layout = { preview = "main" },
-        },
-      },
+      -- sources = {
+      --   explorer = {
+      --     cycle = true,
+      --     auto_close = false,
+      --     jump = { close = false },
+      --     layout = { preview = "main" },
+      --   },
+      -- },
       exclude = {
         ".ansible*",
         ".git",
