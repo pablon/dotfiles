@@ -5,9 +5,9 @@ gui:
   nerdFontsVersion: "3"
   shortTimeFormat: 03:04 PM
 git:
-  paging:
-    colorArg: always
-    pager: "delta -n --paging=never --tabs=2"
+  pagers:
+    - colorArg: always
+      pager: "delta -n --paging=never --tabs=2"
   commit:
     signOff: true
   # Branch name detection to automatically create commits in a standardized format
