@@ -184,7 +184,8 @@ if ( type kubectl &>/dev/null ) ; then
   alias ksd='kubectl scale deployment'
   alias ktn='kubectl top node --use-protocol-buffers=true'
   alias ktnc='kubectl top node --show-capacity=true --use-protocol-buffers=true'
-  alias get_taints='kubectl get node -o name | while read node ; do echo -en "$(basename ${node})\t" ; kubectl describe ${node} | grep Taint | column -tx ; done'
+  alias get-taints='kubectl get node -o name | while read node ; do echo -en "$(basename ${node})\t" ; kubectl describe ${node} | grep Taint | column -tx ; done'
+  alias get-all-certs='kubectl get secrets --field-selector type=kubernetes.io/tls'
   # krew stuff
   ( type kubeconform &>/dev/null ) && alias kubeconform='kubeconform -output pretty -summary -strict -verbose'
   # custom pods
