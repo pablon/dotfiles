@@ -670,6 +670,76 @@ function decode_secret() {
 }
 
 #===============================================================
+# k8s: check tls certs expiration date
+function get-tls-certs() {
+  _info "Checking TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NONE}\n"
+  kubectl get certificates --no-headers -A 2>/dev/null | awk '{print $1" "$2}' | while read -r tls_cert ; do
+    CERT_NAMESPACE="$(echo "${tls_cert}" | awk '{print $1}')"
+    CERT_NAME="$(echo "${tls_cert}" | awk '{print $2}')"
+    CERT_INFO="$(kubectl -n ${CERT_NAMESPACE} get secret/${CERT_NAME} -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -noout -issuer -subject -dates)"
+    CERT_ISSUER="$(echo "${CERT_INFO}" | grep '^issuer')"
+    CERT_SUBJECT="$(echo "${CERT_INFO}" | grep '^subject')"
+    CERT_DATES="$(echo "${CERT_INFO}" | grep -E '^notBefore|^notAfter')"
+    CERT_STATUS="$(
+        not_after=$(echo "${CERT_DATES}" | grep notAfter | sed 's|notAfter=||')
+        [[ -n "$not_after" ]] && exp_epoch=$(date -d "${not_after}" +%s 2>/dev/null || date -j -f "%b %d %H:%M:%S %Y %Z" "${not_after}" +%s 2>/dev/null) && days=$(((exp_epoch - $(date +%s)) / 86400)) && { [[ ${days} -lt 0 ]] && echo "EXPIRED:$((days * -1))" || [[ ${days} -eq 0 ]] && echo "EXPIRES_TODAY:0" || [[ ${days} -le 30 ]] && echo "WARNING:${days}" || echo "OK:${days}"; } || echo "ERROR:INVALID_CERT"
+      )"
+    echo "${CERT_STATUS}" | IFS=':' read -r this_cert_status days
+    COLOUR="${STRONG}"
+    case "${this_cert_status}" in
+      "OK")
+        ICON="✅"
+        COLOUR="${NONE}"
+        CERT_MESSAGE="El certificado es válido, vence en: ${GREEN}${days} días${NONE}"
+        ;;
+      "WARNING")
+        ICON="⚠️"
+        COLOUR="${YELLOW}"
+        CERT_MESSAGE="${ICON}${YELLOW} El certificado expira pronto: ${MAGENTA}${days} días${NONE}"
+        ;;
+      "EXPIRES_TODAY")
+        ICON="🚨"
+        COLOUR="${YELLOW}"
+        CERT_MESSAGE="${ICON}${YELLOW} El certificado expira HOY!!!${NONE}"
+        ;;
+      "EXPIRED")
+        ICON="💀"
+        COLOUR="${MAGENTA}"
+        CERT_MESSAGE="${ICON}${MAGENTA} El certificado ha expirado hace ${MAGENTA}${days} días${NONE}"
+        ;;
+      "ERROR")
+        ICON="❌"
+        CERT_MESSAGE="${ICON}${MAGENTA} Certificado no válido o archivo no encontrado${NONE}"
+        ;;
+    esac
+    echo -e "==> ${ICON} ${COLOUR}Certificate: ${COLOUR}${CERT_NAMESPACE}/${CYAN}${CERT_NAME}${COLOUR}"
+    echo -e "${CERT_ISSUER}\n${CERT_SUBJECT}\n${CERT_DATES}\n${CERT_MESSAGE}${NONE}" | sed 's|^|\t|'
+    unset CERT_DATES
+    unset CERT_INFO
+    unset CERT_ISSUER
+    unset CERT_MESSAGE
+    unset CERT_NAME
+    unset CERT_NAMESPACE
+    unset CERT_STATUS
+    unset CERT_SUBJECT
+    unset ICON
+  done
+  echo
+}
+
+#===============================================================
+# k8s: check cert-manager tls certs expiration date
+function get-cm-certs() {
+  _info "Checking cert-manager TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NONE}\n"
+  kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read namespace cert ; do 
+    cmctl status certificate -n ${namespace} ${cert} | grep --colour=never -E 'Name|^-|^Not\ |^Renewal'
+    divider
+    unset cert
+    unset namespace
+  done
+}
+
+#===============================================================
 # k8s: list node count+version
 function get-node-versions() {
   date

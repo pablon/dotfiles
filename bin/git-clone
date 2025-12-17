@@ -7,7 +7,7 @@ set -euo pipefail
 
 ##########################################################
 # if you don't like ~/projects set GIT_WORKDIR in your shell
-GIT_DEFAULT_WORKDIR=~/projects
+GIT_DEFAULT_WORKDIR="${HOME}/projects"
 # git log format
 PRETTY_FORMAT='%C(auto)%h%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>'
 ##########################################################
@@ -35,8 +35,8 @@ if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
 		_info "  Project already exists in ${CLEAR}${REPO_DIR}"
 		echo
 	else
-		_info "${RED}${STRONG} Cloning ${CLEAR}${CLONE_URL}${STRONG} ..."
-		_info "${GREEN} ${STRONG} into ${YELLOW}${REPO_DIR//$HOME/~} ..." &&
+		_info "${RED}${STRONG} Cloning ${CYAN}${CLONE_URL}${STRONG}"
+		_info "${GREEN} ${STRONG} into    ${YELLOW}${REPO_DIR//${HOME}/\~}" &&
 			mkdir -p "${CLONE_PATH}" &&
 			git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
 			_info "${GREEN} ${STRONG} Done!" &&
