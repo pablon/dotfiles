@@ -13,12 +13,12 @@ export KUBIE_CONFIG="${HOME}/.kube/kubie.yaml"
 export KUBIE_CONFIG_DIR="${HOME}/.kube/configs"
 
 function create_kubie_yaml() {
-  if [ -f "${KUBIE_CONFIG}" ]; then
-    BACKUP_TS="$(date +%Y%m%d-%H%M%S)"
-    cp -vf ${KUBIE_CONFIG}{,.${BACKUP_TS}}
-    _warning "Saving backup of existing configuration file\nas ${MAGENTA}${KUBIE_CONFIG}.${BACKUP_TS}"
-  fi
-  cat <<EOF >${KUBIE_CONFIG}
+	if [ -f "${KUBIE_CONFIG}" ]; then
+		BACKUP_TS="$(date +%Y%m%d-%H%M%S)"
+		cp -vf ${KUBIE_CONFIG}{,.${BACKUP_TS}}
+		_warning "Saving backup of existing configuration file\nas ${MAGENTA}${KUBIE_CONFIG}.${BACKUP_TS}"
+	fi
+	cat <<EOF >${KUBIE_CONFIG}
 # Ref: https://github.com/sbstp/kubie#settings
 
 shell: zsh
@@ -71,19 +71,19 @@ behavior:
     # Default: auto
     print_context_in_exec: auto
 EOF
-  if [ $? -eq 0 ]; then
-    _info "Archivo de configuración ${YELLOW}${KUBIE_CONFIG}${STRONG} creado"
-  else
-    _error "${RED}ERROR creando el archivo de configuración ${YELLOW}${KUBIE_CONFIG}${STRONG} "
-    _error "Lee https://github.com/sbstp/kubie#settings y hazlo tú mismo"
-  fi
+	if [ $? -eq 0 ]; then
+		_info "Configuration file ${YELLOW}${KUBIE_CONFIG}${STRONG} created"
+	else
+		_error "${RED}ERROR creating the configuration file ${YELLOW}${KUBIE_CONFIG}${STRONG} "
+		_error "Read https://github.com/sbstp/kubie#settings and do it yourself"
+	fi
 }
 
 if [[ ! -d "${KUBIE_CONFIG_DIR}" ]]; then
-  mkdir -vp "${KUBIE_CONFIG_DIR}"
+	mkdir -vp "${KUBIE_CONFIG_DIR}"
 fi
 
 # crear la config
 create_kubie_yaml
 
-_success "Ahora puedes almacenar cada contexto de kubernetes como un archivo YAML\n\tseparado en el directorio \n\t${YELLOW}${KUBIE_CONFIG_DIR}/${GREEN}\n\tLuego prueba ejecutar ${GREEN}kubie ctx${STRONG}, después ${GREEN}kubie ns${STRONG}\n"
+_success "Now you can store each kubernetes context as a separate YAML file\n\tin the directory \n\t${YELLOW}${KUBIE_CONFIG_DIR}/${GREEN}\n\tThen try running ${GREEN}kubie ctx${STRONG}, then ${GREEN}kubie ns${STRONG}\n"

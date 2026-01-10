@@ -437,7 +437,7 @@ EOF
 function do_ansible_galaxy() {
 	if (type ansible-galaxy &>/dev/null); then
 		_info "Installing ansible community.sops ..."
-		ansible-galaxy collection install community.sops &&
+		(LC_ALL='en_US.UTF-8' ansible-galaxy collection install community.sops) &&
 			ansible-galaxy collection list | grep sops
 		_success "Done $(basename "${0}")"
 	fi
@@ -448,7 +448,7 @@ function do_ansible_galaxy() {
 
 detect_os
 echo
-_info "Preparando sistema operativo base para ${YELLOW}${OS}\n"
+_info "Preparing base operating system for ${YELLOW}${OS}\n"
 echo
 eval "do_prepare_${OS}"
 eval "do_ansible_galaxy"

@@ -1,134 +1,200 @@
-set -a
+#!/usr/bin/env bash
+# Description: Shared shell functions and environment configuration
+# Compatibility: Linux & macOS (Bash 3.2+)
+# Usage: source .functions
 
-# https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting
-if [ "${GITHUB_TOKEN}" ]; then
-	# export GITHUB_AUTH="-H 'Authorization: Bearer ${GITHUB_TOKEN}'"
+# Ensure strict mode compliance for variables (can be sourced by scripts using set -u)
+# We do not set -euo pipefail here to avoid breaking the parent shell if sourced interactively,
+# but we write code that satisfies strict mode.
+
+# --- 1. Environment & Variables ---
+
+# GitHub Token Support
+# Use ${VAR:-} syntax to prevent unbound variable errors in strict mode
+if [ -n "${GITHUB_TOKEN:-}" ]; then
 	export GITHUB_AUTH="-H 'Authorization: token ${GITHUB_TOKEN}'"
 fi
-# Colors:
-export STRONG="\033[1;37m"
-export RED="\033[1;31m"
-export GREEN="\033[1;92m"
-export YELLOW="\033[1;93m"
-export BLUE="\033[1;94m"
-export MAGENTA="\033[1;95m"
-export CYAN="\033[1;96m"
-export NONE="\033[0m"
 
-# pkg managers cli opts
+# Initialize SUDO to empty string to prevent unbound variable errors when running as root
+export SUDO=""
+# If not root, set SUDO command
+if [ "$(id -u)" -ne 0 ]; then
+	export SUDO="sudo"
+fi
+
+# Colors
+export STRONG='\033[1;37m'
+export RED='\033[1;31m'
+export GREEN='\033[1;92m'
+export YELLOW='\033[1;93m'
+export BLUE='\033[1;94m'
+export MAGENTA='\033[1;95m'
+export CYAN='\033[1;96m'
+export NONE='\033[0m'
+
+# Package Manager Options
 export APT_OPTS="-yqq"
 export DEBIAN_FRONTEND="noninteractive"
 export DNF_OPTS="--skip-broken -y"
 export PACMAN_OPTS="--noconfirm --noprogressbar --needed --color always --disable-download-timeout"
 
-# this allows us to debug as root when SUDOis not set
-[[ "$(id -u)" -ne "0" ]] && export SUDO="sudo"
+# --- 2. Logging Utilities ---
 
-# multi purpose banners
-function _info() {
-  divider
-  echo -e "${BLUE}==>  ${STRONG}${1}${NONE}"
+divider() {
+	local COLUMNS=80
+	# printf is safer than echo for variable width
+	printf '─%.0s' $(seq 1 "${COLUMNS}")
+	printf '\n'
 }
 
-function _warning() {
-  divider
-  echo -e "${YELLOW}==>  ${1}${NONE}"
+_info() {
+	divider
+	echo -e "${BLUE}==>  ${STRONG}${1}${NONE}\n"
 }
 
-function _success() {
-  echo -e "${GREEN}==> ✔ ${1}${NONE}"
+_warning() {
+	divider
+	echo -e "${YELLOW}==>  ${1}${NONE}\n"
 }
 
-function _error() {
-  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NONE}\n"
+_success() {
+	echo -e "${GREEN}==> ✔ ${1}${NONE}\n"
 }
 
-function divider() {
-  local COLUMNS=80
-  eval "printf '─%.0s' {1..$COLUMNS}"
-  echo
+_error() {
+	echo -e "${RED}==> ✘ ${MAGENTA}${1}${NONE}\n\n"
 }
 
-# detect os
-function detect_os() {
-  case "$(uname)" in
-    Darwin)
-      export OS="darwin"
-      ;;
-    Linux)
-      source /etc/os-release || exit 1
-      case "${ID}" in
-        arch|debian|ubuntu|fedora|rocky|almalinux)
-          export OS="${ID}"
-          ;;
-        *)
-          echo "${ID} OS not supported"
-          exit 1
-          ;;
-      esac
-      ;;
-  esac
-}
+# Compatibility Aliases for setup.sh
+_log() { _info "$@"; }
+_warn() { _warning "$@"; }
+_err() { _error "$@"; }
 
-# detect swl
-is_wsl() {
-	case "$(uname -r)" in
-    'Microsoft'|'microsoft') true ;;
-    *) false;;
+# --- 3. OS Detection ---
+
+detect_os() {
+	case "$(uname)" in
+	Darwin)
+		export OS="darwin"
+		;;
+	Linux)
+		if [ -f /etc/os-release ]; then
+			# shellcheck disable=SC1091
+			source /etc/os-release
+			case "${ID}" in
+			arch | debian | ubuntu | fedora | rocky | almalinux)
+				export OS="${ID}"
+				;;
+			*)
+				# Fallback or error
+				echo "${ID} OS not supported"
+				exit 1
+				;;
+			esac
+		else
+			echo "Linux distribution not detected (/etc/os-release missing)"
+			exit 1
+		fi
+		;;
+	*)
+		echo "OS $(uname) not supported"
+		exit 1
+		;;
 	esac
 }
 
-# standard pkg install for each os flavour
-function install_pkg_darwin() {
-  brew install "${@}"
+is_wsl() {
+	case "$(uname -r)" in
+	*Microsoft* | *microsoft*) return 0 ;;
+	*) return 1 ;;
+	esac
 }
 
-function install_pkg_debian() {
+# --- 4. Package Managers ---
+
+install_pkg_darwin() {
+	# Check if brew exists
+	if command -v brew >/dev/null 2>&1; then
+		brew install "$@"
+	else
+		_error "Homebrew not found. Cannot install packages."
+		return 1
+	fi
+}
+
+install_pkg_debian() {
 	${SUDO} apt-get update ${APT_OPTS} &&
-	${SUDO} apt-get install ${APT_OPTS} "${@}"
+		${SUDO} apt-get install ${APT_OPTS} "$@"
 }
 
 install_pkg_ubuntu() {
 	install_pkg_debian "$@"
 }
 
-function install_pkg_arch() {
-	${SUDO} pacman ${PACMAN_OPTS} -Syy &>/dev/null &&
-	${SUDO} pacman ${PACMAN_OPTS} -Sy "${@}"
+install_pkg_arch() {
+	${SUDO} pacman ${PACMAN_OPTS} -Syy >/dev/null 2>&1 &&
+		${SUDO} pacman ${PACMAN_OPTS} -Sy "$@"
 }
 
-function install_pkg_manjaro() {
+install_pkg_manjaro() {
 	install_pkg_arch "$@"
 }
 
-function install_pkg_rhel() {
-	${SUDO} dnf install ${DNF_OPTS} "${@}"
+install_pkg_rhel() {
+	${SUDO} dnf install ${DNF_OPTS} "$@"
 }
 
-function install_pkg_fedora() {
+install_pkg_fedora() {
 	install_pkg_rhel "$@"
 }
 
-function install_pkg_rocky() {
+install_pkg_rocky() {
 	install_pkg_rhel "$@"
 }
 
-function install_pkg_almalinux() {
+install_pkg_almalinux() {
 	install_pkg_rhel "$@"
 }
 
-function install_pkg_asdf() {
-  local SCOPE="-u"
-  asdf plugin add ${*} 2>/dev/null
-  local LATEST="latest"
-  echo
-  _info "ASDF :: installing ${YELLOW}${*} ${GREEN}${LATEST}"
-  asdf install "${@}" ${LATEST} || {
-    # get the latest plugin version
-    local LATEST="$(asdf list all "${@}" | sort -nr | head -1 | xargs)"
-    echo
-    _info "ASDF :: installing ${YELLOW}${*} ${CYAN}${LATEST}"
-    asdf install "${@}" ${LATEST} || _error "Could not install ${YELLOW}${*} ${CYAN}${LATEST}"
-  }
-  asdf set ${SCOPE} "${@}" ${LATEST}
+# --- 5. ASDF Version Manager ---
+
+install_pkg_asdf() {
+	local SCOPE="-u" # Default to global
+	local PLUGIN="$1"
+	shift # Remaining args are passed to install (e.g. version)
+
+	# Add plugin if missing
+	asdf plugin add "${PLUGIN}" >/dev/null 2>&1 || true
+
+	local VERSION="latest"
+
+	# Try installing latest
+	echo
+	_info "ASDF :: installing ${YELLOW}${PLUGIN} ${GREEN}${VERSION}"
+
+	if ! asdf install "${PLUGIN}" "${VERSION}"; then
+		# Fallback: finding latest version number manually
+		# Note: 'sort -V' is not available on all systems (e.g. vanilla macOS), but asdf usually runs in environments with some utils.
+		# We attempt a basic numeric sort. Ideally, use asdf's latest resolution if available.
+
+		local LATEST_VER
+		LATEST_VER="$(asdf list all "${PLUGIN}" | grep -v '[a-z]' | sort -V 2>/dev/null | tail -1 || echo "")"
+
+		if [ -z "${LATEST_VER}" ]; then
+			# Fallback for systems without sort -V, use strict numeric sort (imperfect for semver but better than nothing)
+			LATEST_VER="$(asdf list all "${PLUGIN}" | grep -v '[a-z]' | sort -n | tail -1)"
+		fi
+
+		if [ -n "${LATEST_VER}" ]; then
+			echo
+			_info "ASDF :: installing ${YELLOW}${PLUGIN} ${CYAN}${LATEST_VER}"
+			asdf install "${PLUGIN}" "${LATEST_VER}" || _error "Could not install ${YELLOW}${PLUGIN} ${CYAN}${LATEST_VER}"
+			VERSION="${LATEST_VER}"
+		else
+			_error "Could not determine latest version for ${PLUGIN}"
+			return 1
+		fi
+	fi
+
+	asdf set ${SCOPE} "${PLUGIN}" "${VERSION}"
 }
