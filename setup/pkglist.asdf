@@ -1,9 +1,9 @@
 age
 argocd
 bat
+bun
 eza
 fzf
-ghostty
 git-lfs
 golang
 golangci-lint
@@ -33,3 +33,4 @@ xh
 yamllint
 yarn
 zoxide
+zig

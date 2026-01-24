@@ -732,7 +732,7 @@ function get-tls-certs() {
 # k8s: check cert-manager tls certs expiration date
 function get-cm-certs() {
   _info "Checking cert-manager TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NONE}\n"
-  kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read namespace cert ; do 
+  kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read namespace cert ; do
     cmctl status certificate -n ${namespace} ${cert} | grep --colour=never -E 'Name|^-|^Not\ |^Renewal' | grep -iv 'issuer'
     divider
     unset cert

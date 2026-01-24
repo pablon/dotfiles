@@ -18,7 +18,7 @@ done
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # atuin
-[ -d "${HOME}/.atuin/bin" ] && source "${HOME}/.atuin/bin/env"
+[ -x "${HOME}/.atuin/bin/env" ] && source "${HOME}/.atuin/bin/env" &>/dev/null
 eval "$(atuin init zsh --disable-up-arrow)"
 
 # starship

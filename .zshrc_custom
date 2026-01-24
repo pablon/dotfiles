@@ -77,9 +77,11 @@ PATH_DIRS=(
   "${HOME}/.asdf/shims"
   "${HOME}/.atuin/bin"
   "${HOME}/.cache/lm-studio/bin"
+  "${HOME}/.cargo/bin"
   "${HOME}/.docker/bin"
   "${HOME}/.krew/bin"
   "${HOME}/.local/bin"
+  "${HOME}/.opencode/bin"
   "${HOME}/bin"
   "${HOME}/go/bin"
 )

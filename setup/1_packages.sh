@@ -7,8 +7,8 @@
 set -a
 
 source "$(dirname "${0}")/.functions" || exit 1
-detect_os
 
+export DEBIAN_FRONTEND="noninteractive"
 export INSTALL_OPTS='--owner=root --group=root --mode=0755'
 export PKGLIST_APT="$(dirname "${0}")/pkglist.apt"       # ubuntu|debian
 export PKGLIST_ASDF="$(dirname "${0}")/pkglist.asdf"     # asdf-vm
@@ -20,6 +20,7 @@ export PKGLIST_PACMAN="$(dirname "${0}")/pkglist.pacman" # arch|manjaro
 # os packages
 
 function do_prepare_darwin() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	# Detect Apple Silicon chipset + install rosetta
 	if [[ "$(uname)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
 		if (! arch -x86_64 /usr/bin/true 2>/dev/null); then
@@ -38,7 +39,7 @@ function do_prepare_darwin() {
 		_info "Installing ${YELLOW}homebrew"
 		NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 		# verify
-		if [ "$?" -ne "0" ] || (! command -v brew config &>/dev/null); then
+		if [ "${?}" -ne "0" ] || (! command -v brew config &>/dev/null); then
 			_error "Something went wrong installing homebrew. Canceling."
 			exit 1
 		fi
@@ -66,7 +67,7 @@ function do_prepare_darwin() {
 }
 
 function do_apt_init() {
-	_info "Executing function ${FUNCNAME}"
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} apt update ${APT_OPTS} &&
 		${SUDO} apt upgrade ${APT_OPTS} &&
 		${SUDO} apt dist-upgrade ${APT_OPTS} &&
@@ -87,6 +88,7 @@ function do_apt_init() {
 }
 
 function do_prepare_debian() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	do_apt_init
 	PACKAGES="${PKGLIST_APT}"
 	if [ -r "${PACKAGES}" ] && [ -s "${PACKAGES}" ]; then
@@ -111,6 +113,7 @@ function do_prepare_ubuntu() {
 }
 
 function do_prepare_arch() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	_info "Updating archlinux local keyring with pacman-key..."
 	${SUDO} pacman-key --init &>/dev/null &&
 		${SUDO} pacman-key --populate archlinux &>/dev/null &&
@@ -163,6 +166,7 @@ function do_prepare_manjaro() {
 }
 
 function do_prepare_rhel() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} update
 	# ${SUDO} dnf ${DNF_OPTS} upgrade --refresh
 	${SUDO} dnf ${DNF_OPTS} install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm &&
@@ -198,7 +202,16 @@ function do_prepare_fedora() {
 	do_prepare_rhel
 }
 
+function do_batcat_fix() {
+	# link batcat -> bat
+	if (type batcat &>/dev/null) && (! type bat &>/dev/null); then
+		local BINDIR="$(dirname "$(type -p batcat | awk '{print $NF}')")"
+		${SUDO} ln -s "${BINDIR}/batcat" "${BINDIR}/bat" && _info "$(type bat)"
+	fi
+}
+
 function do_asdf() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	[ "${OS}" == "Darwin" ] && return 0 # macos uses brew
 	if (type asdf &>/dev/null); then
 		local CURRENT_VER="$(asdf version | awk '{print $1}')"
@@ -214,7 +227,7 @@ function do_asdf() {
 		local LATEST="$(curl ${GITHUB_AUTH} -s "https://api.github.com/repos/${GITHUB_PROJECT}/releases/latest" | jq -r ".tag_name")" # v0.18.0
 		if [ -z "${LATEST}" ] || [ "${LATEST}" == "null" ]; then
 			_error "could not determine the latest version of asdf from ${CYAN}https://api.github.com/repos/${GITHUB_PROJECT}/releases/latest"
-			sleep 5000
+			sleep 10
 			return 1
 		fi
 		local TARBALL="${PROGRAM}.tar.gz"
@@ -249,6 +262,7 @@ function do_asdf() {
 }
 
 function do_asdf_packages() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	export PATH="${ASDF_DATA_DIR:-${HOME}/.asdf}/shims:${HOME}/.cargo/bin:${PATH}"
 	# install packages
 	PACKAGES="${PKGLIST_ASDF}"
@@ -271,7 +285,7 @@ function do_asdf_packages() {
 # useful tools
 
 function do_additional_tools() {
-
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	# helm plugins
 	if (type helm &>/dev/null); then
 		_info "Installing helm plugins"
@@ -280,7 +294,7 @@ function do_additional_tools() {
 		helm plugin install https://github.com/aslafy-z/helm-git 2>/dev/null
 	fi
 
-	local PATH="${ASDF_DATA_DIR:-${HOME}/.asdf}/shims:${PATH}"
+	local PATH="${ASDF_DATA_DIR:-${HOME}/.asdf}/shims:${HOME}/.atuin/bin:${PATH}"
 	# rustup
 	if [ ! -f "${HOME}/.rustup/settings.toml" ]; then
 		_info "Installing ${CYAN}rustup" &&
@@ -295,10 +309,6 @@ function do_additional_tools() {
 		else
 			_success "atuin is already installed ($(atuin --version))"
 		fi
-
-		# import your existing shell history!
-		eval "atuin import bash" 2>/dev/null
-		eval "atuin import zsh" 2>/dev/null
 
 		# starship
 		if (! type starship &>/dev/null); then
@@ -355,6 +365,7 @@ function install_yazi() {
 # docker
 
 function do_docker_debian() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	install_pkg_debian ca-certificates curl
 	${SUDO} install -m 0755 -d /etc/apt/keyrings
 	${SUDO} curl -fsSL https://download.docker.com/linux/${OS}/gpg -o /etc/apt/keyrings/docker.asc
@@ -374,6 +385,7 @@ function do_docker_ubuntu() {
 }
 
 function do_docker_arch() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	install_pkg_arch docker docker-compose docker-buildx containerd &&
 		${SUDO} systemctl enable --now docker.service
 	do_docker_post_install
@@ -384,6 +396,7 @@ function do_docker_manjaro() {
 }
 
 function do_docker_rhel() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
 	${SUDO} dnf ${DNF_OPTS} config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
 	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -391,6 +404,7 @@ function do_docker_rhel() {
 }
 
 function do_docker_fedora() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
 	${SUDO} dnf ${DNF_OPTS} config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
 	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -402,6 +416,7 @@ function do_docker_rocky() {
 }
 
 function do_docker_almalinux() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
 	${SUDO} dnf ${DNF_OPTS} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -409,19 +424,20 @@ function do_docker_almalinux() {
 }
 
 function do_docker_post_install() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	# https://docs.docker.com/engine/daemon/#configure-the-docker-daemon
 	if [ ! -f "/etc/docker/daemon.json.example" ]; then
 		_info "Creating /etc/docker/daemon.json.example"
 		[ -d "/etc/docker" ] || ${SUDO} mkdir -p /etc/docker &>/dev/null
 		cat <<EOF | ${SUDO} tee /etc/docker/daemon.json.example
-    {
-      "insecure-registries": [
-      "my.registry.example.com:8443"
-      ]
-    },
-  {
-    "data-root": "/mnt/docker"
-  }
+{
+  "insecure-registries": [
+  "my.registry.example.com:8443"
+  ]
+},
+{
+  "data-root": "/mnt/docker"
+}
 EOF
 	fi
 
@@ -430,31 +446,31 @@ EOF
 		${SUDO} usermod -aG docker $(whoami) && id $(whoami)
 	fi
 
-	docker --version &&
-		_success "Docker has been installed"
+	docker --version
 }
 
 function do_ansible_galaxy() {
+	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	if (type ansible-galaxy &>/dev/null); then
 		_info "Installing ansible community.sops ..."
-		(LC_ALL='en_US.UTF-8' ansible-galaxy collection install community.sops) &&
-			ansible-galaxy collection list | grep sops
-		_success "Done $(basename "${0}")"
+		local LANG='en_US.UTF-8'
+		local LC_ALL='en_US.UTF-8'
+		ansible-galaxy collection install community.sops &&
+			ansible-galaxy collection list | grep 'sops'
 	fi
 }
 
 # ===============================================================
 # main
 
-detect_os
 echo
-_info "Preparing base operating system for ${YELLOW}${OS}\n"
+_info "${YELLOW} Preparing base operating system for ${OS}\n"
 echo
 eval "do_prepare_${OS}"
+eval "do_batcat_fix"
 eval "do_ansible_galaxy"
-_info "Installing Docker"
+_info "${YELLOW} Installing Docker"
 (type docker &>/dev/null) || eval "do_docker_${OS}"
 (type asdf &>/dev/null) || eval "do_asdf"
 eval "do_additional_tools"
 eval "do_asdf_packages"
-_success "Done $(basename "${0}")"

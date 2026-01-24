@@ -10,21 +10,19 @@ source "$(dirname "${0}")/.functions" || exit 1
 
 # Make a backup of your current Neovim files:
 (
-  # required
-  mv ~/.config/nvim{,.bak}
-  # optional but recommended
-  mv ~/.local/share/nvim{,.bak}
-  mv ~/.local/state/nvim{,.bak}
-  mv ~/.cache/nvim{,.bak}
+	# required
+	mv -v ~/.config/nvim{,.bak}
+	# optional but recommended
+	mv -v ~/.local/share/nvim{,.bak}
+	mv -v ~/.local/state/nvim{,.bak}
+	mv -v ~/.cache/nvim{,.bak}
 ) &>/dev/null
 
 # Clone the starter from https://www.lazyvim.org/
-git clone https://github.com/LazyVim/starter ~/.config/nvim || exit 1
+# git clone https://github.com/LazyVim/starter ~/.config/nvim || exit 1
 
 # Remove the .git folder, so you can add it to your own repo later
-rm -rf ~/.config/nvim/.git
+# rm -rf ~/.config/nvim/.git &>/dev/null
 
 # Verify
 nvim --version
-
-_success "Done ${0}"

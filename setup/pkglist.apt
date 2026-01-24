@@ -2,6 +2,7 @@
 ansible
 apache2-utils
 bash
+bat
 bc
 binutils
 ca-certificates
@@ -11,6 +12,7 @@ curl
 dialog
 dirmngr
 dos2unix
+eza
 fd-find
 ffmpeg
 fontconfig
@@ -30,6 +32,7 @@ jq
 locales
 lolcat
 lua5.1
+luajit
 man-db
 manpages
 manpages-dev
@@ -41,10 +44,12 @@ nodejs
 npm
 poppler-utils
 ppa-purge
+pre-commit
 python3
 python3-venv
 ripgrep
 sed
+shellcheck
 stow
 sudo
 tar

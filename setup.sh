@@ -6,134 +6,122 @@
 ##########################################################
 
 # 1. Strict Mode
-set -euo pipefail
+# set -euo pipefail
+set -a
 IFS=$'\n\t'
 
-# Force standard locale for consistent string parsing
+# 2. Verify user id
+if [[ "$(id -u)" -ne "0" ]]; then
+	echo -e "\n==> Running as user '$(whoami)' ($(id -u))\n"
+	export SUDO="sudo"
+	sleep 2
+else
+	echo -e "\n==> ✘ ERROR: You must run this script as a non-root user. Bye\n"
+	exit 1
+fi
+
+# 3. Force standard locale for consistent string parsing
 export LC_ALL=C
+export LANG=C
 
-# 2. Context & Path Definitions
+# 4. Context & Path Definitions
 # Robust way to find script directory in Bash 3.2+ without realpath dependency
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOTFILES_DIR="${SCRIPT_DIR}"
-SETUP_DIR="${DOTFILES_DIR}/setup"
-FUNCTIONS_FILE="${SETUP_DIR}/.functions"
+export SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export DOTFILES_DIR="${SCRIPT_DIR}"
+export SETUP_DIR="${DOTFILES_DIR}/setup"
+export FUNCTIONS_FILE="${SETUP_DIR}/.functions"
 
-# 3. Utilities
-_log() { printf "${BLUE}==> %s${NONE}\n" "$1"; }
-_warn() { printf "${YELLOW}==> WARNING: %s${NONE}\n" "$1"; }
-_err() { printf "${RED}==> ERROR: %s${NONE}\n" "$1"; }
-
-# Source Library (Safely)
+# 5. Source Library (Safely)
 if [ -f "${FUNCTIONS_FILE}" ]; then
 	set +u # Allow unbound variables in legacy functions
 	source "${FUNCTIONS_FILE}"
 	set -u
 else
-	# Minimal fallback colors if functions file is missing
-	BLUE='\033[1;34m' YELLOW='\033[1;33m' RED='\033[0;31m' GREEN='\033[0;32m' NONE='\033[0m'
-	_err "Library ${FUNCTIONS_FILE} not found."
+	_error "Library ${FUNCTIONS_FILE} not found."
 	exit 1
 fi
 
-# 4. Pre-flight Checks
+# 6. Pre-flight Checks
 check_env() {
-	local deps=("git" "curl")
-	for dep in "${deps[@]}"; do
-		if ! command -v "$dep" >/dev/null 2>&1; then
-			_err "Missing core dependency: $dep"
-			exit 1
-		fi
-	done
-
 	if [ ! -d "${DOTFILES_DIR}" ]; then
-		_err "Dotfiles directory not found at ${DOTFILES_DIR}"
+		_error "Dotfiles directory not found at ${DOTFILES_DIR}"
 		exit 1
 	fi
+
+	local deps=("curl" "sudo")
+
+	for dep in "${deps[@]}"; do
+		if ! command -v "${dep}" >/dev/null 2>&1; then
+			_error "Missing core dependency: ${dep} -- installing it.."
+			install_pkg_${OS} ${dep} || exit 1
+		fi
+	done
 }
 
-# --- MAIN EXECUTION ---
-
 check_env
+
+# --- MAIN EXECUTION ---
 
 # PHASE 1: Run Setup Scripts
 if [ -d "${SETUP_DIR}" ]; then
 	divider
-	_log "Running setup scripts from ${SETUP_DIR}"
-
-	# Portable find + sort loop
-	# Using process substitution compatible with Bash 3.2+
-	while read -r script; do
-		script_name=$(basename "$script")
+	_info "Running setup scripts from ${SETUP_DIR}"
+	for script in "${SETUP_DIR}"/*.sh; do
+		script_name="$(basename "$script")"
 		divider
 		_info "Executing: ${GREEN}${script_name}"
-
 		# Subshell for isolation
-		(
-			cd "${SETUP_DIR}" || exit 1
-			if ! bash "$script"; then
-				_err "Script ${script_name} failed."
-				exit 1
-			fi
-		)
-	done < <(find "${SETUP_DIR}" -maxdepth 1 -name "*.sh" -type f | sort)
+		(cd "${SETUP_DIR}/" && bash "${script_name}")
+
+		if [ "${?}" -eq "0" ]; then
+			_success "${script_name} exit code: $?"
+		else
+			_warning "${script_name} exit code: $?"
+			sleep 5
+		fi
+	done
 fi
 
 # PHASE 2: Check Stow
 if ! command -v stow >/dev/null 2>&1; then
-	_err "GNU Stow is not installed. Setup scripts failed to install it."
+	_error "GNU Stow is not installed. Setup scripts failed to install it."
 	exit 1
 fi
 
-# PHASE 3: Smart Link & Backup
+# PHASE 3: Stow Backup
+
+STOW_VER="$(stow --version | awk '{print $NF}')"
+STOW_VER="${STOW_VER%.*}"
 (
-	cd "${DOTFILES_DIR}" || exit 1
+	cd "${DOTFILES_DIR}/" || exit
 	divider
-	_log "Backing up conflicts and linking files"
-
-	# Capture stow dry-run errors to identify conflicts
-	# We use a temporary file because pipes + set -e can be tricky with grep return codes
-	TMP_ERR=$(mktemp)
-	stow -nv -t "${HOME}" . 2>"${TMP_ERR}" >/dev/null || true
-
-	# Parse conflicts manually to avoid regex compatibility issues in [[ ]] across bash versions
-	# We use grep/sed which are standard posix/gnu utilities available on both platforms
-
-	# Process the error log
-	while read -r line; do
-		file=""
-		# Try to extract filename using sed for different stow version outputs
-
-		# Case 1: "existing target is not owned by stow: .zshrc"
-		if echo "$line" | grep -q "existing target is not owned by stow:"; then
-			file=$(echo "$line" | sed 's/.*existing target is not owned by stow: //')
-		# Case 2: "LINK: .zshrc => ... exists; neither a link nor a directory"
-		elif echo "$line" | grep -q "neither a link nor a directory"; then
-			file=$(echo "$line" | awk '{print $2}')
-		fi
-
-		if [ -n "$file" ]; then
-			# Clean up filename (trim whitespace)
-			file=$(echo "$file" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-			TARGET="${HOME}/${file}"
-
-			if [ -e "${TARGET}" ]; then
-				TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-				BACKUP="${TARGET}.backup-${TIMESTAMP}"
-				_warn "Conflict: ${file} -> ${BACKUP}"
-
-				mkdir -p "$(dirname "$BACKUP")"
-				mv "${TARGET}" "${BACKUP}"
-			fi
-		fi
-	done <"${TMP_ERR}"
-	rm -f "${TMP_ERR}"
-
-	# Apply Links
-	divider
-	_log "Applying stow links..."
-	stow -v -t "${HOME}" .
+	_info "Backing up conflicts"
+	if [ 1 -eq "$(echo "${STOW_VER} > 2.3" | bc)" ]; then
+		(cd "${DOTFILES_DIR}/" && stow -nv . 2>&1) |
+			awk '/neither a link nor a directory|existing target is not owned by stow/ {print $8}' | while read -r i; do
+			mv -vf ${HOME}/${i}{,.$(date +%Y%m%d-%H%M%S)}
+		done
+	else
+		(cd "${DOTFILES_DIR}/" && stow -nv . 2>&1) |
+			awk '/neither a link nor a directory|existing target is not owned by stow/ {print $NF}' | while read -r i; do
+			mv -vf ${HOME}/${i}{,.$(date +%Y%m%d-%H%M%S)}
+		done
+	fi
 )
 
+# PHASE 4: Stow Smart Link
+divider
+_info "Applying stow links..."
+(cd "${DOTFILES_DIR}/" && stow -v .)
+
+# PHASE 5: import existing shell history
+if [ "${?}" -eq "0" ]; then
+	_info "[atuin] Importing existing shell history"
+	export PATH="${ASDF_DATA_DIR:-${HOME}/.asdf}/shims:${HOME}/.atuin/bin:${PATH}"
+	for shell in bash zsh; do
+		atuin import ${shell}
+	done
+fi
+
 _success "Dotfiles setup complete!"
-_success "Action required: Reload your shell:\n\t${GREEN}source ~/.zshrc${NONE}"
+_success "Action required: Reload your shell with ${CYAN}source ~/.zshrc${GREEN} or logout/login again"

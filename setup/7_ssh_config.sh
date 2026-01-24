@@ -12,15 +12,15 @@ export SSH_CONFIG_FILE="${HOME}/.ssh/config"
 
 # create ssh key
 if [ ! -f "${SSH_KEY}" ]; then
-  _info "Creating SSH key ${CYAN}${SSH_KEY}"
-  # crate key with no passphrase
-  ssh-keygen -t ${SSH_KEY_TYPE} -f "${SSH_KEY}" -qN '' || exit 1
+	_info "Creating SSH key ${CYAN}${SSH_KEY}"
+	# crate key with no passphrase
+	ssh-keygen -t ${SSH_KEY_TYPE} -f "${SSH_KEY}" -qN '' || exit 1
 fi
 
 if [ ! -f "${SSH_CONFIG_FILE}" ]; then
-  # create ${SSH_CONFIG_FILE}
-  _info "Creating ${CYAN}${SSH_CONFIG_FILE}"
-  cat <<'EOF' >"${SSH_CONFIG_FILE}"
+	# create ${SSH_CONFIG_FILE}
+	_info "Creating ${CYAN}${SSH_CONFIG_FILE}"
+	cat <<'EOF' >"${SSH_CONFIG_FILE}"
 # Include other configs if needed:
 # Include ~/.ssh/config_project1
 # Include ~/.ssh/config_project2
@@ -50,7 +50,5 @@ Host gitlab.com
   User git
 EOF
 else
-  _success "${SSH_CONFIG_FILE} already exists - skipping"
+	_success "${SSH_CONFIG_FILE} already exists - skipping"
 fi
-
-_success "Done ${0}"

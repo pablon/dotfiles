@@ -387,5 +387,7 @@ function do_darwin() {
 # TODO: add function do_linux
 
 if [[ "$(uname)" != "Darwin" ]]; then
+	_warning "This currently works on macOS only, sorry :-)"
+	sleep 2
 	exit 0
 fi

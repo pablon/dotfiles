@@ -87,3 +87,4 @@ fi
 create_kubie_yaml
 
 _success "Now you can store each kubernetes context as a separate YAML file\n\tin the directory \n\t${YELLOW}${KUBIE_CONFIG_DIR}/${GREEN}\n\tThen try running ${GREEN}kubie ctx${STRONG}, then ${GREEN}kubie ns${STRONG}\n"
+sleep 5

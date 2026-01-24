@@ -27,5 +27,3 @@ done
 # Install iTerm2 Shell Integration
 [ -n "${ITERM_SESSION_ID}" ] &&
 	curl ${GITHUB_AUTH} --create-dirs -o "${HOME}/.config/iterm2/shell_integration.zsh" -L https://iterm2.com/shell_integration/zsh
-
-_success "Done ${0}"
