@@ -192,7 +192,7 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m'   # begin underline
 
 ######################################################################
 # auto completion
-AUTO_COMPLETION=(docker helm kubectl)
+AUTO_COMPLETION=(docker helm kubectl kops)
 for app in ${AUTO_COMPLETION} ; do
   ( type ${app} &>/dev/null ) && source <(${app} completion zsh)
 done ; unset app
@@ -202,11 +202,12 @@ for app in gh glab ; do
 done ; unset app
 
 ( type aws_completer &>/dev/null ) && complete -C "$(which aws_completer)" aws
-( type kops &>/dev/null ) && source <(kops completion zsh)
 ( type op &>/dev/null ) && eval "$(\op completion zsh)"; compdef _op op
 ( type opencode &>/dev/null ) && source <(opencode completion)
 ( type stern &>/dev/null ) && source <(stern --completion zsh)
 ( type zoxide &>/dev/null ) && eval "$(zoxide init zsh)"
+[[ "$(uname)" == "Darwin" ]] && ( type az &>/dev/null ) && source "$(brew --prefix)/etc/bash_completion.d/az"
+
 
 ######################################################################
 # ssh-add

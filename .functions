@@ -902,6 +902,29 @@ function kdescribe() {
 }
 alias kdesc=kdescribe
 
+# AKS stuff
+
+function aks-get-clusters() {
+  az aks list --query "[].{Cluster:name, ResourceGroup:resourceGroup, Location:location, Version:kubernetesVersion, Status:powerState.code}" -o table
+}
+
+function aks-get-credentials() {
+  aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱞽 Get KUBECONFIG for cluster > " | read -r CLUSTER RESOURCEGROUP
+  if [ -n "${CLUSTER}" ]; then
+    az aks get-credentials --name ${CLUSTER} --resource-group ${RESOURCEGROUP} &&
+      _info "KUBECONFIG for cluster ${CLUSTER} saved to ${CYAN}~/.kube/config\n"
+  fi
+}
+
+function aks-get-upgrades() {
+  aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱞽 Select cluster > " | read -r CLUSTER RESOURCEGROUP
+  if [ -n "${CLUSTER}" ]; then
+    _info "Available upgrades for cluster: ${GREEN}${CLUSTER}"
+    az aks get-upgrades --name ${CLUSTER} --resource-group ${RESOURCEGROUP} -o table 2>/dev/null
+    echo
+  fi
+}
+
 ################################################################
 # Add your custom functions below
 ################################################################
