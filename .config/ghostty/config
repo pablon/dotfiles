@@ -12,6 +12,3 @@ keybind                 = super+bracket_right=increase_font_size:1
 keybind                 = global:super+escape=toggle_quick_terminal
 keybind                 = super+l=clear_screen
 keybind                 = super+w=close_tab:this
-# colors
-selection-background   = #f1e89d
-selection-foreground   = #000000
