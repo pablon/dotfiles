@@ -31,7 +31,7 @@ return {
     git = { enabled = true },
     explorer = {
       cycle = true,
-      auto_close = false,
+      auto_close = true,
       jump = { close = false },
       layout = { preview = "main" },
     },
