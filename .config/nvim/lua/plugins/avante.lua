@@ -6,239 +6,233 @@
 -- https://docs.anthropic.com/es/docs/about-claude/models/overview
 -- https://docs.github.com/en/copilot/using-github-copilot/ai-models
 
--- Define user name
-local user_name = os.getenv("USER") or "User"
-
--- Cache the system prompt lookup
-local DEFAULT_SYSTEM_PROMPT = table.concat({
-  "You are an expert DevOps engineer specialized in cloud services,",
-  "infrastructure as code, containers, helm, helmfile and kubernetes.",
-  "You have a technical yet practical approach, with clear and applicable explanations,",
-  "always providing useful examples for intermediate and advanced DevOps professionals.",
-  "You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor.",
-  "You avoid excessive formalities and use direct language, but technical when required.",
-}, " ")
-
-local system_prompt = os.getenv("SYSTEM_PROMPT") or DEFAULT_SYSTEM_PROMPT
-
 return {
-  "yetone/avante.nvim",
-  event = "VeryLazy",
-  lazy = false,
-  version = false, -- set this if you want to always pull the latest change
-  opts = {
-    system_prompt = system_prompt,
-    ---@alias Mode "agentic" | "legacy"
-    mode = "agentic", -- The default mode for interaction. "agentic" uses tools to automatically generate code, "legacy" uses the old planning method to generate code.
-    -- WARNING: Since auto-suggestions are a high-frequency operation and therefore expensive,
-    -- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
-    -- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
-    cursor_applying_provider = nil, -- The provider used in the applying phase of Cursor Planning Mode, defaults to nil, when nil uses Config.provider as the provider for the applying phase
-    auto_suggestions_provider = "copilot", -- default copilot
-    ---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
-    provider = "copilot", -- openai, claude, copilot
-    -- providers
-    providers = {
-      openai = {
-        endpoint = "https://api.openai.com/v1",
-        model = "gpt-5", -- your desired model (or use gpt-4o, etc.)
-        timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
-        context_window = 128000, -- Number of tokens to send to the model for context
-        extra_request_body = {
-          temperature = 0.75,
-          max_completion_tokens = 16384, -- Increase this to include reasoning tokens (for reasoning models) - default 16384 , 4096
-          reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+  {
+    "yetone/avante.nvim",
+    event = "VeryLazy",
+    version = false, -- Never set this value to "*"! Never!
+    ---@module 'avante'
+    ---@type avante.Config
+    opts = function(_, opts)
+      -- Track avante's internal state during resize
+      local in_resize = false
+      local original_cursor_win = nil
+      local avante_filetypes = { "Avante", "AvanteInput", "AvanteAsk", "AvanteSelectedFiles" }
+
+      -- Check if current window is avante
+      local function is_in_avante_window()
+        local win = vim.api.nvim_get_current_win()
+        local buf = vim.api.nvim_win_get_buf(win)
+        local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+
+        for _, avante_ft in ipairs(avante_filetypes) do
+          if ft == avante_ft then
+            return true, win, ft
+          end
+        end
+        return false
+      end
+
+      -- Temporarily move cursor away from avante during resize
+      local function temporarily_leave_avante()
+        local is_avante, avante_win, avante_ft = is_in_avante_window()
+        if is_avante and not in_resize then
+          in_resize = true
+          original_cursor_win = avante_win
+
+          -- Find a non-avante window to switch to
+          local target_win = nil
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+
+            local is_avante_ft = false
+            for _, aft in ipairs(avante_filetypes) do
+              if ft == aft then
+                is_avante_ft = true
+                break
+              end
+            end
+
+            if not is_avante_ft and vim.api.nvim_win_is_valid(win) then
+              target_win = win
+              break
+            end
+          end
+
+          -- Switch to non-avante window if found
+          if target_win then
+            vim.api.nvim_set_current_win(target_win)
+            return true
+          end
+        end
+        return false
+      end
+
+      -- Restore cursor to original avante window
+      local function restore_cursor_to_avante()
+        if in_resize and original_cursor_win and vim.api.nvim_win_is_valid(original_cursor_win) then
+          -- Small delay to ensure resize is complete
+          vim.defer_fn(function()
+            pcall(vim.api.nvim_set_current_win, original_cursor_win)
+            in_resize = false
+            original_cursor_win = nil
+          end, 50)
+        end
+      end
+
+      -- Prevent duplicate windows cleanup
+      local function cleanup_duplicate_avante_windows()
+        local seen_filetypes = {}
+        local windows_to_close = {}
+
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          local buf = vim.api.nvim_win_get_buf(win)
+          local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+
+          -- Special handling for Ask and Select Files panels
+          if ft == "AvanteAsk" or ft == "AvanteSelectedFiles" then
+            if seen_filetypes[ft] then
+              -- Found duplicate, mark for closing
+              table.insert(windows_to_close, win)
+            else
+              seen_filetypes[ft] = win
+            end
+          end
+        end
+
+        -- Close duplicate windows
+        for _, win in ipairs(windows_to_close) do
+          if vim.api.nvim_win_is_valid(win) then
+            pcall(vim.api.nvim_win_close, win, true)
+          end
+        end
+      end
+
+      -- Create autocmd group for resize fix
+      vim.api.nvim_create_augroup("AvanteResizeFix", { clear = true })
+
+      -- Main resize handler for Resize
+      vim.api.nvim_create_autocmd({ "VimResized" }, {
+        group = "AvanteResizeFix",
+        callback = function()
+          -- Move cursor away from avante before resize processing
+          local moved = temporarily_leave_avante()
+
+          if moved then
+            -- Let resize happen, then restore cursor
+            vim.defer_fn(function()
+              restore_cursor_to_avante()
+              -- Force a clean redraw
+              vim.cmd("redraw!")
+            end, 100)
+          end
+
+          -- Cleanup duplicates after resize completes
+          vim.defer_fn(cleanup_duplicate_avante_windows, 150)
+        end,
+      })
+
+      -- Prevent avante from responding to scroll/resize events during resize
+      vim.api.nvim_create_autocmd({ "WinScrolled", "WinResized" }, {
+        group = "AvanteResizeFix",
+        pattern = "*",
+        callback = function(args)
+          local buf = args.buf
+          if buf and vim.api.nvim_buf_is_valid(buf) then
+            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+
+            for _, avante_ft in ipairs(avante_filetypes) do
+              if ft == avante_ft then
+                -- Prevent event propagation for avante buffers during resize
+                if in_resize then
+                  return true -- This should stop the event
+                end
+                break
+              end
+            end
+          end
+        end,
+      })
+
+      -- Additional cleanup on focus events
+      vim.api.nvim_create_autocmd("FocusGained", {
+        group = "AvanteResizeFix",
+        callback = function()
+          -- Reset resize state on focus gain
+          in_resize = false
+          original_cursor_win = nil
+          -- Clean up any duplicate windows
+          vim.defer_fn(cleanup_duplicate_avante_windows, 100)
+        end,
+      })
+
+      return {
+        -- add any opts here
+        -- for example
+        provider = "copilot",
+        providers = {
+          copilot = {
+            model = "claude-sonnet-4",
+          },
         },
-      },
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        -- -- models:
-        -- -- https://docs.claude.com/es/docs/about-claude/models/overview
-        -- model = "claude-sonnet-4-5-20250929",
-        model = "claude-sonnet-4-20250514",
-        -- model = "claude-3-7-sonnet-20250219",
-        extra_request_body = {
-          temperature = 0,
-          max_tokens = 4096,
+        cursor_applying_provider = "copilot",
+        auto_suggestions_provider = "copilot",
+        behaviour = {
+          enable_cursor_planning_mode = true,
         },
-      },
-      copilot = {
-        -- use "GCP Vertex AI" id from:
-        -- -- https://docs.claude.com/es/docs/about-claude/models/overview
-        -- o1-preview | o1-mini | claude-3.5-sonnet | claude-3.7-sonnet | claude-sonnet-4-5
-        -- model = "claude-sonnet-4-5",
-        model = "claude-sonnet-4",
-        -- model = "claude-3.7-sonnet",
-      },
-      gemini = {
-        endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
-        model = "gemini-2.5-flash",
-        timeout = 30000, -- Timeout in milliseconds
-        context_window = 1048576,
-        use_ReAct_prompt = true,
-        extra_request_body = {
-          generationConfig = {
-            temperature = 0.75,
+        -- File selector configuration
+        --- @alias FileSelectorProvider "native" | "fzf" | "mini.pick" | "snacks" | "telescope" | string
+        file_selector = {
+          provider = "snacks", -- Avoid native provider issues
+          provider_opts = {},
+        },
+        windows = {
+          ---@type "right" | "left" | "top" | "bottom" | "smart"
+          position = "right", -- the position of the sidebar
+          wrap = true, -- similar to vim.o.wrap
+          width = 30, -- default % based on available width
+          sidebar_header = {
+            enabled = true, -- true, false to enable/disable the header
+            align = "center", -- left, center, right for title
+            rounded = true,
+          },
+          input = {
+            prefix = "> ",
+            height = 8, -- Height of the input window in vertical layout
+          },
+          edit = {
+            start_insert = true, -- Start insert mode when opening the edit window
+          },
+          ask = {
+            floating = false, -- Open the 'AvanteAsk' prompt in a floating window
+            start_insert = true, -- Start insert mode when opening the ask window
+            ---@type "ours" | "theirs"
+            focus_on_apply = "ours", -- which diff to focus after applying
+          },
+        },
+        system_prompt = system_prompt,
+      }
+    end,
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      {
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            use_absolute_path = true,
           },
         },
       },
-      -- ollama = {
-      --   endpoint = "http://127.0.0.1:11434",
-      --   timeout = 30000, -- Timeout in milliseconds
-      --   extra_request_body = {
-      --     options = {
-      --       temperature = 0.75,
-      --       num_ctx = 20480,
-      --       keep_alive = "5m",
-      --     },
-      --   },
-      -- },
-    },
-    ---Specify the special dual_boost mode
-    ---1. enabled: Whether to enable dual_boost mode. Default to false.
-    ---2. first_provider: The first provider to generate response. Default to "openai".
-    ---3. second_provider: The second provider to generate response. Default to "claude".
-    ---4. prompt: The prompt to generate response based on the two reference outputs.
-    ---5. timeout: Timeout in milliseconds. Default to 60000.
-    ---How it works:
-    --- When dual_boost is enabled, avante will generate two responses from the first_provider and second_provider respectively. Then use the response from the first_provider as provider1_output and the response from the second_provider as provider2_output. Finally, avante will generate a response based on the prompt and the two reference outputs, with the default Provider as normal.
-    ---Note: This is an experimental feature and may not work as expected.
-    dual_boost = {
-      enabled = true,
-      first_provider = "openai",
-      second_provider = "claude",
-      prompt = "Based on the two reference outputs below, generate a response that incorporates elements from both but reflects your own judgment and unique perspective. Do not provide any explanation, just give the response directly. Reference Output 1: [{{provider1_output}}], Reference Output 2: [{{provider2_output}}]",
-      timeout = 60000, -- Timeout in milliseconds
-    },
-    behaviour = {
-      auto_suggestions = false, -- Experimental stage
-      auto_set_highlight_group = true,
-      auto_set_keymaps = true,
-      auto_apply_diff_after_generation = false,
-      support_paste_from_clipboard = false,
-      minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
-      enable_token_counting = true, -- Whether to enable token counting. Default to true.
-    },
-    mappings = {
-      --- @class AvanteConflictMappings
-      diff = {
-        ours = "co",
-        theirs = "ct",
-        all_theirs = "ca",
-        both = "cb",
-        cursor = "cc",
-        next = "]x",
-        prev = "[x",
-      },
-      suggestion = {
-        accept = "<M-l>",
-        next = "<M-]>",
-        prev = "<M-[>",
-        dismiss = "<C-]>",
-      },
-      jump = {
-        next = "]]",
-        prev = "[[",
-      },
-      submit = {
-        normal = "<CR>",
-        insert = "<C-s>",
-      },
-      sidebar = {
-        apply_all = "A",
-        apply_cursor = "a",
-        retry_user_request = "r",
-        edit_user_request = "e",
-        switch_windows = "<Tab>",
-        reverse_switch_windows = "<S-Tab>",
-        remove_file = "d",
-        add_file = "@",
-        close = { "<Esc>", "q" },
-        close_from_input = nil, -- e.g., { normal = "<Esc>", insert = "<C-d>" }
-      },
-    },
-    hints = { enabled = true },
-    windows = {
-      ---@type "right" | "left" | "top" | "bottom"
-      position = "right", -- the position of the sidebar
-      wrap = true, -- similar to vim.o.wrap
-      width = 30, -- default % based on available width
-      sidebar_header = {
-        enabled = true, -- true, false to enable/disable the header
-        align = "center", -- left, center, right for title
-        rounded = true,
-      },
-      input = {
-        prefix = "❯ ",
-        height = 8, -- Height of the input window in vertical layout
-      },
-      edit = {
-        border = "rounded",
-        start_insert = true, -- Start insert mode when opening the edit window
-      },
-      ask = {
-        floating = false, -- Open the 'AvanteAsk' prompt in a floating window
-        start_insert = true, -- Start insert mode when opening the ask window
-        border = "rounded",
-        ---@type "ours" | "theirs"
-        focus_on_apply = "ours", -- which diff to focus after applying
-      },
-    },
-    highlights = {
-      diff = {
-        current = "DiffText",
-        incoming = "DiffAdd",
-      },
-    },
-    --- @class AvanteConflictUserConfig
-    diff = {
-      autojump = true,
-      ---@type string | fun(): any
-      list_opener = "copen",
-      --- Override the 'timeoutlen' setting while hovering over a diff (see :help timeoutlen).
-      --- Helps to avoid entering operator-pending mode with diff mappings starting with `c`.
-      --- Disable by setting to -1.
-      override_timeoutlen = 500,
-    },
-    suggestion = {
-      debounce = 600,
-      throttle = 600,
-    },
-  },
-  -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-  build = "make",
-  -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter",
-    "stevearc/dressing.nvim",
-    "nvim-lua/plenary.nvim",
-    "MunifTanjim/nui.nvim",
-    --- The below dependencies are optional,
-    "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-    {
-      -- support for image pasting
-      "HakonHarnes/img-clip.nvim",
-      event = "VeryLazy",
-      opts = {
-        -- recommended settings
-        default = {
-          embed_image_as_base64 = false,
-          prompt_for_file_name = false,
-          drag_and_drop = {
-            insert_mode = true,
-          },
-          -- required for Windows users
-          use_absolute_path = true,
-        },
-      },
-    },
-    {
-      -- Make sure to set this up properly if you have lazy=true
-      "MeanderingProgrammer/render-markdown.nvim",
-      opts = {
-        file_types = { "markdown", "Avante" },
-      },
-      ft = { "markdown", "Avante" },
     },
   },
 }
