@@ -5,13 +5,14 @@ command_timeout = 2000
 follow_symlinks = false
 palette = 'catppuccin_mocha' # nord onedark catppuccin_mocha
 
-# Output the current git config email only for git repository
-# [custom.git_config_email]
-# description = "Output the current git user's configured email address."
-# command = "git config user.email"
-# format = "\n[$symbol( $output)]($style)"
-# when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
-# style = "text"
+# # Output the current git config email only for git repository
+# [custom.git_email_generic]
+# description = "Show git user email"
+# command = "git config --get user.email"
+# symbol = ' '
+# format = "\n[$symbol($output)]($style)"
+# when = "git remote -v 2>/dev/null"
+# require_repo = true
 
 [directory]
 home_symbol = '~'
@@ -87,21 +88,25 @@ format = '[$symbol($version )]($style)'
 [aws]
 symbol = " "
 style = 'bold peach'
-format = '[\($symbol $profile\)]($style) ' # $profile|$region
-# disabled = true
+format = '[\($symbol $profile\)]($style) '
+disabled = true
 
 [gcloud]
 symbol = ""
-style = 'bold blue'
-format = '[\($symbol $project\)]($style) ' # $account $domain $region $project
+style = 'bold cyan'
+format = '[\($symbol $project\)]($style) '
 disabled = true
+
+[azure]
+symbol = "󰠅"
+style = 'bold blue'
+format = '[\($symbol $subscription\)]($style) '
+# disabled = false
 
 [docker_context]
 symbol = ' '
 style = 'fg:#06969A'
-format = '[$symbol]($style) $path'
-detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
-detect_extensions = ['Dockerfile']
+format = '[$symbol] ($style) $path'
 
 [jobs]
 symbol = ' '
@@ -113,33 +118,6 @@ format = '[$symbol]($style)'
 # min_time = 500
 style = 'fg:gray'
 format = ' [$duration]($style)'
-
-[palettes.nord]
-dark_blue = '#5E81AC'
-blue = '#81A1C1'
-teal = '#88C0D0'
-red = '#BF616A'
-orange = '#D08770'
-green = '#A3BE8C'
-yellow = '#EBCB8B'
-purple = '#B48EAD'
-gray = '#434C5E'
-black = '#2E3440'
-white = '#D8DEE9'
-
-[palettes.onedark]
-format = '[$symbol($version )]($style)'
-dark_blue = '#61afef'
-blue = '#56b6c2'
-red = '#e06c75'
-green = '#98c379'
-purple = '#c678dd'
-cyan = '#56b6c2'
-orange = '#be5046'
-yellow = '#e5c07b'
-gray = '#828997'
-white = '#abb2bf'
-black = '#2c323c'
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
