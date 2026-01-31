@@ -159,7 +159,7 @@ if ( type fzf &>/dev/null ) ; then
   export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target
   --preview 'bat -n --color=always {}'"
 
-  export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git . | awk -F'/' '{print NF-1, \$0}' | sort -n | cut -d' ' -f2-"
+  export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude '.git' . | awk -F'/' '{print NF-1, \$0}' | sort -n | cut -d' ' -f2-"
 
   export FZF_COMPLETION_OPTS='--border'
   export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
