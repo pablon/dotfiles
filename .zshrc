@@ -25,6 +25,9 @@ eval "$(atuin init zsh --disable-up-arrow)"
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
 eval "$(starship init zsh)"
 
+# direnv
+(type direnv &>/dev/null) && eval "$(direnv hook zsh)"
+
 cookie
 if [ -z "${TMUX}" ] ; then
   tmux ls 2>/dev/null | while read session ; do _info "tmux session:${NONE} ${session}" ; done ; echo

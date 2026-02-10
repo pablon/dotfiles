@@ -32,7 +32,7 @@ return {
     explorer = {
       cycle = true,
       auto_close = true,
-      jump = { close = false },
+      jump = { close = true },
       layout = { preview = "main" },
     },
     picker = {
@@ -40,14 +40,6 @@ return {
       hidden = true,
       ignored = true,
       ui_select = false,
-      -- sources = {
-      --   explorer = {
-      --     cycle = true,
-      --     auto_close = false,
-      --     jump = { close = false },
-      --     layout = { preview = "main" },
-      --   },
-      -- },
       exclude = {
         ".ansible*",
         ".git",
@@ -99,7 +91,7 @@ return {
     {
       "<C-n>",
       function()
-        Snacks.explorer()
+        Snacks.explorer({ auto_close = true })
       end,
       desc = "Explorer",
     },

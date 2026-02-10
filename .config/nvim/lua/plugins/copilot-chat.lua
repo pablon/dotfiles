@@ -3,24 +3,9 @@
 --
 -- This file contains the configuration for integrating GitHub Copilot and Copilot Chat plugins in Neovim.
 
--- Define user name
-local user_name = os.getenv("USER") or "User"
-
--- Cache the system prompt lookup
-local DEFAULT_SYSTEM_PROMPT = table.concat({
-  "You are an expert DevOps engineer specialized in cloud services,",
-  "infrastructure as code, containers, helm, helmfile and kubernetes.",
-  "You have a technical yet practical approach, with clear and applicable explanations,",
-  "always providing useful examples for intermediate and advanced DevOps professionals.",
-  "You speak with a professional yet approachable tone, relaxed, and with a bit of clever humor.",
-  "You avoid excessive formalities and use direct language, but technical when required.",
-}, " ")
-
-local system_prompt = os.getenv("SYSTEM_PROMPT") or DEFAULT_SYSTEM_PROMPT
-
 -- Constants for better maintainability
 local HEADERS = {
-  user = " " .. user_name .. " ",
+  user = " You",
   copilot = "  Copilot ",
   error = "✘ Error ",
 }
@@ -41,8 +26,8 @@ local prompts = {
   FixError = "Please explain the error in the following text and provide a solution.", -- Prompt to fix errors
   BetterNamings = "Please provide better names for the following variables and functions.", -- Prompt to suggest better names
   Documentation = "Please provide documentation for the following code.", -- Prompt to generate documentation
-  DocumentationMarkdown = "Please provide documentation for the following code using Markdown format. Save it as README-new.md", -- Prompt to generate Markdown documentation
-  DocumentationAsciiDoc = "Please provide documentation for the following code using AsciiDoc format. Save it as README-new.adoc", -- Prompt to generate AsciiDoc documentation
+  DocumentationMarkdown = "Please provide documentation for the following code using Markdown format. Save it as README.md", -- Prompt to generate Markdown documentation
+  DocumentationAsciiDoc = "Please provide documentation for the following code using AsciiDoc format. Save it as README.adoc", -- Prompt to generate AsciiDoc documentation
   CreateAPost = "Please provide documentation for the following code to post it in social media, like Linkedin, it has to be deep, must have a catchy header, must be well explained and easy to understand. Also do it in a fun and engaging way. Finish with a short satirical or empowering epigram.", -- Prompt to create a social media post
   Summarize = "Please summarize the following text.", -- Prompt to summarize text
   Spelling = "Please correct any grammar and spelling errors in the following text.", -- Prompt to correct spelling and grammar
@@ -55,7 +40,6 @@ return {
   "CopilotC-Nvim/CopilotChat.nvim",
   opts = {
     prompts = prompts,
-    system_prompt = system_prompt,
     model = "claude-sonnet-4",
     agent = "copilot",
     context = { "buffer", "git:staged" },

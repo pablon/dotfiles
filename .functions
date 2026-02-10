@@ -364,7 +364,7 @@ function drmi() {
   elif (type crictl &>/dev/null); then
     local CLI="crictl"
   fi
-  ${CLI} images | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='2' | xargs -r ${CLI} rmi -f
+  ${CLI} images --format table | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' | xargs -r ${CLI} rmi -f
 }
 
 ################################################################
@@ -502,7 +502,7 @@ function rebaser() {
 
 #===============================================================
 function is_in_git_repo() {
-  [ -n "$(git remote -v &>/dev/null)" ] || git rev-parse HEAD &>/dev/null || git rev-parse &>/dev/null
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1
 }
 
 #===============================================================
@@ -566,6 +566,7 @@ function mr-checkout() {
     --border --border-label-pos=3 \
     --color=label:italic:yellow,preview-bg:#101010 \
     --border-label='󰮠 Merge Request checkout' \
+    --pointer='' \
     --delimiter='\t' \
     --preview='echo -e {2} | bat -l md --style=plain --color=always' \
     --preview-window=top,50%:wrap | sed 's/^#\([0-9]\+\).*/\1/'

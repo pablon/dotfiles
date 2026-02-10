@@ -1,4 +1,4 @@
--- https://github.com/NickvanDyke/opencode.nvim/tree/main
+-- https://github.com/NickvanDyke/opencode.nvim
 -- Integrate the opencode AI assistant with Neovim — streamline editor-aware
 -- research, reviews, and requests.
 
@@ -109,12 +109,29 @@ return {
     },
   },
   config = function()
+    -- Use tmux provider inside tmux, otherwise fallback to snacks
+    local provider = vim.env.TMUX and "tmux" or "snacks"
     vim.g.opencode_opts = {
       provider = {
-        snacks = {
+        enabled = provider,
+        tmux = {
           win = {
-            position = "right",
+            enter = true,
           },
+          focus = true,
+          allow_passthrough = false,
+        },
+        snacks = {
+          auto_close = true, -- Close the terminal when `opencode` exits
+          win = {
+            enter = true,
+            bo = {
+              -- Make it easier to target for customization, and prevent possibly unintended `"snacks_terminal"` targeting.
+              -- e.g. the recommended edgy.nvim integration puts all `"snacks_terminal"` windows at the bottom.
+              filetype = "opencode_terminal",
+            },
+          },
+          focus = true,
         },
       },
     }

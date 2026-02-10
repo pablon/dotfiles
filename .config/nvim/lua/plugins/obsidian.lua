@@ -7,6 +7,7 @@ local function bootstrap_dir(dir)
     vim.fn.mkdir(dir, "p")
   end
 end
+-- user env OBSIDIAN_VAULT_DIR to set vault path, default to ~/obsidian-vault
 local vault_path = os.getenv("OBSIDIAN_VAULT_DIR") or "~/obsidian-vault"
 local vault_name = vim.fs.basename(vault_path)
 vault_path = vim.fn.expand(vault_path)
@@ -21,6 +22,7 @@ return {
     "nvim-lua/plenary.nvim",
   },
   opts = {
+    legacy_commands = false,
     notes_subdir = "inbox",
     new_notes_location = "inbox",
 
@@ -31,17 +33,17 @@ return {
       },
     },
 
-    -- completion = {
-    --   nvim_cmp = false,
-    --   min_chars = 2,
-    -- },
+    completion = {
+      cmp = true,
+      min_chars = 2,
+    },
 
     note_id_func = function(title)
-      -- Create note IDs in a Zettelkasten format:
       local suffix = ""
       if title ~= nil then
         suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
         -- else
+        --   -- Create note IDs in a Zettelkasten format.
         --   -- If title is nil, just add 8 random uppercase letters to the suffix.
         --   for _ = 1, 8 do
         --     suffix = suffix .. string.char(math.random(65, 90))
@@ -52,7 +54,7 @@ return {
       end
     end,
 
-    note_frontmatter_func = function(note)
+    frontmatter_func = function(note)
       local out = { id = note.id, aliases = note.aliases, tags = note.tags }
       if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
         for k, v in pairs(note.metadata) do

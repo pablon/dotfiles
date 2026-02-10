@@ -76,10 +76,12 @@ fi
 # open dotfiles
 alias dots='[ -d ~/dotfiles/ ] && _info "Entering dotfiles config! 🚀" && (cd ~/dotfiles/ && nvim .)'
 
+# obsidian new_from_template
+alias on="_info '💎 Creating new Obsidian note' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c 'Obsidian new_from_template' )"
 # obsidian open
 alias oo="_info '📝 Opening Obsidian' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim . )"
 # obsidian search
-alias os="_info '🔎 Opening ObsidianSearch' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c ObsidianSearch )"
+alias os="_info '🔎 Opening Obsidian search' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c 'Obsidian search' )"
 
 alias reload="reset ; source ${HOME}/.zshrc"
 ( type cmatrix &>/dev/null ) && alias cmatrix='cmatrix -abs'
@@ -219,5 +221,5 @@ fi
 # private browsing - set one of:
 #   alias pb="$(which brave) --incognito &"
 #   alias pb="$(which google-chrome) --incognito &"
-#   alias pb="$(which firefox) --private-window --safe-mode &"
+#   alias pb="$(which firefox) --private-window &"
 #===============================================================
