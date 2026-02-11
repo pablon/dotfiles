@@ -17,4 +17,8 @@ return {
     "NickvanDyke/opencode.nvim",
     enabled = true,
   },
+  {
+    "coder/claudecode.nvim",
+    enabled = false,
+  },
 }
