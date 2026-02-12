@@ -398,7 +398,8 @@ function do_docker_rhel() {
 	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
 	${SUDO} dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/rhel/docker-ce.repo
-	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin &&
+		${SUDO} systemctl enable --now docker
 	do_docker_post_install
 }
 
@@ -406,7 +407,8 @@ function do_docker_fedora() {
 	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
 	${SUDO} dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
-	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin &&
+		${SUDO} systemctl enable --now docker
 	do_docker_post_install
 }
 
@@ -443,6 +445,7 @@ EOF
 	if [ "$(id -u)" -ne "0" ]; then
 		_info "Adding $(whoami) to 'docker' group"
 		${SUDO} usermod -aG docker $(whoami) && id $(whoami)
+		newgrp docker
 	fi
 
 	docker --version
