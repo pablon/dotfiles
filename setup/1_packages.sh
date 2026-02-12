@@ -167,19 +167,19 @@ function do_prepare_manjaro() {
 
 function do_prepare_rhel() {
 	_info "Executing function ${MAGENTA}${FUNCNAME}"
-	${SUDO} dnf ${DNF_OPTS} update
-	# ${SUDO} dnf ${DNF_OPTS} upgrade --refresh
+	${SUDO} dnf -y update
+	${SUDO} dnf ${DNF_OPTS} upgrade --skip-unavailable
 	${SUDO} dnf ${DNF_OPTS} install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm &&
 		${SUDO} dnf config-manager --set-enabled epel
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
-	${SUDO} dnf ${DNF_OPTS} groupinstall 'Development Tools'
+	${SUDO} dnf ${DNF_OPTS} group install development-tools
 
 	PACKAGES="${PKGLIST_DNF}"
 	if [ -r "${PACKAGES}" ] && [ -s "${PACKAGES}" ]; then
 		_info "Installing packages from $(basename "${PACKAGES}")"
 		install_pkg_rhel $(xargs <"${PACKAGES}") || {
 			_error "Failed to install packages from ${PACKAGES}"
-			exit 1
+			# exit 1
 		}
 	else
 		_error "Package list ${PACKAGES} not found or is empty."
@@ -398,7 +398,7 @@ function do_docker_manjaro() {
 function do_docker_rhel() {
 	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
-	${SUDO} dnf ${DNF_OPTS} config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+	${SUDO} dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/rhel/docker-ce.repo
 	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	do_docker_post_install
 }
@@ -406,7 +406,7 @@ function do_docker_rhel() {
 function do_docker_fedora() {
 	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
-	${SUDO} dnf ${DNF_OPTS} config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+	${SUDO} dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
 	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	do_docker_post_install
 }
@@ -418,7 +418,7 @@ function do_docker_rocky() {
 function do_docker_almalinux() {
 	_info "Executing function ${MAGENTA}${FUNCNAME}"
 	${SUDO} dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
-	${SUDO} dnf ${DNF_OPTS} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+	${SUDO} dnf config-manager addrepo https://download.docker.com/linux/centos/docker-ce.repo
 	${SUDO} dnf ${DNF_OPTS} install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	do_docker_post_install
 }
@@ -432,7 +432,7 @@ function do_docker_post_install() {
 		cat <<EOF | ${SUDO} tee /etc/docker/daemon.json.example
 {
   "insecure-registries": [
-  "my.registry.example.com:8443"
+    "my.registry.example.com:8443"
   ]
 },
 {

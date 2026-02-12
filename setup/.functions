@@ -34,7 +34,7 @@ export NONE='\033[0m'
 # Package Manager Options
 export APT_OPTS="-yqq"
 export DEBIAN_FRONTEND="noninteractive"
-export DNF_OPTS="--skip-broken -y"
+export DNF_OPTS="-y"
 export PACMAN_OPTS="--noconfirm --noprogressbar --needed --color always --disable-download-timeout"
 
 # --- 2. Logging Utilities ---
