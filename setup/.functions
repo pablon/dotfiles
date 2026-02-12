@@ -130,7 +130,7 @@ install_pkg_manjaro() {
 }
 
 install_pkg_rhel() {
-  ${SUDO} dnf install ${DNF_OPTS} "$@"
+  ${SUDO} dnf ${DNF_OPTS} install "$@"
 }
 
 install_pkg_fedora() {

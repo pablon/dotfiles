@@ -177,10 +177,9 @@ function do_prepare_rhel() {
 	PACKAGES="${PKGLIST_DNF}"
 	if [ -r "${PACKAGES}" ] && [ -s "${PACKAGES}" ]; then
 		_info "Installing packages from $(basename "${PACKAGES}")"
-		install_pkg_rhel $(xargs <"${PACKAGES}") || {
-			_error "Failed to install packages from ${PACKAGES}"
-			# exit 1
-		}
+		cat "${PACKAGES}" | while read -r i; do
+			install_pkg_rhel "${i}"
+		done
 	else
 		_error "Package list ${PACKAGES} not found or is empty."
 		exit 1
