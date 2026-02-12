@@ -9,7 +9,7 @@ ZSH_PLUGINS=(zsh-completions zsh-autosuggestions zsh-syntax-highlighting zsh-his
 source "$(dirname "${0}")/.functions" || exit 1
 
 _info "Changing default shell to ${CYAN}zsh"
-sudo chsh -s /bin/zsh "$(whoami)" && _success "Done"
+sudo chsh -s $(command -v zsh) "$(whoami)" && _success "Done"
 # [ -f "${HOME}/.zshrc" ] && mv -f "${HOME}/.zshrc" "${HOME}/.zshrc.bak"
 
 [ -d "${HOME}/.zsh" ] || mkdir -p "${HOME}/.zsh"
