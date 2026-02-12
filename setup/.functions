@@ -32,7 +32,7 @@ export CYAN='\033[1;96m'
 export NONE='\033[0m'
 
 # Package Manager Options
-export APT_OPTS="-yqq"
+export APT_OPTS="-y"
 export DEBIAN_FRONTEND="noninteractive"
 export DNF_OPTS="-y"
 export PACMAN_OPTS="--noconfirm --noprogressbar --needed --color always --disable-download-timeout"
@@ -112,7 +112,7 @@ install_pkg_darwin() {
 }
 
 install_pkg_debian() {
-  ${SUDO} apt-get update ${APT_OPTS} &&
+  ${SUDO} apt-get update &&
     ${SUDO} apt-get install ${APT_OPTS} "$@"
 }
 
