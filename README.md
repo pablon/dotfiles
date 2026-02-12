@@ -15,6 +15,7 @@ Install required tools first:
 
 - `git`
 - `curl`
+- `sudo`
 - `jq`
 
 Clone this repo:
