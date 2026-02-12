@@ -1,18 +1,20 @@
 # shellcheck disable=SC2148
 # get zsh load time - START
 # prefer gnu-date
-[[ "$(uname)" == "Darwin" ]] && ( type gdate &>/dev/null ) && alias date='gdate'
+[[ "$(uname)" == "Darwin" ]] && (type gdate &>/dev/null) && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
+
+# load zsh plugins
+for plugin in $(\ls -1 ${HOME}/.zsh/ | xargs); do
+  plugin_dir="${HOME}/.zsh/${plugin}"
+  plugin_file=""
+  plugin_file="$(find "${plugin_dir}" -maxdepth 1 -type f -name '*.plugin.zsh' 2>/dev/null | head -1)"
+  [[ -n "${plugin_file}" ]] && source "${plugin_file}"
+  unset plugin plugin_dir plugin_file
+done
 
 # load ~/.zshrc_custom
 [ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
-
-# zsh plugins
-ZSH_PLUGINS=(zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search)
-for plugin in "${ZSH_PLUGINS[@]}" ; do
-    [ -f "${HOME}/.zsh/${plugin}/${plugin}.zsh" ] &&
-    source ${HOME}/.zsh/${plugin}/${plugin}.zsh
-done
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -29,11 +31,12 @@ eval "$(starship init zsh)"
 (type direnv &>/dev/null) && eval "$(direnv hook zsh)"
 
 cookie
-if [ -z "${TMUX}" ] ; then
-  tmux ls 2>/dev/null | while read session ; do _info "tmux session:${NONE} ${session}" ; done ; echo
+if [ -z "${TMUX}" ]; then
+  tmux ls 2>/dev/null | while read session; do _info "tmux session:${NONE} ${session}"; done
+  echo
 fi
 
 # get zsh load time - END
 _zsh_end="$(date +%s%3N)"
-printf " %.3f s\\n" "$(( ${_zsh_end} - ${_zsh_start} ))e-3"
+printf " %.3f s\\n" "$((${_zsh_end} - ${_zsh_start}))e-3"
 unset _zsh_start _zsh_end

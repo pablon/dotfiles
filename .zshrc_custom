@@ -12,15 +12,16 @@ export NONE="\033[0m"
 
 ######################################################################
 # clipboard tool
-_clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( type pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
+_clipboardApp="$(if (command xclip -v &>/dev/null); then echo xclip; elif (type pbcopy &>/dev/null); then echo pbcopy; fi)"
 
 ######################################################################
 # load custom aliases & functions
 ALIASES_WORK="${HOME}/.aliases_work"
 SECRETS_FILE="${HOME}/.secrets"
-for file in ${HOME}/{.aliases,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}" ; do
+for file in ${HOME}/{.aliases,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}"; do
   [ -r "${file}" ] && source "${file}"
-done ; unset file
+done
+unset file
 
 ######################################################################
 # zsh
@@ -44,10 +45,11 @@ setopt INC_APPEND_HISTORY_TIME # append command to history file immediately afte
 setopt SHARE_HISTORY           # Share history between all sessions.
 unsetopt menu_complete         # do not autoselect the first completion entry
 unsetopt flowcontrol
-setopt auto_menu               # show completion menu on successive tab press
+setopt auto_menu # show completion menu on successive tab press
 setopt complete_in_word
 setopt always_to_end
 # async mode for autocompletion
+export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
 export ZSH_AUTOSUGGEST_USE_ASYNC=true
 export ZSH_HIGHLIGHT_MAXLENGTH=300
 
@@ -106,10 +108,6 @@ done
 (type brew &>/dev/null) && FPATH+=":$(brew --prefix)/share/zsh/site-functions"
 export FPATH="${FPATH}"
 
-# compinit (if having issues, delete ~/.zcompdump and re-run to rebuild)
-autoload bashcompinit && bashcompinit
-autoload -Uz compinit && compinit
-
 # You may need to manually set your MANPATH
 export MANPATH="/usr/local/man:${MANPATH}"
 
@@ -127,7 +125,7 @@ if (type brew &>/dev/null); then
 fi
 
 # iTerm2 Shell Integration
-if [[ -n "${ITERM_SESSION_ID}" ]] && [[ -f "${HOME}/.config/iterm2/shell_integration.zsh" ]] ; then
+if [[ -n "${ITERM_SESSION_ID}" ]] && [[ -f "${HOME}/.config/iterm2/shell_integration.zsh" ]]; then
   source "${HOME}/.config/iterm2/shell_integration.zsh"
 fi
 
@@ -139,7 +137,7 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # fzf
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
-if ( type fzf &>/dev/null ) ; then
+if (type fzf &>/dev/null); then
   source <(fzf --zsh 2>/dev/null)
 
   export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude '.git' --exclude 'node_modules' --one-file-system"
@@ -167,12 +165,12 @@ fi
 
 ######################################################################
 # asdf
-if ( type asdf &>/dev/null ) ; then
+if (type asdf &>/dev/null); then
   case "$(uname)" in
-    Linux)
-      ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
-      [ -x "${ASDF_SCRIPT}" ] && source "${ASDF_SCRIPT}"
-      ;;
+  Linux)
+    ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
+    [ -x "${ASDF_SCRIPT}" ] && source "${ASDF_SCRIPT}"
+    ;;
   esac
 fi
 
@@ -182,32 +180,34 @@ export LESS='-asrRix8'
 export LESSCHARSET='utf-8'
 
 # color manpage
-export LESS_TERMCAP_mb=$'\E[01;31m'         # begin blinking
-export LESS_TERMCAP_md=$'\E[01;38;5;208m'   # begin bold
-export LESS_TERMCAP_me=$'\E[0m'             # end mode
-export LESS_TERMCAP_se=$'\E[0m'             # end standout-mode
-export LESS_TERMCAP_so=$'\E[38;07;246m'     # begin standout-mode - info box
-export LESS_TERMCAP_ue=$'\E[0m'             # end underline
-export LESS_TERMCAP_us=$'\E[04;38;5;111m'   # begin underline
+export LESS_TERMCAP_mb=$'\E[01;31m'       # begin blinking
+export LESS_TERMCAP_md=$'\E[01;38;5;208m' # begin bold
+export LESS_TERMCAP_me=$'\E[0m'           # end mode
+export LESS_TERMCAP_se=$'\E[0m'           # end standout-mode
+export LESS_TERMCAP_so=$'\E[38;07;246m'   # begin standout-mode - info box
+export LESS_TERMCAP_ue=$'\E[0m'           # end underline
+export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 
 ######################################################################
 # auto completion
 AUTO_COMPLETION=(docker helm kubectl kops)
-for app in ${AUTO_COMPLETION} ; do
-  ( type ${app} &>/dev/null ) && source <(${app} completion zsh)
-done ; unset app
+for app in ${AUTO_COMPLETION}; do
+  (type ${app} &>/dev/null) && source <(${app} completion zsh)
+done
+unset app
 
-for app in gh glab ; do
-  ( type ${app} &>/dev/null ) && source <(${app} completion -s zsh)
-done ; unset app
+for app in gh glab; do
+  (type ${app} &>/dev/null) && source <(${app} completion -s zsh)
+done
+unset app
 
-( type aws_completer &>/dev/null ) && complete -C "$(which aws_completer)" aws
-( type op &>/dev/null ) && eval "$(\op completion zsh)"; compdef _op op
-( type opencode &>/dev/null ) && source <(opencode completion)
-( type stern &>/dev/null ) && source <(stern --completion zsh)
-( type zoxide &>/dev/null ) && eval "$(zoxide init zsh)"
-[[ "$(uname)" == "Darwin" ]] && ( type az &>/dev/null ) && source "$(brew --prefix)/etc/bash_completion.d/az"
-
+(type aws_completer &>/dev/null) && complete -C "$(which aws_completer)" aws
+(type op &>/dev/null) && eval "$(\op completion zsh)"
+compdef _op op
+(type opencode &>/dev/null) && source <(opencode completion)
+(type stern &>/dev/null) && source <(stern --completion zsh)
+(type zoxide &>/dev/null) && eval "$(zoxide init zsh)"
+[[ "$(uname)" == "Darwin" ]] && (type az &>/dev/null) && source "$(brew --prefix)/etc/bash_completion.d/az"
 
 ######################################################################
 # ssh-add
