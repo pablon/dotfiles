@@ -7,46 +7,23 @@ Your dotfiles are how you personalize your system - These are mine.
 
 </div>
 
+:whale: [Try with docker](docs/docker.md)
+
+:notebook: [Read the full docs](docs/README.md)
+
 ---
 
-# Install
+## Quick Start
 
-Install required tools first:
-
-- `git`
-- `curl`
-- `sudo`
-- `jq`
-
-Clone this repo:
+**Prerequisites**: `bc`, `git`, `curl`, `sudo`, `jq`
 
 ```bash
 git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
-```
-
-Fresh installation:
-
-```bash
 ./setup.sh
 ```
 
-.. or just re-link:
-
-```bash
-( type stow &>/dev/null ) && ( cd ~/dotfiles/ && stow -v . )
-```
-
 ---
 
-# Uninstall
+## License
 
-```bash
-( cd ~/dotfiles/ && stow -vD . )
-```
-
-This unlinks all the files, but does not remove the actual files from your
-system. You can then remove the `~/dotfiles` directory if you wish.
-
----
-
-[Read the full docs here](docs/README.md).
+[GPL v3.0](LICENSE.md) - feel free to use, modify, and share.
