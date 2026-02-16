@@ -37,7 +37,7 @@ cookie
 
 # list tmux sessions if not in tmux
 if [ -z "${TMUX}" ]; then
-  tmux ls 2>/dev/null | while read session; do _info "tmux session:${NONE} ${session}"; done
+  tmux ls 2>/dev/null | while read session; do _info "tmux session:${NC} ${session}"; done
   echo
 fi
 

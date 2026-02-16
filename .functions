@@ -4,19 +4,19 @@ _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( 
 #===============================================================
 # multi purpose banners
 function _info() {
-  echo -e "${CYAN}==>  ${STRONG}${1}${NONE}"
+  echo -e "${CYAN}==>  ${STRONG}${1}${NC}"
 }
 
 function _warning() {
-  echo -e "${YELLOW}==>  ${1}${NONE}"
+  echo -e "${YELLOW}==>  ${1}${NC}"
 }
 
 function _success() {
-  echo -e "${GREEN}==> ✔ ${NONE}${1}"
+  echo -e "${GREEN}==> ✔ ${NC}${1}"
 }
 
 function _error() {
-  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NONE}\n"
+  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NC}\n"
 }
 alias _fail='_error'
 
@@ -100,7 +100,7 @@ function asdf_remove() {
   local PLUGIN="${1}"
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
   [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
-  echo -en "${YELLOW}⁈ Completely remove ALL ${PLUGIN} versions? [y/N]:${NONE} " ; read -r confirm
+  echo -en "${YELLOW}⁈ Completely remove ALL ${PLUGIN} versions? [y/N]:${NC} " ; read -r confirm
   case "${confirm}" in
     [yY]*) true ;;
     *)     return 0 ;;
@@ -200,8 +200,8 @@ function flushdns() {
       sudo resolvectl flush-caches &>/dev/null || \
       sudo systemd-resolve --flush-caches &>/dev/null
   fi
-  _info "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
-  _info "To clear DNS cache on Chrome visit ${CYAN}about:preferences#privacy${NONE}\n"
+  _info "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NC}\n"
+  _info "To clear DNS cache on Chrome visit ${CYAN}about:preferences#privacy${NC}\n"
 }
 #===============================================================
 # check host for dns availability
@@ -214,7 +214,7 @@ function checkdns() {
 # print random fortune with cowsay & fortune
 function cookie() {
   if ( command -v fortune &>/dev/null ) ; then
-    echo -e "\n${CYAN}$(fortune -s | sed 's|^|\t|')${NONE}\n"
+    echo -e "\n${CYAN}$(fortune -s | sed 's|^|\t|')${NC}\n"
   fi
 }
 #===============================================================
@@ -267,7 +267,7 @@ function awsprofile() {
     echo "${ANSWER}"
     case "${AWSSHELL}" in
       'zsh')  ( export AWS_PROFILE="${ANSWER}" && zsh -i ) ;;
-      'bash') ( export AWS_PROFILE="${ANSWER}" && bash --rcfile <(echo "PS1=\"[${YELLOW}aws${NONE}|${MAGENTA}${ANSWER}${NONE}] \W ${GREEN}→${NONE} \"") -i ) ;;
+      'bash') ( export AWS_PROFILE="${ANSWER}" && bash --rcfile <(echo "PS1=\"[${YELLOW}aws${NC}|${MAGENTA}${ANSWER}${NC}] \W ${GREEN}→${NC} \"") -i ) ;;
     esac
   fi
 }
@@ -607,7 +607,7 @@ function helm_create() {
   elif [ ! -d "${1}" ] ; then
     echo -en "${YELLOW}"
     helm create "${1}"
-    echo -en "${NONE}"
+    echo -en "${NC}"
     _info "cd ${CYAN}$(pwd)/"
     cd "${1}/" && \rm -rf templates/tests templates/*.{txt,yaml}
     cat << EOF > templates/NOTES.txt
@@ -663,7 +663,7 @@ function decode_secret() {
 #===============================================================
 # k8s: check tls certs expiration date
 function get-tls-certs() {
-  _info "Checking TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NONE}\n"
+  _info "Checking TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NC}\n"
   kubectl get certificates --no-headers -A 2>/dev/null | awk '{print $1" "$2}' | while read -r tls_cert ; do
     CERT_NAMESPACE="$(echo "${tls_cert}" | awk '{print $1}')"
     CERT_NAME="$(echo "${tls_cert}" | awk '{print $2}')"
@@ -681,30 +681,30 @@ function get-tls-certs() {
       "OK")
         ICON="✅"
         COLOUR="${STRONG}"
-        CERT_STATUS_MSG="${GREEN}Certificate is valid${NONE} - expires in ${GREEN}${days}${NONE} days"
+        CERT_STATUS_MSG="${GREEN}Certificate is valid${NC} - expires in ${GREEN}${days}${NC} days"
         ;;
       "WARNING")
         ICON="⚠️"
         COLOUR="${YELLOW}"
-        CERT_STATUS_MSG="${ICON}${YELLOW} Certificate expires soon: ${MAGENTA}${days}${YELLOW} days${NONE}"
+        CERT_STATUS_MSG="${ICON}${YELLOW} Certificate expires soon: ${MAGENTA}${days}${YELLOW} days${NC}"
         ;;
       "EXPIRES_TODAY")
         ICON="🚨"
         COLOUR="${YELLOW}"
-        CERT_STATUS_MSG="${ICON}${YELLOW} Certificate expires ${MAGENTA}TODAY${YELLOW} !!!${NONE}"
+        CERT_STATUS_MSG="${ICON}${YELLOW} Certificate expires ${MAGENTA}TODAY${YELLOW} !!!${NC}"
         ;;
       "EXPIRED")
         ICON="💀"
         COLOUR="${MAGENTA}"
-        CERT_STATUS_MSG="${ICON}${MAGENTA} Certificate expired ${YELLOW}${days}${MAGENTA} days ago${NONE}"
+        CERT_STATUS_MSG="${ICON}${MAGENTA} Certificate expired ${YELLOW}${days}${MAGENTA} days ago${NC}"
         ;;
       "ERROR")
         ICON="❌"
-        CERT_STATUS_MSG="${MAGENTA} Certificado invalid or not found${NONE}"
+        CERT_STATUS_MSG="${MAGENTA} Certificado invalid or not found${NC}"
         ;;
     esac
-    echo -e "==> ${ICON} ${COLOUR}Certificate: ns=${BLUE}${CERT_NAMESPACE}${COLOUR} secret=${PURPLE}${CERT_NAME}${NONE}"
-    echo -e "CN=${CYAN}${CERT_SUBJECT#subject=CN=}${NONE}\n${CERT_ISSUER}\n${CERT_DATES}\n${CERT_STATUS_MSG}${NONE}" | sed 's|^|\t|'
+    echo -e "==> ${ICON} ${COLOUR}Certificate: ns=${BLUE}${CERT_NAMESPACE}${COLOUR} secret=${PURPLE}${CERT_NAME}${NC}"
+    echo -e "CN=${CYAN}${CERT_SUBJECT#subject=CN=}${NC}\n${CERT_ISSUER}\n${CERT_DATES}\n${CERT_STATUS_MSG}${NC}" | sed 's|^|\t|'
     divider
     unset CERT_DATES
     unset CERT_INFO
@@ -722,7 +722,7 @@ function get-tls-certs() {
 #===============================================================
 # k8s: check cert-manager tls certs expiration date
 function get-cm-certs() {
-  _info "Checking cert-manager TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NONE}\n"
+  _info "Checking cert-manager TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NC}\n"
   kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read namespace cert ; do
     cmctl status certificate -n ${namespace} ${cert} | grep --colour=never -E 'Name|^-|^Not\ |^Renewal' | grep -iv 'issuer'
     divider
@@ -752,7 +752,7 @@ function get-nodepools() {
 # k8s: get node resources
 function get-node-resources() {
   if ( ! command -v numfmt &>/dev/null ) ; then
-    echo "${MAGENTA}numfmt${NONE} not found - install coreutils package"
+    echo "${MAGENTA}numfmt${NC} not found - install coreutils package"
     return 1
   fi
   _info "Cluster: ${GREEN}$(kubectl config current-context)"
@@ -760,10 +760,10 @@ function get-node-resources() {
   kubecolor top node --use-protocol-buffers
   kubectl get node -o wide --no-headers | awk '{print $1" "$3" "$6}' | while IFS=' ' read -r THIS_NODE_NAME THIS_NODE_ROLE THIS_NODE_IP ; do
 
-    [[ "${THIS_NODE_ROLE}" == *"control"* ]] && THIS_NODE_ROLE="${RED}${THIS_NODE_ROLE}${NONE}" || THIS_NODE_ROLE="${GREEN}${THIS_NODE_ROLE}${NONE}"
+    [[ "${THIS_NODE_ROLE}" == *"control"* ]] && THIS_NODE_ROLE="${RED}${THIS_NODE_ROLE}${NC}" || THIS_NODE_ROLE="${GREEN}${THIS_NODE_ROLE}${NC}"
     THIS_NODE_INSTANCE_TYPE="$(kubectl get node/${THIS_NODE_NAME} --no-headers -o jsonpath='{.metadata.labels.beta\.kubernetes\.io/instance-type}' 2>/dev/null)"
 
-    divider ; _info "Resources for ${MAGENTA}${THIS_NODE_NAME}${NONE} ${THIS_NODE_IP} (${THIS_NODE_ROLE}) ${YELLOW}${THIS_NODE_INSTANCE_TYPE}" | column -tx
+    divider ; _info "Resources for ${MAGENTA}${THIS_NODE_NAME}${NC} ${THIS_NODE_IP} (${THIS_NODE_ROLE}) ${YELLOW}${THIS_NODE_INSTANCE_TYPE}" | column -tx
 
     NODE_DETAILS="$(kubectl describe node/${THIS_NODE_NAME} 2>/dev/null)"
     NODE_RESOURCES="$(echo "${NODE_DETAILS}" | grep '^Capacity' -A 12)"
@@ -783,13 +783,13 @@ function get-node-resources() {
     ALLOC_MEM_MI="$(numfmt --from=iec-i --to-unit=1M --grouping ${ALLOC_MEM_KI} | sed 's|,||')Mi"
     ALLOC_MEM_GI="$(numfmt --from=iec-i --to=iec ${ALLOC_MEM_KI})i"
 
-    echo -e "${CYAN}Capacity:${NONE}
+    echo -e "${CYAN}Capacity:${NC}
      cpu:    ${CAP_CPU_CORES}\t= ${CAP_CPU_MILLIS}
   memory:    ${CAP_MEM_GI}\t= ${CAP_MEM_MI} = ${CAP_MEM_KI}
-${CYAN}Allocatable:${NONE}
+${CYAN}Allocatable:${NC}
      cpu:    ${ALLOC_CPU_CORES}\t= ${ALLOC_CPU_MILLIS}
   memory:    ${ALLOC_MEM_GI}\t= ${ALLOC_MEM_MI} = ${ALLOC_MEM_KI}
-${CYAN}Pressure:${NONE}
+${CYAN}Pressure:${NC}
 ${NODE_PRESSURE}"
   done
   divider
@@ -845,7 +845,7 @@ EOF
     return 1
   fi
 
-  local PRINT_NAMESPACE="${GREEN}${NAMESPACE}${NONE}/"
+  local PRINT_NAMESPACE="${GREEN}${NAMESPACE}${NC}/"
   local ALL_PODS="$(\kubectl get pod -n ${NAMESPACE} ${OPT_LABEL} -o jsonpath='{range.items[*]}{..metadata.name}{" "}{..nodeName}{"\n"}{end}')"
 
   if [ -z "${ALL_PODS}" ] ; then
@@ -856,8 +856,8 @@ EOF
   local POD_COUNT="$(echo "${ALL_PODS}" | wc -l | sed 's/^[ \t]*//;s/[ \t]*$//')"
   local CURRENT_CONTEXT="$(\kubectl config current-context)"
 
-  [ -n "${CURRENT_CONTEXT}" ] && divider ; _info "Cluster:   ${GREEN}${CURRENT_CONTEXT}" ; _info "Namespace: ${GREEN}${NAMESPACE}${NONE}" ; divider
-  echo -e "Match: ${STRONG}${POD_COUNT}${NONE} Pod(s)"
+  [ -n "${CURRENT_CONTEXT}" ] && divider ; _info "Cluster:   ${GREEN}${CURRENT_CONTEXT}" ; _info "Namespace: ${GREEN}${NAMESPACE}${NC}" ; divider
+  echo -e "Match: ${STRONG}${POD_COUNT}${NC} Pod(s)"
 
   echo "${ALL_PODS}" | while read -r THIS_POD THIS_POD_NODE ; do
     local THIS_PVC="$(\kubectl -n ${NAMESPACE} describe pod/${THIS_POD} | awk '/ClaimName/ {print $2}')"
@@ -873,7 +873,7 @@ EOF
       local THIS_PV_INFO="driver:$(\kubectl get pv/${THIS_PV} -o yaml 2>/dev/null | yq '.spec.csi| (.driver, .volumeHandle, .fsType)' | xargs)"
     fi
     divider
-    echo -e "    Pod: ${CYAN}${THIS_POD}${NONE}\n   Node: ${THIS_POD_NODE}\tip:${STRONG}${THIS_POD_NODE_EXTERNAL_IP}${NONE}\n    PVC: ${THIS_PVC}\tclass:${STRONG}${THIS_PVC_CLASS}${NONE}\n     PV: ${THIS_PV} size:${STRONG}${THIS_SIZE}${NONE}\nDetails: ${YELLOW}${THIS_PV_INFO}${NONE}"
+    echo -e "    Pod: ${CYAN}${THIS_POD}${NC}\n   Node: ${THIS_POD_NODE}\tip:${STRONG}${THIS_POD_NODE_EXTERNAL_IP}${NC}\n    PVC: ${THIS_PVC}\tclass:${STRONG}${THIS_PVC_CLASS}${NC}\n     PV: ${THIS_PV} size:${STRONG}${THIS_SIZE}${NC}\nDetails: ${YELLOW}${THIS_PV_INFO}${NC}"
     fi
   done
   divider

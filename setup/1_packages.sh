@@ -24,12 +24,12 @@ function do_prepare_darwin() {
 	# Detect Apple Silicon chipset + install rosetta
 	if [[ "$(uname)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
 		if (! arch -x86_64 /usr/bin/true 2>/dev/null); then
-			echo -e "${YELLOW}ATTENTION! I detected you're using an Apple Silicon chip - ${CYAN}I'll install Rosetta2 now${NONE}"
+			echo -e "${YELLOW}ATTENTION! I detected you're using an Apple Silicon chip - ${CYAN}I'll install Rosetta2 now${NC}"
 			sleep 2
 			_info "Installing ${YELLOW}rosetta2"
 			ROSETTA_CMD="/usr/sbin/softwareupdate --install-rosetta --agree-to-license"
 			eval "${ROSETTA_CMD}"
-			echo -e "${ROSETTA_CMD}${NONE} = ${YELLOW}$?${NONE}"
+			echo -e "${ROSETTA_CMD}${NC} = ${YELLOW}$?${NC}"
 		fi
 	fi
 	# Install Homebrew

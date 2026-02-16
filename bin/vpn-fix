@@ -38,17 +38,17 @@ GREEN="\033[1;92m"
 MAGENTA="\033[1;95m"
 YELLOW="\033[1;93m"
 RED="\033[1;31m"
-NONE="\033[0m"
+NC="\033[0m"
 
 # sudo or GTFO
 if [[ $(id -u) -ne 0 ]]; then
-	echo -e "${RED}# you better run:${NONE} sudo ${0}\n"
+	echo -e "${RED}# you better run:${NC} sudo ${0}\n"
 	exit 1
 fi
 
 for program in awk host; do
 	if ! (which ${program} &>/dev/null); then
-		echo -e "${RED}# program ${STRONG}${program}${RED} is needed to run this script.\n# Install it and try again.${NONE}\n"
+		echo -e "${RED}# program ${STRONG}${program}${RED} is needed to run this script.\n# Install it and try again.${NC}\n"
 		exit 1
 	fi
 done
@@ -101,29 +101,29 @@ function get_kubeconfig_servers() {
 }
 
 function fix_routes() {
-	echo -e "${STRONG}-- Searching for k8s API servers...${NONE}"
+	echo -e "${STRONG}-- Searching for k8s API servers...${NC}"
 	declare -a K8S_ENDPOINTS=($(get_kubeconfig_servers))
 	if [[ -n ${K8S_ENDPOINTS} ]]; then
-		echo -e "  [${GREEN}✔${NONE}] done, ${#K8S_ENDPOINTS[@]} IPs found"
+		echo -e "  [${GREEN}✔${NC}] done, ${#K8S_ENDPOINTS[@]} IPs found"
 	else
-		echo -e "${RED}Yucs! No servers found in \$KUBECONFIG${NONE}\t(╯°□°)╯︵ ┻━┻"
+		echo -e "${RED}Yucs! No servers found in \$KUBECONFIG${NC}\t(╯°□°)╯︵ ┻━┻"
 	fi
 	if [[ -n ${VPN_CIDRS} ]] || [[ -n ${K8S_ENDPOINTS} ]]; then
 		# remove default route on TUNNEL_INTERFACE
 		ip r del default dev ${TUNNEL_INTERFACE} 2>/dev/null &&
-			echo -e "  [${RED}-${NONE}] deleted default gw on ${TUNNEL_INTERFACE}" ||
-			echo -e "  [${BLUE}i${NONE}] default gw on ${TUNNEL_INTERFACE}\talready deleted\t(skipping)"
+			echo -e "  [${RED}-${NC}] deleted default gw on ${TUNNEL_INTERFACE}" ||
+			echo -e "  [${BLUE}i${NC}] default gw on ${TUNNEL_INTERFACE}\talready deleted\t(skipping)"
 		if [[ -n ${VPN_CIDRS} ]]; then
-			echo -e "${STRONG}-- Adding routes for VPN_CIDRS...${NONE}"
+			echo -e "${STRONG}-- Adding routes for VPN_CIDRS...${NC}"
 			# add route for each CIDR in VPN_CIDRS
 			for cidr in ${VPN_CIDRS}; do
 				ip r a ${cidr} dev ${TUNNEL_INTERFACE} 2>/dev/null &&
-					echo -e "  [${GREEN}✔${NONE}] ip route add ${cidr} dev ${TUNNEL_INTERFACE}" ||
-					echo -e "  [${BLUE}i${NONE}] ${cidr} \talready set (skipping)"
+					echo -e "  [${GREEN}✔${NC}] ip route add ${cidr} dev ${TUNNEL_INTERFACE}" ||
+					echo -e "  [${BLUE}i${NC}] ${cidr} \talready set (skipping)"
 			done
 		fi
 		if [[ -n ${K8S_ENDPOINTS} ]]; then
-			echo -e "${STRONG}-- Adding routes for k8s API servers...${NONE}"
+			echo -e "${STRONG}-- Adding routes for k8s API servers...${NC}"
 			# sweep all IPs found in KUBECONFIG & kubie YAMLs
 			# shellcheck disable=SC2068
 			for ip in ${K8S_ENDPOINTS[@]}; do
@@ -132,7 +132,7 @@ function fix_routes() {
 					# verify if ${ip} falls within any of the VPN_CIDRS
 					if (in_subnet ${cidr} ${ip}); then
 						# if true, this ${ip} dies here
-						[ "${DEBUG}" == "1" ] && echo -e "  [${YELLOW}i${NONE}] ${ip}\tis in ${cidr}\t(skipping)"
+						[ "${DEBUG}" == "1" ] && echo -e "  [${YELLOW}i${NC}] ${ip}\tis in ${cidr}\t(skipping)"
 						TAGGED=0
 						break
 					else
@@ -147,15 +147,15 @@ function fix_routes() {
 			# shellcheck disable=SC2068
 			for ip in ${OUTPUT[@]}; do
 				ip r a ${ip} dev ${TUNNEL_INTERFACE} 2>/dev/null &&
-					echo -e "  [${GREEN}✔${NONE}] ip route add ${ip} dev ${TUNNEL_INTERFACE}" ||
-					echo -e "  [${BLUE}i${NONE}] ${ip}\talready set (skipping)"
+					echo -e "  [${GREEN}✔${NC}] ip route add ${ip} dev ${TUNNEL_INTERFACE}" ||
+					echo -e "  [${BLUE}i${NC}] ${ip}\talready set (skipping)"
 			done
 		fi
 	else
-		echo -e "${RED}# No CIDRs defined in \$VPN_CIDRS and/or no API servers detected in your ~/.kube/config${NONE} (ノಠ益ಠ)ノ彡┻━┻" && exit 0
+		echo -e "${RED}# No CIDRs defined in \$VPN_CIDRS and/or no API servers detected in your ~/.kube/config${NC} (ノಠ益ಠ)ノ彡┻━┻" && exit 0
 	fi
-	echo -e "${STRONG}-- VPN routes on ${TUNNEL_INTERFACE}:${NONE}\n${CYAN}$(ip r | grep "${TUNNEL_INTERFACE}" | column -t | sed 's|^|  |')${NONE}"
-	echo -e "${STRONG}-- Your default gateway:${NONE}\n${GREEN}$(ip r | grep ^default | column -t | sed 's|^|  |')${NONE}"
+	echo -e "${STRONG}-- VPN routes on ${TUNNEL_INTERFACE}:${NC}\n${CYAN}$(ip r | grep "${TUNNEL_INTERFACE}" | column -t | sed 's|^|  |')${NC}"
+	echo -e "${STRONG}-- Your default gateway:${NC}\n${GREEN}$(ip r | grep ^default | column -t | sed 's|^|  |')${NC}"
 }
 
 function show_fortune {
@@ -169,17 +169,17 @@ function show_fortune {
 		index=$((${RANDOM} % ${size}))
 		echo -e "${STRONG}"
 		fortune -s | cowsay -f "${array[${index}]}" | sed 's|^|  |'
-		echo -e "${NONE}"
+		echo -e "${NC}"
 	fi
 }
 
 function fix_resolvconf() {
-	echo -e "${STRONG}-- /etc/resolv.conf:${NONE}"
+	echo -e "${STRONG}-- /etc/resolv.conf:${NC}"
 	echo "# created $(date +%F\ %T) by $(basename ${0})" >/etc/resolv.conf
 	for ns in ${NAMESERVERS}; do
 		echo "nameserver ${ns}" >>/etc/resolv.conf
 	done
-	echo -e "${CYAN}$(cat /etc/resolv.conf | sed 's|^|  |')${NONE}"
+	echo -e "${CYAN}$(cat /etc/resolv.conf | sed 's|^|  |')${NC}"
 }
 
 # main
@@ -189,7 +189,7 @@ if (ip link show "${TUNNEL_INTERFACE}" &>/dev/null); then
 	show_fortune
 	echo
 else
-	echo -e "${RED}-- Tunnel not stablished or ${STRONG}TUNNEL_INTERFACE${RED} not detected ¯\_(ツ)_/¯${NONE}\n"
+	echo -e "${RED}-- Tunnel not stablished or ${STRONG}TUNNEL_INTERFACE${RED} not detected ¯\_(ツ)_/¯${NC}\n"
 fi
 
 # EOF

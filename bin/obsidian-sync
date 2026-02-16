@@ -35,7 +35,7 @@ function obsidian_sync() {
             _error "Something failed!"
           exit 1
         else
-          _warning "${MAGENTA}[DRY-RUN] ${CHANGED_FILES} files to add:${NONE}\n$(echo "${AFFECTED_FILES}")\n"
+          _warning "${MAGENTA}[DRY-RUN] ${CHANGED_FILES} files to add:${NC}\n$(echo "${AFFECTED_FILES}")\n"
         fi
       fi
     fi

@@ -20,29 +20,29 @@ GREEN="\033[1;92m"
 MAGENTA="\033[1;95m"
 RED="\033[1;31m"
 YELLOW="\033[1;93m"
-NONE="\033[0m"
+NC="\033[0m"
 
 PRETTY_FORMAT="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C(reset)"
 
 # functions
 function _info() {
 	if [ "${DRY_RUN}" ]; then
-		echo -e "==> ${RED}󰡾${MAGENTA} DRY_RUN${NONE} ${STRONG}${1}${NONE}"
+		echo -e "==> ${RED}󰡾${MAGENTA} DRY_RUN${NC} ${STRONG}${1}${NC}"
 	else
-		echo -e "==> ${CYAN} ${STRONG}${1}${NONE}"
+		echo -e "==> ${CYAN} ${STRONG}${1}${NC}"
 	fi
 }
 
 function _warning() {
-	echo -e "==> ${YELLOW} ${1}${NONE}"
+	echo -e "==> ${YELLOW} ${1}${NC}"
 }
 
 function _success() {
-	echo -e "==> ${GREEN}✔ ${NONE}${1}"
+	echo -e "==> ${GREEN}✔ ${NC}${1}"
 }
 
 function _error() {
-	echo -e "==> ${RED}✘ ${MAGENTA}${1}${NONE}\n"
+	echo -e "==> ${RED}✘ ${MAGENTA}${1}${NC}\n"
 	exit "${2:-1}"
 }
 
@@ -81,7 +81,7 @@ while getopts cdsh Option; do
 		CHANGE_CC_TYPE=1
 		;;
 	d)
-		DRY_RUN="${RED}󰡾${MAGENTA} DRY_RUN ${NONE}"
+		DRY_RUN="${RED}󰡾${MAGENTA} DRY_RUN ${NC}"
 		_info "mode, simulating all commands"
 		sleep 1
 		;;
@@ -118,7 +118,7 @@ ADDED_FILES="$(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Sel
 if [ -z "${ADDED_FILES}" ]; then
 	divider
 	_warning "No files were added!"
-	echo -en "==> ${YELLOW} Create an ${MAGENTA}empty-commit${YELLOW}?${NONE} [y/N]: "
+	echo -en "==> ${YELLOW} Create an ${MAGENTA}empty-commit${YELLOW}?${NC} [y/N]: "
 	read -r empty_option
 	case "${empty_option}" in
 	Y | y)
@@ -158,7 +158,7 @@ else
 		THIS_CC_SCOPE="${SCOPE}"
 		_info "Scope ${CYAN}${SCOPE}${STRONG} will be used"
 	else
-		echo -en "${MAGENTA}❯ Enter the ${STRONG}scope${MAGENTA} for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (hit ENTER to skip):${NONE} " && read -r THIS_CC_SCOPE
+		echo -en "${MAGENTA}❯ Enter the ${STRONG}scope${MAGENTA} for ${CYAN}${THIS_CC_TYPE}()${MAGENTA} (hit ENTER to skip):${NC} " && read -r THIS_CC_SCOPE
 	fi
 
 	# detect ticket string in branch name (after first '/')
@@ -176,7 +176,7 @@ else
 	else
 		THIS_COMMENT_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F'/' '{print $NF}' | sed -e 's|[_-]| |g')"
 	fi
-	echo -en "${MAGENTA}❯ Enter the ${STRONG}commit message${MAGENTA} (hit ENTER to accept '${STRONG}${THIS_COMMENT_GUESS}${MAGENTA}'):${NONE} " && read -r COMMIT_MESSAGE
+	echo -en "${MAGENTA}❯ Enter the ${STRONG}commit message${MAGENTA} (hit ENTER to accept '${STRONG}${THIS_COMMENT_GUESS}${MAGENTA}'):${NC} " && read -r COMMIT_MESSAGE
 	[ -z "${COMMIT_MESSAGE}" ] && COMMIT_MESSAGE="${THIS_COMMENT_GUESS}"
 
 	# create add/commit/push commands
@@ -189,7 +189,7 @@ else
 	# dry-run info
 	if [ "${DRY_RUN}" ]; then
 		divider
-		_info "${MAGENTA}These commands would have been executed:${NONE}"
+		_info "${MAGENTA}These commands would have been executed:${NC}"
 		[ ! "${ALLOW_EMPTY}" ] && _info "  ${COMMAND_ADD}"
 		_info "  ${COMMAND_COMMIT}"
 		_info "  ${COMMAND_PUSH}"
@@ -201,7 +201,7 @@ else
 		echo -e "\t${COMMAND_COMMIT}"
 
 		# add & commit
-		echo -en "\n${YELLOW}󰈸 ${MAGENTA}Add & commit? [Y/n]:${NONE} " && read -r add_commit_opt
+		echo -en "\n${YELLOW}󰈸 ${MAGENTA}Add & commit? [Y/n]:${NC} " && read -r add_commit_opt
 		case "${add_commit_opt}" in
 		N | n)
 			_error "Cancelled" 0
@@ -219,7 +219,7 @@ else
 
 		# push
 		if [ "${COMMIT_RC}" -eq "0" ]; then
-			echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to ${CYAN}󰘬 ${CURRENT_BRANCH} ${MAGENTA}?${NONE} [Y/n]: "
+			echo -en "\n${YELLOW}󰈸 ${MAGENTA}Push to ${CYAN}󰘬 ${CURRENT_BRANCH} ${MAGENTA}?${NC} [Y/n]: "
 			read -r push_option
 			case "${push_option}" in
 			N | n)

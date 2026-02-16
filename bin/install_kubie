@@ -29,14 +29,14 @@ GREEN="\033[1;92m"
 MAGENTA="\033[1;95m"
 YELLOW="\033[1;93m"
 RED="\033[1;31m"
-NONE="\033[0m"
+NC="\033[0m"
 
 ME="$(basename ${0})"
 KUBIE_CONFIG="${HOME}/.kube/kubie.yaml"
 
 for program in curl jq; do
 	if ! (command -v ${program} &>/dev/null); then
-		echo -e "${RED}# program ${STRONG}${program}${RED} is needed to run this script.\n# Install it and try again.${NONE}\n"
+		echo -e "${RED}# program ${STRONG}${program}${RED} is needed to run this script.\n# Install it and try again.${NC}\n"
 		exit 1
 	fi
 done
@@ -57,7 +57,7 @@ function get_system() {
 	elif [[ "$(uname)" == "Darwin" ]]; then
 		export THIS_OS='darwin'
 		if (! command -v brew &>/dev/null); then
-			echo -e "\n${YELLOW}Homebrew Package Manager for macOS is required to install kubie and fzf.${NONE}"
+			echo -e "\n${YELLOW}Homebrew Package Manager for macOS is required to install kubie and fzf.${NC}"
 			read -p "Install homebrew now? [Y/n]: " -s ANSWER
 			case "${ANSWER}" in
 			N | n)
@@ -68,7 +68,7 @@ function get_system() {
 				echo "Installing Homebrew from https://brew.sh/"
 				bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 				if [[ $? -ne 0 ]]; then
-					echo -e "${RED}ERROR installing homebrew${NONE}"
+					echo -e "${RED}ERROR installing homebrew${NC}"
 					exit 1
 				fi
 				;;
@@ -86,7 +86,7 @@ function get_system() {
 
 function add_bash_completion() {
 	if [[ "$(echo $(basename ${SHELL}))" == "bash" ]] && [[ "${THIS_OS}" = "linux" ]] && [[ ! -f ~/.kube/kubie.bash ]]; then
-		echo -e "==> ${YELLOW}Installing kubie's shell completion${NONE} as ${STRONG}~/.kube/kubie.bash${NONE}"
+		echo -e "==> ${YELLOW}Installing kubie's shell completion${NC} as ${STRONG}~/.kube/kubie.bash${NC}"
 		curl -fsSL -o ~/.kube/kubie.bash 'https://raw.githubusercontent.com/sbstp/kubie/master/completion/kubie.bash'
 		echo -e "\n# Load kubie's bash completion\n[[ -f ~/.kube/kubie.bash ]] && source ~/.kube/kubie.bash\n" >>~/.bashrc
 	fi
@@ -110,7 +110,7 @@ function install_update() {
 			;;
 		darwin)
 			VERB="${ACTION:-install}"
-			echo -e "==> (${MAGENTA}invoking brew for ${VERB}...${NONE})"
+			echo -e "==> (${MAGENTA}invoking brew for ${VERB}...${NC})"
 			if [[ "${1}" = "kubie" ]]; then
 				brew ${VERB} kubie
 			elif [[ "${1}" = "fzf" ]]; then
@@ -120,7 +120,7 @@ function install_update() {
 		esac
 	)
 	[[ -d ${WORKDIR} ]] && rm -rf "${WORKDIR}"
-	echo -e "> ${1} --version\n${GREEN}$(${1} --version)${NONE}\n"
+	echo -e "> ${1} --version\n${GREEN}$(${1} --version)${NC}\n"
 }
 
 function create_kubie_yaml() {
@@ -136,7 +136,7 @@ function create_kubie_yaml() {
 	if [ -f ${KUBIE_CONFIG} ]; then
 		BACKUP_TS="$(date +%Y%m%d-%H%M%S)"
 		cp -vf ${KUBIE_CONFIG}{,.${BACKUP_TS}}
-		echo -e "==> ${YELLOW}Saving existing config file as${NONE} as ${MAGENTA}${KUBIE_CONFIG}.${BACKUP_TS}${NONE}"
+		echo -e "==> ${YELLOW}Saving existing config file as${NC} as ${MAGENTA}${KUBIE_CONFIG}.${BACKUP_TS}${NC}"
 	fi
 	cat <<EOF >${KUBIE_CONFIG}
 # Force kubie to use a particular shell, if unset detect shell currently in use.
@@ -203,23 +203,23 @@ behavior:
     print_context_in_exec: auto
 EOF
 	if [ $? -eq 0 ]; then
-		echo -e "==> Configuration file ${YELLOW}${KUBIE_CONFIG}${NONE} created :-)"
+		echo -e "==> Configuration file ${YELLOW}${KUBIE_CONFIG}${NC} created :-)"
 	else
-		echo -e "${RED}==> ERROR creating configuration file ${YELLOW}${KUBIE_CONFIG}${NONE} "
+		echo -e "${RED}==> ERROR creating configuration file ${YELLOW}${KUBIE_CONFIG}${NC} "
 	fi
 
 	if [[ ! -d ${HOME}/.kube/configs ]]; then
 		mkdir -vp ${HOME}/.kube/configs
-		echo -e "==> Now you can store every kubernetes context as a separate YAML file in \n\t${YELLOW}~/.kube/configs/${NONE} dir\n==> Then try running ${GREEN}kubie ctx${NONE}, then ${GREEN}kubie ns${NONE} and enjoy"
+		echo -e "==> Now you can store every kubernetes context as a separate YAML file in \n\t${YELLOW}~/.kube/configs/${NC} dir\n==> Then try running ${GREEN}kubie ctx${NC}, then ${GREEN}kubie ns${NC} and enjoy"
 	fi
 }
 
 # main
 for i in kubie fzf; do
-	[[ "${DEBUG}" -eq "1" ]] && echo -e " ${RED}==> Getting latest version of ${i}${NONE}"
+	[[ "${DEBUG}" -eq "1" ]] && echo -e " ${RED}==> Getting latest version of ${i}${NC}"
 	LATEST_FULL="$(get_latest_ver ${i})"
 	LATEST="${LATEST_FULL/v/}"
-	[[ "${DEBUG}" -eq "1" ]] && echo -e " ${RED}==> LATEST_${i} =\t${LATEST}${NONE}"
+	[[ "${DEBUG}" -eq "1" ]] && echo -e " ${RED}==> LATEST_${i} =\t${LATEST}${NC}"
 
 	if (which ${i} &>/dev/null); then
 		if [[ "${i}" = "kubie" ]]; then
@@ -228,13 +228,13 @@ for i in kubie fzf; do
 			CURRENT="$(fzf --version | awk '{print $1}')"
 		fi
 		if [[ "${LATEST}" != "${CURRENT}" ]]; then
-			echo -e "==> ${YELLOW}${i} ${GREEN}needs to be updated${NONE}: ${STRONG}${CURRENT} => ${LATEST}${NONE}"
+			echo -e "==> ${YELLOW}${i} ${GREEN}needs to be updated${NC}: ${STRONG}${CURRENT} => ${LATEST}${NC}"
 			install_update ${i} ${LATEST} ${LATEST_FULL} upgrade
 		else
-			echo -e "==> ${YELLOW}${i}${NONE} already installed (${STRONG}${CURRENT} = latest${NONE})"
+			echo -e "==> ${YELLOW}${i}${NC} already installed (${STRONG}${CURRENT} = latest${NC})"
 		fi
 	else
-		echo -e "==> ${YELLOW}${i} ${STRONG}${LATEST}${GREEN} will be installed, hold on..${NONE}"
+		echo -e "==> ${YELLOW}${i} ${STRONG}${LATEST}${GREEN} will be installed, hold on..${NC}"
 		install_update ${i} ${LATEST} ${LATEST_FULL}
 	fi
 done
@@ -242,7 +242,7 @@ done
 if [ ! -r "${KUBIE_CONFIG}" ]; then
 	create_kubie_yaml
 else
-	echo -e "==> ${YELLOW}${KUBIE_CONFIG}${NONE} exists."
+	echo -e "==> ${YELLOW}${KUBIE_CONFIG}${NC} exists."
 	read -p "    Do you wan to update kubie's config file? [Y/n]:  "
 	case "${REPLY}" in
 	N | n) true ;;

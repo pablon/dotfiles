@@ -29,7 +29,7 @@ export YELLOW='\033[1;93m'
 export BLUE='\033[1;94m'
 export MAGENTA='\033[1;95m'
 export CYAN='\033[1;96m'
-export NONE='\033[0m'
+export NC='\033[0m'
 
 # Package Manager Options
 export APT_OPTS="-y"
@@ -48,20 +48,20 @@ divider() {
 
 _info() {
   divider
-  echo -e "${BLUE}==>  ${STRONG}${1}${NONE}\n"
+  echo -e "${BLUE}==>  ${STRONG}${1}${NC}\n"
 }
 
 _warning() {
   divider
-  echo -e "${YELLOW}==>  ${1}${NONE}\n"
+  echo -e "${YELLOW}==>  ${1}${NC}\n"
 }
 
 _success() {
-  echo -e "${GREEN}==> ✔ ${1}${NONE}\n"
+  echo -e "${GREEN}==> ✔ ${1}${NC}\n"
 }
 
 _error() {
-  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NONE}\n"
+  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NC}\n"
 }
 
 # --- 3. OS Detection ---
