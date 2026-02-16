@@ -65,7 +65,7 @@ if ( type zoxide &>/dev/null ); then
   alias cd="z"
   alias cdi="zi"
 fi
-( type nc &>/dev/null ) && alias nc="nc -vvv -w3"
+( type nc &>/dev/null ) && alias nc="nc -vvz -w 3"
 
 
 
