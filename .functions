@@ -201,6 +201,7 @@ function flushdns() {
       sudo systemd-resolve --flush-caches &>/dev/null
   fi
   _info "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NONE}\n"
+  _info "To clear DNS cache on Chrome visit ${CYAN}about:preferences#privacy${NONE}\n"
 }
 #===============================================================
 # check host for dns availability
@@ -212,19 +213,9 @@ function checkdns() {
 #===============================================================
 # print random fortune with cowsay & fortune
 function cookie() {
-  for program in cowsay fortune ; do
-    if ! ( command -v ${program} &>/dev/null ) ; then
-      echo "${program} is not installed ಠ_ಠ"
-      return
-    fi
-  done
-  # get all possible figures with: cowsay -l:
-  # array=( $(cowsay -l | grep -v Cow | xargs) )
-  # or set a fixed list:
-  array=(koala luke-koala moofasa moose sheep skeleton small three-eyes tux vader vader-koala www)
-  size=${#array[@]}
-  index=$((RANDOM % size))
-  echo -e "${CYAN}" ; fortune -s | LC_ALL=C cowsay -f "${array[${index}]}" | sed 's|^|  |' ; echo "${NONE}"
+  if ( command -v fortune &>/dev/null ) ; then
+    echo -e "\n${CYAN}$(fortune -s | sed 's|^|\t|')${NONE}\n"
+  fi
 }
 #===============================================================
 # left trim
@@ -250,14 +241,13 @@ function curl-cert() {
   openssl s_client -showcerts -connect "${1}":443 -servername ${1}
 }
 #===============================================================
-# yazi wrapper
+# yazi wrapper - https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
 function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  yazi "$@" --cwd-file="$tmp"
-  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    builtin cd -- "$cwd"
-  fi
-  rm -f -- "$tmp"
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
 }
 #===============================================================
 # spawn subshell into an aws profile
