@@ -445,7 +445,6 @@ EOF
 	if [ "$(id -u)" -ne "0" ]; then
 		_info "Adding $(whoami) to 'docker' group"
 		${SUDO} usermod -aG docker $(whoami) && id $(whoami)
-		newgrp docker
 	fi
 
 	docker --version

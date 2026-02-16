@@ -13,6 +13,7 @@ dnf-utils
 dnf‑plugins-core
 dos2unix
 fd-find
+file
 fontawesome-fonts-all
 fontconfig
 fortune-mod
@@ -20,12 +21,13 @@ gawk
 git
 git-delta
 glibc-langpack-en
+gnu-which
 gnupg
 gzip
 htop
 httpd-tools
-iftop
 ImageMagick
+iftop
 iotop-c
 jq
 lua

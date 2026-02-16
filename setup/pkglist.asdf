@@ -5,6 +5,8 @@ bun
 eza
 fzf
 git-lfs
+github-cli
+glab
 golang
 golangci-lint
 hadolint
@@ -13,7 +15,6 @@ helm-docs
 helmfile
 k9s
 krew
-kube-linter
 kubecolor
 kubeconform
 kubectl
@@ -32,5 +33,5 @@ tree-sitter
 xh
 yamllint
 yarn
-zoxide
 zig
+zoxide
