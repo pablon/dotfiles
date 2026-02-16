@@ -5,8 +5,7 @@
 # Compatibility: Linux & macOS (Bash 3.2+)
 ##########################################################
 
-# 1. Strict Mode
-# set -euo pipefail
+# 1. Set Execution Mode and IFS
 set -a
 IFS=$'\n\t'
 
@@ -42,23 +41,20 @@ else
 fi
 
 # 6. Pre-flight Checks
-check_env() {
-	if [ ! -d "${DOTFILES_DIR}" ]; then
-		_error "Dotfiles directory not found at ${DOTFILES_DIR}"
-		exit 1
+if [ ! -d "${DOTFILES_DIR}" ]; then
+	_error "Dotfiles directory not found at ${DOTFILES_DIR}"
+	exit 1
+fi
+
+deps=("curl" "sudo" "jq" "stow")
+for dep in "${deps[@]}"; do
+	if ! command -v "${dep}" >/dev/null 2>&1; then
+		_warning "Missing core dependency: ${dep}${NC} -- trying to install it.."
+		install_pkg_${OS} ${dep} || exit 1
 	fi
-
-	local deps=("curl" "sudo")
-
-	for dep in "${deps[@]}"; do
-		if ! command -v "${dep}" >/dev/null 2>&1; then
-			_error "Missing core dependency: ${dep} -- installing it.."
-			install_pkg_${OS} ${dep} || exit 1
-		fi
-	done
-}
-
-check_env
+	unset dep
+done
+unset deps
 
 # --- MAIN EXECUTION ---
 
@@ -77,19 +73,11 @@ if [ -d "${SETUP_DIR}" ]; then
 			_success "${script_name} exit code: $?"
 		else
 			_warning "${script_name} exit code: $?"
-			sleep 5
 		fi
 	done
 fi
 
-# PHASE 2: Check Stow
-if ! command -v stow >/dev/null 2>&1; then
-	_error "GNU Stow is not installed. Setup scripts failed to install it."
-	exit 1
-fi
-
-# PHASE 3: Stow Backup
-
+# PHASE 2: Stow Backup
 STOW_VER="$(stow --version | awk '{print $NF}')"
 STOW_VER="${STOW_VER%.*}"
 (
@@ -109,7 +97,7 @@ STOW_VER="${STOW_VER%.*}"
 	fi
 )
 
-# PHASE 4: Stow Smart Link
+# PHASE 3: Stow Smart Link
 divider
 _info "Applying stow links..."
 (cd "${DOTFILES_DIR}/" && stow -v .)
@@ -123,5 +111,8 @@ if [ "${?}" -eq "0" ]; then
 	done
 fi
 
+divider
 _success "Dotfiles setup complete!"
-_success "Action required: Reload your shell with ${CYAN}source ~/.zshrc${GREEN} or logout/login again"
+divider
+_success "Action required: ${YELLOW}logout/login again"
+divider
