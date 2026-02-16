@@ -49,23 +49,12 @@ setopt auto_menu # show completion menu on successive tab press
 setopt complete_in_word
 setopt always_to_end
 # async mode for autocompletion
-export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
+export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 export ZSH_AUTOSUGGEST_USE_ASYNC=true
 export ZSH_HIGHLIGHT_MAXLENGTH=300
 
-# case insensitive path-completion
-zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
-zstyle ':completion:*' complete-options true
-zstyle ':completion:*' file-sort modification
-zstyle ':completion:*' menu select
-zstyle ':completion:*' squeeze-slashes true
-zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
-zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
-zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions commands
-zstyle ':completion:*:*:cp:*' file-sort modification reverse
-zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
-zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
-zstyle ':completion:*' verbose true
+export SPACESHIP_PROMPT_ASYNC=true
+export SPACESHIP_PROMPT_ADD_NEWLINE=true
 
 export XDG_CONFIG_HOME="${HOME}/.config"
 
@@ -92,7 +81,7 @@ for i in "${PATH_DIRS[@]}"; do
 done
 export PATH="${PATH}"
 
-# shell completion
+# TODO: shell completion with carapace
 # export CARAPACE_BRIDGES='zsh'
 # zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 # source <(carapace _carapace)
@@ -105,7 +94,7 @@ FPATH_DIRS=(
 for i in "${FPATH_DIRS[@]}"; do
   [ -d "${i}" ] && FPATH+=":${i}"
 done
-(type brew &>/dev/null) && FPATH+=":$(brew --prefix)/share/zsh/site-functions"
+(type brew &>/dev/null) && FPATH+=":/opt/homebrew/share/zsh/site-functions"
 export FPATH="${FPATH}"
 
 # You may need to manually set your MANPATH
@@ -190,24 +179,26 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 
 ######################################################################
 # auto completion
-AUTO_COMPLETION=(docker helm kubectl kops)
-for app in ${AUTO_COMPLETION}; do
-  (type ${app} &>/dev/null) && source <(${app} completion zsh)
-done
-unset app
 
-for app in gh glab; do
-  (type ${app} &>/dev/null) && source <(${app} completion -s zsh)
-done
-unset app
+(command -v aws_completer &>/dev/null) && complete -C "$(command -v aws_completer)" aws
+# AUTO_COMPLETION=(docker helm kubectl kops)
+# for app in ${AUTO_COMPLETION}; do
+#   (type ${app} &>/dev/null) && source <(${app} completion zsh)
+# done
+# unset app
+#
+# for app in gh glab; do
+#   (type ${app} &>/dev/null) && source <(${app} completion -s zsh)
+# done
+# unset app
+# (type op &>/dev/null) && eval "$(\op completion zsh)"
+# compdef _op op
+# (type opencode &>/dev/null) && source <(opencode completion)
+# (type stern &>/dev/null) && source <(stern --completion zsh)
+# [[ "$(uname)" == "Darwin" ]] && (type az &>/dev/null) && source "$(brew --prefix)/etc/bash_completion.d/az"
 
-(type aws_completer &>/dev/null) && complete -C "$(which aws_completer)" aws
-(type op &>/dev/null) && eval "$(\op completion zsh)"
-compdef _op op
-(type opencode &>/dev/null) && source <(opencode completion)
-(type stern &>/dev/null) && source <(stern --completion zsh)
+# zoxide init
 (type zoxide &>/dev/null) && eval "$(zoxide init zsh)"
-[[ "$(uname)" == "Darwin" ]] && (type az &>/dev/null) && source "$(brew --prefix)/etc/bash_completion.d/az"
 
 ######################################################################
 # ssh-add

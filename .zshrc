@@ -8,9 +8,8 @@ zmodload zsh/zprof
 _zsh_start="$(date +%s%3N)"
 
 # load zsh plugins
-for plugin in $(\ls -1 ${HOME}/.zsh/ | xargs); do
+for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
   plugin_dir="${HOME}/.zsh/${plugin}"
-  plugin_file=""
   plugin_file="$(find "${plugin_dir}" -maxdepth 1 -type f -name '*.plugin.zsh' 2>/dev/null | head -1)"
   [[ -n "${plugin_file}" ]] && source "${plugin_file}"
   unset plugin plugin_dir plugin_file
@@ -47,5 +46,5 @@ _zsh_end="$(date +%s%3N)"
 printf " %.3f s\\n" "$((${_zsh_end} - ${_zsh_start}))e-3"
 unset _zsh_start _zsh_end
 
-# end zsh profiling
+# save zsh profiling
 zprof 2>&1 >~/.zsh.profiling
