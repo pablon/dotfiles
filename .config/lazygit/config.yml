@@ -1,9 +1,10 @@
 gui:
-  scrollPastBottom: true
-  tabWidth: 2
-  showIcons: true
   nerdFontsVersion: "3"
+  scrollPastBottom: true
   shortTimeFormat: 03:04 PM
+  showDivergenceFromBaseBranch: arrowAndNumber
+  showFileIcons: true
+  tabWidth: 2
 git:
   pagers:
     - colorArg: always
