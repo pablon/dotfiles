@@ -5,37 +5,37 @@ command_timeout = 2000
 follow_symlinks = false
 palette = 'catppuccin_mocha'
 
-[custom.git_email_azure]
-command = "git config --get user.email"
-symbol = '󰠅 '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep 'azure' )"
-require_repo = true
+# [custom.git_email_azure]
+# command = "git config --get user.email"
+# symbol = '󰠅 '
+# style = 'fg:#595959'
+# format = "\n[$symbol($output)]($style)"
+# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep 'azure' )"
+# require_repo = true
 
-[custom.git_email_github]
-command = "git config --get user.email"
-symbol = '󰊤 '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep 'github' )"
-require_repo = true
+# [custom.git_email_github]
+# command = "git config --get user.email"
+# symbol = '󰊤 '
+# style = 'fg:#595959'
+# format = "\n[$symbol($output)]($style)"
+# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep 'github' )"
+# require_repo = true
 
-[custom.git_email_gitlab]
-command = "git config --get user.email"
-symbol = '󰮠 '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep gitlab )"
-require_repo = true
+# [custom.git_email_gitlab]
+# command = "git config --get user.email"
+# symbol = '󰮠 '
+# style = 'fg:#595959'
+# format = "\n[$symbol($output)]($style)"
+# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep gitlab )"
+# require_repo = true
 
-[custom.git_email_generic]
-command = "git config --get user.email"
-symbol = '󰊢 '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab' )"
-require_repo = true
+# [custom.git_email_generic]
+# command = "git config --get user.email"
+# symbol = '󰊢 '
+# style = 'fg:#595959'
+# format = "\n[$symbol($output)]($style)"
+# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab' )"
+# require_repo = true
 
 [directory]
 home_symbol = '~'
