@@ -169,7 +169,7 @@
 
 [commit]
   verbose = true
-  ; gpgsign = true
+  gpgsign = true
 
 ; [format]
 ;   signOff = true
