@@ -3,5 +3,7 @@
 --ignore=.helm
 --ignore=.pre-commit-config.yaml
 --ignore=.stowrc
+--ignore=AGENTS.md
+--ignore=docs
 --ignore=setup
 --ignore=setup.sh
