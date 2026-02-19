@@ -18,7 +18,7 @@ _clipboardApp="$(if (command xclip -v &>/dev/null); then echo xclip; elif (type 
 # load custom aliases & functions
 ALIASES_WORK="${HOME}/.aliases_work"
 SECRETS_FILE="${HOME}/.secrets"
-for file in ${HOME}/{.aliases,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}"; do
+for file in ${HOME}/{.aliases,.exports,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}"; do
   [ -r "${file}" ] && source "${file}"
 done
 unset file
