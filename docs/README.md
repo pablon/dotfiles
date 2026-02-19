@@ -100,13 +100,25 @@ git config --global user.signingkey ~/.ssh/id_ed25519.pub
 
 #### 2. Shell Customization
 
-Edit `~/.zshrc_custom` for personal settings:
+Create optional configuration files for customization:
+
+| File              | Purpose                                             |
+| ----------------- | --------------------------------------------------- |
+| `~/.aliases_work` | Work-specific aliases (not created, auto-sourced)   |
+| `~/.completions/` | Custom completion scripts dir (auto-added to FPATH) |
+| `~/.exports`      | Additional environment variables (auto-sourced)     |
+| `~/.secrets`      | Secrets and API keys (not created, auto-sourced)    |
 
 ```bash
+# Example edit, in ~/.zshrc_custom
 export EDITOR=nvim
-export VISUAL=nvim
+export VISUAL=vim
 export OBSIDIAN_VAULT_DIR="${HOME}/Documents/obsidian"
 export GIT_WORKDIR="${HOME}/code"
+
+# Example ~/.exports
+export FOO="bar"
+export PATH="${HOME}/my-tools:${PATH}"
 ```
 
 #### 3. Kubernetes Operations
@@ -206,16 +218,27 @@ rm -rf ~/dotfiles
 #### Neovim (.config/nvim/)
 
 - [LazyVim](https://www.lazyvim.org) based setup
-- Enhanced with Snacks, Obsidian, and other plugins
+- Enhanced plugins:
+  - **Obsidian**: Vault integration with attachment handling, URL encoding,
+    slides support
+  - **Snacks**: Image rendering in multiple directories, Obsidian path
+    resolution, GitHub integration
 - LSP support for multiple languages
 - Custom keymaps and options
 
 #### Git (.gitconfig)
 
 - Conventional commit setup with `bin/commit`
-- GPG signing enabled
+- GPG signing enabled for all commits
 - Custom aliases and workflows
 - Branch-specific configurations
+
+#### Lazygit (.config/lazygit/)
+
+- Branch divergence indicators showing ahead/behind status
+- File icons and Nerd Fonts v3 support
+- Delta integration for better diffs
+- Automatic commit prefix from branch names (Jira/Azure DevOps patterns)
 
 #### Kubernetes
 
@@ -292,7 +315,7 @@ dps    # watch docker ps
 ds     # docker stop+removal
 ```
 
-#### Kubernetes
+#### Kubernetes Operations
 
 ```bash
 k      # kubectl (with kubecolor)
@@ -327,17 +350,16 @@ vpn-fix # Run VPN route fixer
 
 ### Shell Customization
 
-**Zsh Setup**: Default shell with oh-my-zsh plugins (zsh-autocomplete,
-zsh-autosuggestions, zsh-syntax-highlighting)
+**Zsh Setup**: Default shell zsh plugins (zsh-autocomplete, zsh-autosuggestions,
+zsh-syntax-highlighting)
 
 **Key Features**:
 
-- **History**: Atuin for unified command history
+- **History**: Atuin for unified command history across sessions
 - **Prompt**: Starship for beautiful, informative prompts
-- **Completion**: Enhanced tab completion
+- **Completion**: Enhanced tab completion with custom completions directory (`~/.completions`)
 - **Syntax Highlighting**: Real-time syntax highlighting
-
-**Personalization**: Edit `~/.zshrc_custom` for your own settings.
+- **Environment**: Modular configuration with `.exports` for variables
 
 ### Git Configuration
 
@@ -349,8 +371,15 @@ zsh-autosuggestions, zsh-syntax-highlighting)
 | `fix/`        | `fix:`      |
 | `docs/`       | `docs:`     |
 
-**Advanced Features**: GPG signing, lazygit TUI, branch divergence indicators,
-custom aliases.
+**Advanced Features**:
+
+- **GPG signing** for all commits
+- **Lazygit TUI** with:
+  - Branch divergence indicators (ahead/behind arrows with counts)
+  - File icons support
+  - Delta integration for beautiful diffs
+  - Auto-commit-prefix from branch names (supports Jira/Azure DevOps patterns)
+- **Custom aliases** for common operations
 
 ### Kubernetes Tools
 
@@ -444,8 +473,8 @@ bash -n script.sh
 ```bash
 #!/usr/bin/env bash
 ##########################################################
-# Description: Brief description
-# Author: https://github.com/pablon
+# Description: <brief description>
+# Author: https://github.com/<user>
 # Compatibility: Linux & macOS (Bash 3.2+)
 ##########################################################
 set -euo pipefail
