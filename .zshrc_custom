@@ -88,6 +88,7 @@ export PATH="${PATH}"
 
 # export FPATH
 FPATH_DIRS=(
+  "${HOME}/.completions"
   "${HOME}/.docker/completions"
   "${HOME}/.zsh/zsh-completions/src"
 )
