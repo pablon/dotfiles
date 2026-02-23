@@ -325,6 +325,14 @@ function do_additional_tools() {
 			_success "yazi is already installed ($(yazi -V))"
 		fi
 
+		# kind
+		if (! type kind &>/dev/null); then
+			_info "Installing ${CYAN}kind"
+			install_kind
+		else
+			_success "kind is already installed ($(kind --version))"
+		fi
+
 		# opencode
 		if (! type opencode &>/dev/null); then
 			_info "Installing ${CYAN}opencode"
@@ -358,6 +366,24 @@ function install_yazi() {
 				exit 3
 		}
 	)
+}
+
+function install_kind() {
+	case "$(uname -s)" in
+	'Darwin')
+		install_pkg_darwin kind
+		;;
+	'Linux')
+		local LATEST="$(curl -s "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest" | jq -r ".tag_name")" # v0.4.1
+		local OS="$(uname -s | tr -s '[:upper:]' '[:lower:]')"
+		case "$(uname -m)" in
+		'x86_64') ARCH="amd64" ;;
+		'arm64') ARCH="arm64" ;;
+		esac
+		curl --create-dirs -fSLo ~/.local/bin/kind "https://kind.sigs.k8s.io/dl/${LATEST}/kind-${OS}-${ARCH}"
+		chmod +x ~/.local/bin/kind
+		;;
+	esac
 }
 
 # ===============================================================
