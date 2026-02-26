@@ -22,14 +22,14 @@ export DEBIAN_FRONTEND="noninteractive"
 apt update && apt install -yq bc git curl sudo jq
 
 # create a test user, as the setup script can't be run as root
-useradd -m -s $(command -v bash) user
-echo 'user    ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/user
+useradd -m -s $(command -v bash) testuser
+echo 'testuser    ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/testuser
 
-# now become 'user'
-su - user
+# now become 'testuser'
+su - testuser
 ```
 
-Run as **user**:
+Run as **testuser**:
 
 ```sh
 # clone the repo
@@ -43,6 +43,6 @@ git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
 
 Once `setup.sh` has finished:
 
-1. Hit `Ctrl+d` once to logout as 'user'
-2. Run `su - user` to became 'user' again
+1. Logout from 'testuser', run: `exit` (you'll see the root prompt)
+2. Become 'testuser' again, run: `su - testuser`
 3. Start playing around :rocket:
