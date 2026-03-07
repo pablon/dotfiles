@@ -1,0 +1,156 @@
+name: PR Checks
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    name: Lint & Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14.3"
+          cache: "pip"
+
+      - name: Cache pre-commit hooks
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files --show-diff-on-failure
+
+  stow-check:
+    name: Stow Dry Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install stow
+        run: sudo apt-get update && sudo apt-get install -y stow
+
+      - name: Validate stow symlinks
+        run: |
+          # Dry-run stow to detect conflicts
+          stow -nv . 2>&1 | tee stow-output.txt
+          # Check for warnings (conflicts would show as WARNING)
+          if grep -q "WARNING" stow-output.txt; then
+            echo "::error::Stow detected conflicts. Check the output above."
+            exit 1
+          fi
+          echo "✅ Stow dry-run passed - no conflicts detected"
+
+  shell-syntax:
+    name: Shell Syntax Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check shell script syntax
+        run: |
+          echo "Checking shell script syntax..."
+          errors=0
+          # Find all shell scripts
+          while IFS= read -r -d '' script; do
+            if ! bash -n "$script" 2>&1; then
+              echo "::error file=$script::Syntax error in $script"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -type f \( -name "*.sh" -o -path "./bin/*" \) -print0 2>/dev/null)
+          # Also check files with shebang
+          while IFS= read -r -d '' script; do
+            if head -1 "$script" | grep -q "^#!.*bash\|^#!.*sh"; then
+              if ! bash -n "$script" 2>&1; then
+                echo "::error file=$script::Syntax error in $script"
+                errors=$((errors + 1))
+              fi
+            fi
+          done < <(find . -type f -not -path "./.git/*" -print0 2>/dev/null)
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::Found $errors script(s) with syntax errors"
+            exit 1
+          fi
+          echo "✅ Shell scripts have valid syntax"
+
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs: [lint, stow-check, shell-syntax]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## PR Checks Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Lint check
+          if [ "${{ needs.lint.result }}" == "success" ]; then
+            echo "✅ **Lint & Validate:** All pre-commit hooks passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.lint.result }}" == "failure" ]; then
+            echo "❌ **Lint & Validate:** Failed - run \`pre-commit run -a\` locally" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Lint & Validate:** ${{ needs.lint.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Stow check
+          if [ "${{ needs.stow-check.result }}" == "success" ]; then
+            echo "✅ **Stow Dry Run:** No symlink conflicts" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.stow-check.result }}" == "failure" ]; then
+            echo "❌ **Stow Dry Run:** Conflicts detected - run \`stow -nv .\` locally" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Stow Dry Run:** ${{ needs.stow-check.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Shell syntax check
+          if [ "${{ needs.shell-syntax.result }}" == "success" ]; then
+            echo "✅ **Shell Syntax:** All scripts valid" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.shell-syntax.result }}" == "failure" ]; then
+            echo "❌ **Shell Syntax:** Syntax errors found - run \`bash -n script.sh\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Shell Syntax:** ${{ needs.shell-syntax.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall status
+          if [ "${{ needs.lint.result }}" == "success" ] && \
+             [ "${{ needs.stow-check.result }}" == "success" ] && \
+             [ "${{ needs.shell-syntax.result }}" == "success" ]; then
+            echo "### ✅ All Checks Passed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "This PR is ready for review." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Some Checks Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Fix locally:**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+            echo "pre-commit run -a    # run all hooks" >> $GITHUB_STEP_SUMMARY
+            echo "stow -nv .           # check stow conflicts" >> $GITHUB_STEP_SUMMARY
+            echo "bash -n <script>.sh  # check syntax" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
