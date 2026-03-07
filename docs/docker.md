@@ -19,7 +19,7 @@ Once inside the container, run as **root**:
 ```sh
 # requirements
 export DEBIAN_FRONTEND="noninteractive"
-apt update && apt install -yq bc git curl sudo jq
+apt update && apt install -yq git sudo
 
 # create a test user, as the setup script can't be run as root
 useradd -m -s $(command -v bash) testuser
