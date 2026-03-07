@@ -88,4 +88,4 @@ stow -nv .                 # dry-run stow
 
 ## License
 
-[GPL v3.0](LICENSE.md) — use, modify, and share freely.
+[GPL v3.0](../LICENSE.md) — use, modify, and share freely.
