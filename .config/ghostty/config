@@ -5,7 +5,8 @@ font-family             = "JetBrainsMono"
 font-size               = 13
 mouse-hide-while-typing = true
 theme                   = TokyoNight
-window-decoration       = true
+window-decoration       = auto
+shell-integration       = zsh
 # keybindings
 keybind                 = super+-=decrease_font_size:2
 keybind                 = super+bracket_right=increase_font_size:1

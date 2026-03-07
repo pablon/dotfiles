@@ -1,0 +1,40 @@
+k9s:
+  liveViewAutoRefresh: false
+  refreshRate: 2
+  maxConnRetry: 5
+  readOnly: false
+  noExitOnCtrlC: true
+  enableMouse: true
+  ui:
+    crumbsless: false
+    reactive: false
+    noIcons: false
+    defaultsToFullScreen: false
+  skipLatestRevCheck: false
+  disablePodCounting: false
+  shellPod:
+    tty: true
+    # image: busybox:1.35.0
+    image: cool_kid_admin:42
+    namespace: default
+    limits:
+      cpu: 100m
+      memory: 100Mi
+  imageScans:
+    enable: false
+    exclusions:
+      namespaces: []
+      labels: {}
+  logger:
+    tail: 50
+    buffer: 2000
+    sinceSeconds: -1
+    textWrap: true
+    showTime: true
+  thresholds:
+    cpu:
+      critical: 90
+      warn: 85
+    memory:
+      critical: 90
+      warn: 85

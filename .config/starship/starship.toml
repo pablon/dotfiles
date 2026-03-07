@@ -5,37 +5,37 @@ command_timeout = 2000
 follow_symlinks = false
 palette = 'catppuccin_mocha'
 
-# [custom.git_email_azure]
-# command = "git config --get user.email"
-# symbol = '󰠅 '
-# style = 'fg:#595959'
-# format = "\n[$symbol($output)]($style)"
-# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep 'azure' )"
-# require_repo = true
+[custom.git_email_azure]
+command = "git config --get user.email"
+symbol = '󰠅 '
+style = 'fg:#595959'
+format = "\n[$symbol($output)]($style)"
+when = "git remote get-url --push origin &>/dev/null | grep 'azure'"
+require_repo = true
 
-# [custom.git_email_github]
-# command = "git config --get user.email"
-# symbol = '󰊤 '
-# style = 'fg:#595959'
-# format = "\n[$symbol($output)]($style)"
-# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep 'github' )"
-# require_repo = true
+[custom.git_email_github]
+command = "git config --get user.email"
+symbol = '󰊤 '
+style = 'fg:#595959'
+format = "\n[$symbol($output)]($style)"
+when = "git remote get-url --push origin &>/dev/null | grep 'github'"
+require_repo = true
 
-# [custom.git_email_gitlab]
-# command = "git config --get user.email"
-# symbol = '󰮠 '
-# style = 'fg:#595959'
-# format = "\n[$symbol($output)]($style)"
-# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep gitlab )"
-# require_repo = true
+[custom.git_email_gitlab]
+command = "git config --get user.email"
+symbol = '󰮠 '
+style = 'fg:#595959'
+format = "\n[$symbol($output)]($style)"
+when = "git remote get-url --push origin &>/dev/null | grep 'gitlab'"
+require_repo = true
 
-# [custom.git_email_generic]
-# command = "git config --get user.email"
-# symbol = '󰊢 '
-# style = 'fg:#595959'
-# format = "\n[$symbol($output)]($style)"
-# when = "git rev-parse --is-inside-work-tree &>/dev/null && ( git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab' )"
-# require_repo = true
+[custom.git_email_generic]
+command = "git config --get user.email"
+symbol = '󰊢 '
+style = 'fg:#595959'
+format = "\n[$symbol($output)]($style)"
+when = "git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab'"
+require_repo = true
 
 [directory]
 home_symbol = '~'
@@ -73,7 +73,7 @@ style = 'teal'
 symbol = ' '
 format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 pyenv_prefix = ''
-# pyenv_version_name = true
+pyenv_version_name = true
 
 [lua]
 symbol = ' '
@@ -112,13 +112,13 @@ format = '[$symbol($version )]($style)'
 symbol = " "
 style = 'bold peach'
 format = '[\($symbol $profile\)]($style) '
-disabled = true
+disabled = false
 
 [gcloud]
 symbol = ""
 style = 'bold cyan'
 format = '[\($symbol $project\)]($style) '
-disabled = true
+# disabled = true
 
 [azure]
 symbol = "󰠅"
@@ -138,7 +138,6 @@ number_threshold = 1
 format = '[$symbol]($style)'
 
 [cmd_duration]
-# min_time = 500
 style = 'fg:gray'
 format = ' [$duration]($style)'
 

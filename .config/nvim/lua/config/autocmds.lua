@@ -7,13 +7,6 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
--- format .yaml.gotmpl as YAML
-vim.filetype.add({
-  pattern = {
-    [".*/*.yaml.gotmpl"] = "yaml",
-  },
-})
-
 -- format .gitconfig{-,_}*
 vim.api.nvim_create_autocmd("BufRead", {
   group = vim.api.nvim_create_augroup("detect_gitconfig", { clear = true }),
@@ -22,4 +15,14 @@ vim.api.nvim_create_autocmd("BufRead", {
   callback = function()
     vim.cmd("set filetype=gitconfig")
   end,
+})
+
+-- format jinja templates
+-- format helm-related files with helm filetype (uses helm-ls)
+-- requires plugins/helm.lua for helm-ls configuration
+vim.filetype.add({
+  pattern = {
+    [".*%.j2"] = "jinja",
+    [".*%.yaml%.gotmpl"] = "helm",
+  },
 })

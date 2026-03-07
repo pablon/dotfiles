@@ -1,0 +1,20 @@
+plugins:
+  # Leverage stern (https://github.com/stern/stern) to output logs.
+  stern:
+    shortCut: Ctrl-L
+    confirm: false
+    description: "Logs (stern)"
+    scopes:
+      - pods
+    command: stern
+    background: false
+    args:
+      - --only-log-lines
+      - -t
+      - -d
+      - -H
+      - "(?i)debug|info|warn[i][n][g]|auth|fail[e][d]|error|critical|unknown|unhealthy"
+      - --tail
+      - 100
+      - -p
+      - $FILTER
