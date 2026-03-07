@@ -142,15 +142,28 @@ if (type fzf &>/dev/null); then
   --preview-window='border-double'
   --bind='ctrl-p:change-preview-window(down|hidden|)'
   --marker='✘' --pointer='❯' --separator='─'
-  --scrollbar='│' --style=full --cycle"
+  --scrollbar='│' --style=full --cycle --ghost='Search..'"
 
-  export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target
-  --preview 'bat -n --color=always {}'"
+  export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target --preview 'bat -n --color=always {}'"
 
   export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude '.git' . | awk -F'/' '{print NF-1, \$0}' | sort -n | cut -d' ' -f2-"
 
-  export FZF_COMPLETION_OPTS='--border'
+  export FZF_COMPLETION_OPTS='--border --info=inline'
   export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
+
+  export FZF_COMPLETION_PATH_OPTS='--walker file,dir,follow,hidden --walker-skip .git,node_modules'
+  export FZF_COMPLETION_DIR_OPTS='--walker dir,follow --walker-skip .git,node_modules'
+
+  _fzf_comprun() {
+    local command="${1}"
+    shift
+    case "${command}" in
+      cd)           fzf --preview 'tree -C {} | head -200'   "$@" ;;
+      export|unset) fzf --preview "eval 'echo \$'{}"         "$@" ;;
+      ssh)          fzf --preview 'dig {}'                   "$@" ;;
+      *)            fzf --preview 'bat -n --color=always {}' "$@" ;;
+    esac
+  }
 fi
 
 ######################################################################
@@ -181,7 +194,7 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 ######################################################################
 # auto completion
 
-(command -v aws_completer &>/dev/null) && complete -C "$(command -v aws_completer)" aws
+# (command -v aws_completer &>/dev/null) && complete -C "$(command -v aws_completer)" aws
 # AUTO_COMPLETION=(docker helm kubectl kops)
 # for app in ${AUTO_COMPLETION}; do
 #   (type ${app} &>/dev/null) && source <(${app} completion zsh)
@@ -196,7 +209,7 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 # compdef _op op
 # (type opencode &>/dev/null) && source <(opencode completion)
 # (type stern &>/dev/null) && source <(stern --completion zsh)
-# [[ "$(uname)" == "Darwin" ]] && (type az &>/dev/null) && source "$(brew --prefix)/etc/bash_completion.d/az"
+# [[ "$(uname)" == "Darwin" ]] && (type az &>/dev/null) && source "${HOMEBREW_PREFIX}/etc/bash_completion.d/az"
 
 # zoxide init
 (type zoxide &>/dev/null) && eval "$(zoxide init zsh)"

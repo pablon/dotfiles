@@ -92,7 +92,6 @@ alias reload="reset ; source ${HOME}/.zshrc"
 #===============================================================
 
 alias pf="fzf --preview='less {}' --bind shift-up:preview-page-up,shift-down:preview-page-down"
-alias v="nvim -o \$(fzf -m --preview 'bat --style=numbers --color=always --line-range :500 {}')"
 
 #===============================================================
 # git
@@ -192,6 +191,7 @@ if ( type kubectl &>/dev/null ) ; then
   ( type kubeconform &>/dev/null ) && alias kubeconform='kubeconform -output pretty -summary -strict -verbose'
   # custom pods
   alias pod_alpine="kubectl run -it --rm alpine --image alpine:latest --restart=Never -- ash"
+  alias pod_debian="kubectl run -it --rm debian --image debian:latest --restart=Never -- bash"
   alias pod_nats="kubectl run -it --rm nats-box --image=natsio/nats-box --restart=Never -- ash"
   alias pod_ubuntu="kubectl run -it --rm ubuntu --image ubuntu:latest --restart=Never -- bash"
 fi

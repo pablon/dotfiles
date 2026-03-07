@@ -26,6 +26,15 @@ function divider() {
   echo
 }
 #===============================================================
+# v for nvim
+function v() {
+  if [ "${1}" ]; then
+    nvim "${1}"
+  else
+    nvim .
+  fi
+}
+#===============================================================
 # Create a new directory and enter it
 function md() {
   mkdir -vp "${1}" && cd "${1}" && _info "cd ${CYAN}$(pwd)/"
@@ -200,8 +209,7 @@ function flushdns() {
       sudo resolvectl flush-caches &>/dev/null || \
       sudo systemd-resolve --flush-caches &>/dev/null
   fi
-  _info "To clear DNS cache on Chrome visit ${CYAN}chrome://net-internals/#dns${NC}\n"
-  _info "To clear DNS cache on Chrome visit ${CYAN}about:preferences#privacy${NC}\n"
+  _info "Now clear DNS cache on your browser\n"
 }
 #===============================================================
 # check host for dns availability
@@ -214,7 +222,7 @@ function checkdns() {
 # print random fortune with cowsay & fortune
 function cookie() {
   if ( command -v fortune &>/dev/null ) ; then
-    echo -e "\n${CYAN}$(fortune -s | sed 's|^|\t|')${NC}\n"
+    echo -e "\n${CYAN}$(fortune -s | sed 's|^|  |')${NC}\n"
   fi
 }
 #===============================================================
@@ -238,19 +246,22 @@ function fh() {
 #===============================================================
 # get tls cert from URL
 function curl-cert() {
-  openssl s_client -showcerts -connect "${1}":443 -servername ${1}
+  local HOST="${1}"
+  local PORT="${2}"
+  openssl s_client -showcerts -connect "${HOST}":${PORT:-443} -servername ${HOST}
 }
 #===============================================================
 # yazi wrapper - https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
 function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	command yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-	rm -f -- "$tmp"
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
 }
 #===============================================================
 # spawn subshell into an aws profile
+# NOTE: better tool to use https://github.com/radiusmethod/awsd
 function awsprofile() {
   if ( type zsh &>/dev/null ) ; then
     local AWSSHELL='zsh'
@@ -367,6 +378,16 @@ _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
 _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | bat --style=numbers'"
 _viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
 
+function glNoGraph() {
+  git log --color --date=format:"%F %H:%M" \
+  --format="%C(auto)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>%C(reset)" \
+  --graph "$@"
+}
+
+function is_in_git_repo() {
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1
+}
+
 #===============================================================
 # take this repo and copy it to somewhere else minus the .git stuff
 function gitexport(){
@@ -379,12 +400,6 @@ function gitexport(){
 }
 #===============================================================
 # git commit browser with previews and vim integration
-function glNoGraph() {
-  git log --color --date=format:"%F %H:%M" \
-  --format="%C(auto)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>%C(reset)" \
-  --graph "$@"
-}
-
 function git-log() {
   is_in_git_repo || return
   glNoGraph |
@@ -491,11 +506,6 @@ function rebaser() {
 }
 
 #===============================================================
-function is_in_git_repo() {
-  git rev-parse --is-inside-work-tree >/dev/null 2>&1
-}
-
-#===============================================================
 # use gh+fzf+bat to explore pull requests, and checkout the PR branch
 function pr-checkout() {
   is_in_git_repo || return
@@ -528,7 +538,7 @@ function pr-checkout() {
   fi
 }
 #===============================================================
-# use glab+fzf+bat to explore pull requests, and checkout
+# use glab+fzf+bat to explore merge requests, and checkout
 # the MR branch to start collaborating
 function mr-checkout() {
   is_in_git_repo || return
@@ -605,15 +615,14 @@ function helm_create() {
   if [ -z "${1}" ] ; then
     _info "Usage:\n  helm_create <chart-name>\n"
   elif [ ! -d "${1}" ] ; then
-    echo -en "${YELLOW}"
-    helm create "${1}"
-    echo -en "${NC}"
+    local CHART_NAME="${1}"
+    echo -e "${YELLOW}helm create ${CHART_NAME}${NC}"
     _info "cd ${CYAN}$(pwd)/"
-    cd "${1}/" && \rm -rf templates/tests templates/*.{txt,yaml}
+    cd "${CHART_NAME}/" && \rm -rf templates/tests templates/*.{txt,yaml}
     cat << EOF > templates/NOTES.txt
-To verify that <${1}> has started, run:
+To verify that <${CHART_NAME}> has started, run:
 
-  kubectl -n {{ .Release.Namespace }} get all -l "app.kubernetes.io/name={{ template "${1}.name" . }}"
+  kubectl -n {{ .Release.Namespace }} get all -l "app.kubernetes.io/name={{ template "${CHART_NAME}.name" . }}"
 
 EOF
   pwd ; tree
@@ -630,7 +639,8 @@ function kx () {
   _info "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
   kubectl exec -it ${pod[1]} ${attr} -- ash 2>/dev/null ||
     kubectl exec -it ${pod[1]} ${attr} -- bash 2>/dev/null ||
-    kubectl exec -it ${pod[1]} ${attr} -- sh 2>/dev/null
+    kubectl exec -it ${pod[1]} ${attr} -- sh 2>/dev/null ||
+    _error "No shell found in ${pod[1]} :-("
 }
 
 #===============================================================
@@ -648,10 +658,10 @@ function kexport() {
     echo "Install kubectl-neat first -- https://github.com/itaysk/kubectl-neat"
     return 1
   elif [[ -z "${*}" ]] ; then
-    echo -e "export kubernetes objects using kubectl-neat\nUsage:\n\t${0} [-n <namespace>] <kind> <name>"
+    echo -e "Exports kubernetes objects using kubectl-neat\nUsage:\n\t${0} [-n <namespace>] <kind> <name>\n"
     return 1
   fi
-  \kubectl get ${@} -o yaml | kubectl-neat | \bat -l yaml -n --theme=monokay -H 2  # set +x
+  \kubectl get ${@} -o yaml | kubectl-neat | \bat -l yaml -n -H 2 -p
 }
 
 #===============================================================
@@ -723,7 +733,7 @@ function get-tls-certs() {
 # k8s: check cert-manager tls certs expiration date
 function get-cm-certs() {
   _info "Checking cert-manager TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NC}\n"
-  kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read namespace cert ; do
+  kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read -r namespace cert ; do
     cmctl status certificate -n ${namespace} ${cert} | grep --colour=never -E 'Name|^-|^Not\ |^Renewal' | grep -iv 'issuer'
     divider
     unset cert
@@ -798,12 +808,10 @@ ${NODE_PRESSURE}"
 #===============================================================
 # k8s: get PersistentVolume info
 function get-pv-info() {
-  local ME="${0}"
-
   function show_help() {
     cat << EOF
 Usage:
-  ${ME} [-n <namespace>] [-l <label-selector>] [-A]
+  ${0} [-n <namespace>] [-l <label-selector>] [-A]
 
 Optional:
   -n  namespace
@@ -812,8 +820,8 @@ Required:
   -l  use label to filter results
 
 Examples:
-  ${ME} -n prod
-  ${ME} -n dev -l cluster-name=foo
+  ${0} -n prod
+  ${0} -n dev -l cluster-name=foo
 
 EOF
   }
@@ -849,7 +857,7 @@ EOF
   local ALL_PODS="$(\kubectl get pod -n ${NAMESPACE} ${OPT_LABEL} -o jsonpath='{range.items[*]}{..metadata.name}{" "}{..nodeName}{"\n"}{end}')"
 
   if [ -z "${ALL_PODS}" ] ; then
-    echo -e "  No matching pods were found. Try:\n\tkubectl -n ${NAMESPACE} get pod --show-labels\n  then use label-selectors:\n\t${ME} -n ${NAMESPACE} [-l key=value]\n"
+    echo -e "  No matching pods were found. Try:\n\tkubectl -n ${NAMESPACE} get pod --show-labels\n  then use label-selectors:\n\t${0} -n ${NAMESPACE} [-l key=value]\n"
     return 1
   fi
 
@@ -891,7 +899,6 @@ function kdescribe() {
   for i in $(kubectl get ${RES_NAME} -o name | xargs) ; do divider ; kubectl describe ${i} ; done
   divider
 }
-alias kdesc=kdescribe
 
 # AKS stuff
 
@@ -902,7 +909,7 @@ function aks-get-clusters() {
 function aks-get-credentials() {
   aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱞽 Get KUBECONFIG for cluster > " | read -r CLUSTER RESOURCEGROUP
   if [ -n "${CLUSTER}" ]; then
-    az aks get-credentials --name ${CLUSTER} --resource-group ${RESOURCEGROUP} &&
+    az aks get-credentials --name ${CLUSTER} --resource-group ${RESOURCEGROUP} --overwrite-existing &&
       _info "KUBECONFIG for cluster ${CLUSTER} saved to ${CYAN}~/.kube/config\n"
   fi
 }
