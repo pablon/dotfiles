@@ -4,6 +4,8 @@
 # Author: https://github.com/pablon
 ##########################################################
 
+set -aeuo pipefail
+
 source "$(dirname "${0}")/.functions" || exit 1
 
 NERD_FONTS=('Hack' 'JetBrainsMono' 'FiraCode')

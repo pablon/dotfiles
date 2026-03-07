@@ -7,7 +7,6 @@ bc
 binutils
 ca-certificates
 coreutils
-cowsay
 curl
 dialog
 dirmngr
@@ -15,6 +14,7 @@ dos2unix
 eza
 fd-find
 ffmpeg
+fzf
 fontconfig
 fonts-font-awesome
 fonts-liberation
@@ -29,6 +29,7 @@ iftop
 imagemagick
 iotop
 jq
+k9s
 locales
 lolcat
 lua5.1
@@ -42,6 +43,7 @@ nala
 neovim
 nodejs
 npm
+pipx
 poppler-utils
 ppa-purge
 pre-commit

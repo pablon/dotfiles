@@ -9,12 +9,12 @@ cargo
 cmatrix
 colordiff
 coreutils
-cowsay
 curl
 diff-so-fancy
 docker
 docker-buildx
 docker-compose
+dockerfilegraph
 dos2unix
 eza
 fd
@@ -46,11 +46,14 @@ ipcalc
 iproute2mac
 jq
 jsonnet
+k9s
+kind
 kompose
 krew
 kube-linter
 kubecolor
 kubeconform
+kubernetes-cli
 kubie
 libpq
 lua
@@ -63,6 +66,7 @@ opencode
 openssl
 osx-cpu-temp
 pass
+pipx
 pngcheck
 pre-commit
 python3
@@ -79,6 +83,7 @@ tflint
 tfsec
 tldr
 tmux
+tree-sitter-cli
 watch
 wget
 xh

@@ -14,17 +14,19 @@ helm
 helm-docs
 helmfile
 k9s
+kind
 krew
 kubecolor
 kubeconform
 kubectl
 kubent
-kubie
-lazydocker
+kubie      https://github.com/johnhamelink/asdf-kubie
+lazydocker https://github.com/comdotlinux/asdf-lazydocker.git
 lazygit
 lua
 luajit
 markdownlint-cli2
+pipx
 pre-commit
 shellcheck
 sops

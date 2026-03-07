@@ -4,6 +4,8 @@
 # Borrowed from https://mths.be/macos
 ##########################################################
 
+set -aeuo pipefail
+
 source "$(dirname "${0}")/.functions" || exit 1
 
 function do_darwin() {
@@ -381,7 +383,6 @@ function do_darwin() {
 	defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true
 	# Don't show the preferences window on next start
 	defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false
-	_success "Done ${0}"
 }
 
 # TODO: add function do_linux

@@ -7,7 +7,6 @@ bc
 binutils
 btop
 coreutils
-cowsay
 curl
 dos2unix
 eza
@@ -17,6 +16,7 @@ fontconfig
 fortune-mod
 fzf
 gawk
+ghostty
 git
 git-delta
 gzip
@@ -25,6 +25,7 @@ iftop
 imagemagick
 iotop
 jq
+k9s
 lazygit
 less
 lua
@@ -40,6 +41,7 @@ pigz
 poppler
 pre-commit
 python
+python-pipx
 resvg
 ripgrep
 sed
@@ -64,4 +66,3 @@ yq
 zig
 zoxide
 zsh
-ghostty

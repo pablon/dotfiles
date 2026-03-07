@@ -1,3 +1,4 @@
+ImageMagick
 ansible
 bash
 bat
@@ -26,7 +27,6 @@ gnupg
 gzip
 htop
 httpd-tools
-ImageMagick
 iftop
 iotop-c
 jq
@@ -35,6 +35,7 @@ man-db
 neovim
 nodejs
 nvtop
+pipx
 poppler-utils
 python3
 ripgrep
