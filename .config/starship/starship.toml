@@ -23,10 +23,18 @@ require_repo = true
 
 [custom.git_email_gitlab]
 command = "git config --get user.email"
-symbol = '󰮠 '
+symbol = ' '
 style = 'fg:#595959'
 format = "\n[$symbol($output)]($style)"
 when = "git remote get-url --push origin &>/dev/null | grep 'gitlab'"
+require_repo = true
+
+[custom.git_email_forgejo]
+command = "git config --get user.email"
+symbol = ' '
+style = 'fg:#595959'
+format = "\n[$symbol($output)]($style)"
+when = "git remote get-url --push origin &>/dev/null | grep -E 'codeberg|forgejo'"
 require_repo = true
 
 [custom.git_email_generic]
@@ -34,7 +42,7 @@ command = "git config --get user.email"
 symbol = '󰊢 '
 style = 'fg:#595959'
 format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab'"
+when = "git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab|codeberg|forgejo'"
 require_repo = true
 
 [directory]
@@ -60,7 +68,7 @@ format = '[\($hash$tag\)]($style) '
 [git_metrics]
 added_style = 'bold blue'
 format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
-disabled = true
+disabled = false
 
 [git_state]
 format = '[\($state( $progress_current of $progress_total)\)]($style) '
