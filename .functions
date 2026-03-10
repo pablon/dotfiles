@@ -617,9 +617,9 @@ function helm_create() {
   elif [ ! -d "${1}" ] ; then
     local CHART_NAME="${1}"
     echo -e "${YELLOW}helm create ${CHART_NAME}${NC}"
-    _info "cd ${CYAN}$(pwd)/"
-    cd "${CHART_NAME}/" && \rm -rf templates/tests templates/*.{txt,yaml}
-    cat << EOF > templates/NOTES.txt
+    \helm create "${CHART_NAME}"
+    \cd "${CHART_NAME}/" && \rm -rf templates/tests templates/*.{txt,yaml}
+    \cat << EOF > templates/NOTES.txt
 To verify that <${CHART_NAME}> has started, run:
 
   kubectl -n {{ .Release.Namespace }} get all -l "app.kubernetes.io/name={{ template "${CHART_NAME}.name" . }}"
@@ -900,14 +900,20 @@ function kdescribe() {
   divider
 }
 
+#===============================================================
 # AKS stuff
 
+check_azcli() {
+  (command -v az &>/dev/null) || { echo "Azure CLI not found - install it first -- https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"; return 1; }
+}
+
 function aks-get-clusters() {
+  check_azcli
   az aks list --query "[].{Cluster:name, ResourceGroup:resourceGroup, Location:location, Version:kubernetesVersion, Status:powerState.code}" -o table
 }
 
 function aks-get-credentials() {
-  aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱞽 Get KUBECONFIG for cluster > " | read -r CLUSTER RESOURCEGROUP
+  aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱃾 Get KUBECONFIG for cluster > " | read -r CLUSTER RESOURCEGROUP
   if [ -n "${CLUSTER}" ]; then
     az aks get-credentials --name ${CLUSTER} --resource-group ${RESOURCEGROUP} --overwrite-existing &&
       _info "KUBECONFIG for cluster ${CLUSTER} saved to ${CYAN}~/.kube/config\n"
@@ -915,7 +921,7 @@ function aks-get-credentials() {
 }
 
 function aks-get-upgrades() {
-  aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱞽 Select cluster > " | read -r CLUSTER RESOURCEGROUP
+  aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱃾 Select cluster > " | read -r CLUSTER RESOURCEGROUP
   if [ -n "${CLUSTER}" ]; then
     _info "Available upgrades for cluster: ${GREEN}${CLUSTER}"
     az aks get-upgrades --name ${CLUSTER} --resource-group ${RESOURCEGROUP} -o table 2>/dev/null
