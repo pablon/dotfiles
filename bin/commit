@@ -69,7 +69,7 @@ EOF
 }
 
 function is_in_git_repo() {
-  return "$(git rev-parse --is-inside-work-tree &>/dev/null)"
+  git rev-parse --is-inside-work-tree &>/dev/null
 }
 
 divider
@@ -101,8 +101,11 @@ is_in_git_repo || _error "Not in a git repo"
 # get remote
 GIT_REMOTE="$(git remote get-url --push origin)"
 
-# get current branch
+# get current branch (fallback to symbolic-ref for new repos)
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+if [[ "${CURRENT_BRANCH}" == "HEAD" ]]; then
+  CURRENT_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || echo "HEAD")"
+fi
 
 # set GIT_PAGER
 if (type delta &>/dev/null); then
@@ -132,22 +135,52 @@ else
   _info "Files to add: ${GREEN}${ADDED_FILES}"
 fi
 
-# list of conventional commits types
-CC_LIST=('feat' 'fix' 'test' 'chore' 'docs' 'refactor' 'ci' 'style' 'perf' 'build' 'revert')
-
-# list of conventional commits types with description
-CC_TYPES=('feat       - A new feature' 'fix        - A bug fix' 'test       - Adding missing tests or correcting existing ones' 'chore      - Other changes that dont modify src or test files' 'docs       - Documentation only changes' 'refactor   - A code change that neither fixes a bug nor adds a feature' 'ci         - Changes to our CI configuration files and scripts' 'style      - Formatting changes that do not affect the meaning of the code' 'perf       - A code change that improves performance' 'build      - Changes that affect the build system or external dependencies' 'revert     - Reverts a previous commit')
+# conventional commits types: "type|description" (single source of truth)
+CC_TYPES=(
+  'feat|A new feature'
+  'fix|A bug fix'
+  'test|Adding missing tests or correcting existing ones'
+  'chore|Other changes that dont modify src or test files'
+  'docs|Documentation only changes'
+  'refactor|A code change that neither fixes a bug nor adds a feature'
+  'ci|Changes to our CI configuration files and scripts'
+  'style|Formatting changes that do not affect the meaning of the code'
+  'perf|A code change that improves performance'
+  'build|Changes that affect the build system or external dependencies'
+  'revert|Reverts a previous commit'
+)
 
 # guess if our branch prefix is an allowed conventional commit type
 CC_GUESS="$(echo "${CURRENT_BRANCH}" | awk -F/ '{print $1}')"
 
-# ..and check that out:
-if [[ "${CC_LIST[@]}" =~ "${CC_GUESS}" ]] && [ -z "${CHANGE_CC_TYPE}" ]; then
+# resolve branch prefix aliases to conventional commit types
+case "${CC_GUESS}" in
+bugfix) CC_GUESS="fix" ;;
+doc) CC_GUESS="docs" ;;
+feature) CC_GUESS="feat" ;;
+esac
+
+# check if CC_GUESS matches any type in CC_TYPES (skip if HEAD - new repo or detached state)
+CC_MATCH=""
+if [[ "${CC_GUESS}" != "HEAD" ]]; then
+  for entry in "${CC_TYPES[@]}"; do
+    if [[ "${entry%%|*}" == "${CC_GUESS}" ]]; then
+      CC_MATCH="true"
+      break
+    fi
+  done
+fi
+
+if [[ -n "${CC_MATCH}" ]] && [[ -z "${CHANGE_CC_TYPE}" ]]; then
   # set conventional commit type as the branch prefix
   THIS_CC_TYPE="${CC_GUESS}"
 else
-  # select conventional commit type with fzf explorer
-  THIS_CC_TYPE="$(for i in "${CC_TYPES[@]}"; do echo "${i}"; done | fzf --accept-nth='1' --prompt '❯ Select conventional commit type (ESC to cancel)')"
+  # select conventional commit type with fzf explorer (format: "type - description")
+  THIS_CC_TYPE="$(for entry in "${CC_TYPES[@]}"; do
+    type="${entry%%|*}"
+    desc="${entry#*|}"
+    printf "%-10s - %s\n" "${type}" "${desc}"
+  done | fzf --accept-nth='1' --prompt '❯ Select conventional commit type (ESC to cancel)')"
 fi
 
 if [ -z "${THIS_CC_TYPE}" ]; then
