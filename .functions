@@ -26,15 +26,6 @@ divider() {
   echo
 }
 #===============================================================
-# v for nvim
-v() {
-  if [ "${1}" ]; then
-    nvim "${1}"
-  else
-    nvim .
-  fi
-}
-#===============================================================
 # Create a new directory and enter it
 md() {
   mkdir -vp "${1}" && cd "${1}" && _info "cd ${CYAN}$(pwd)/"

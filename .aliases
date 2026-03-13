@@ -53,7 +53,6 @@ alias monitor="tail -f /var/log/*.log"
 (type socat &>/dev/null) && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
 (type python3 &>/dev/null) && alias python="$(which python3)"
 (type gsed &>/dev/null) && alias sed="$(which gsed)"
-alias nvc="_info '📝 Opening Neovim Config' ; ([ -d "${XDG_CONFIG_HOME:-~/.config}/nvim" ] && cd "${XDG_CONFIG_HOME:-~/.config}/nvim" && nvim .)"
 alias stat='stat -x'
 alias tm='tmux'
 alias tma='tmux-attach' # see .functions
@@ -61,7 +60,8 @@ alias tmc='tmux-clone'  # see .functions
 alias tmk='tmux-kill'   # see .functions
 alias tmn='tmux-new'    # see .functions
 alias tmls='tmux ls'
-alias vi='vim'
+alias v='nvim'
+alias vi='nvim'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
 (type yamllint &>/dev/null) && alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
 if (type zoxide &>/dev/null); then
@@ -76,7 +76,8 @@ fi
 
 # open dotfiles
 alias dots='[ -d ~/dotfiles/ ] && _info "Entering dotfiles config! 🚀" && (cd ~/dotfiles/ && nvim .)'
-
+# edit nvim configs
+alias nvc="_info '📝 Opening Neovim Config' ; ([ -d "${XDG_CONFIG_HOME:-~/.config}/nvim" ] && cd "${XDG_CONFIG_HOME:-~/.config}/nvim" && nvim .)"
 # obsidian new_from_template
 alias on="_info '💎 Creating new Obsidian note' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c 'Obsidian new_from_template' )"
 # obsidian open
