@@ -15,7 +15,7 @@ export KUBIE_CONFIG_DIR="${HOME}/.kube/configs"
 # install kubie via script if not found
 (type kubie &>/dev/null) || (bash "${REPO_ROOT}/bin/install_kubie" 2>/dev/null)
 
-function create_kubie_yaml() {
+create_kubie_yaml() {
   if [ -f "${KUBIE_CONFIG}" ]; then
     BACKUP_TS="$(date +%Y%m%d-%H%M%S)"
     cp -f ${KUBIE_CONFIG}{,.${BACKUP_TS}}

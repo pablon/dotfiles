@@ -28,7 +28,7 @@ set_github_token() {
   fi
 }
 
-function do_prepare_darwin() {
+do_prepare_darwin() {
   [ "${DEBUG}" ] && _info "Executing function ${MAGENTA}${FUNCNAME}"
   # Detect Apple Silicon chipset + install rosetta
   if [[ "$(uname)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
@@ -71,7 +71,7 @@ function do_prepare_darwin() {
   fi
 }
 
-function do_apt_init() {
+do_apt_init() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   sudo apt update ${APT_OPTS} &&
     sudo apt upgrade ${APT_OPTS} &&
@@ -92,7 +92,7 @@ function do_apt_init() {
   fi
 }
 
-function do_prepare_debian() {
+do_prepare_debian() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   do_apt_init
   PACKAGES="${PKGLIST_APT}"
@@ -113,11 +113,11 @@ function do_prepare_debian() {
   sudo locale-gen en_US.UTF-8
 }
 
-function do_prepare_ubuntu() {
+do_prepare_ubuntu() {
   do_prepare_debian
 }
 
-function do_prepare_arch() {
+do_prepare_arch() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   _info "Updating archlinux local keyring with pacman-key..."
   sudo pacman-key --init &>/dev/null &&
@@ -165,11 +165,11 @@ function do_prepare_arch() {
   fi
 }
 
-function do_prepare_manjaro() {
+do_prepare_manjaro() {
   do_prepare_arch
 }
 
-function do_prepare_rhel() {
+do_prepare_rhel() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   sudo dnf -y update
   sudo dnf ${DNF_OPTS} upgrade --skip-unavailable
@@ -193,19 +193,19 @@ function do_prepare_rhel() {
   sudo localedef -i en_US -f UTF-8 en_US.UTF-8
 }
 
-function do_prepare_rocky() {
+do_prepare_rocky() {
   do_prepare_rhel
 }
 
-function do_prepare_almalinux() {
+do_prepare_almalinux() {
   do_prepare_rhel
 }
 
-function do_prepare_fedora() {
+do_prepare_fedora() {
   do_prepare_rhel
 }
 
-function do_batcat_fix() {
+do_batcat_fix() {
   # link batcat -> bat
   if (type batcat &>/dev/null) && (! type bat &>/dev/null); then
     local BINDIR="$(dirname "$(command -v batcat)")"
@@ -213,7 +213,7 @@ function do_batcat_fix() {
   fi
 }
 
-function do_fdfinfd_fix() {
+do_fdfinfd_fix() {
   # link fdfinfd -> fd
   if (type fdfinfd &>/dev/null) && (! type fd &>/dev/null); then
     local BINDIR="$(dirname "$(command -v fdfinfd)")"
@@ -221,7 +221,7 @@ function do_fdfinfd_fix() {
   fi
 }
 
-function do_asdf() {
+do_asdf() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   [ "${OS}" == "Darwin" ] && return 0 # macos uses brew
   if (type asdf &>/dev/null); then
@@ -268,7 +268,7 @@ function do_asdf() {
   # asdf plugin add lazydocker https://github.com/comdotlinux/asdf-lazydocker.git 2>/dev/null
 }
 
-function do_asdf_packages() {
+do_asdf_packages() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   export PATH="${ASDF_DATA_DIR:-${HOME}/.asdf}/shims:${HOME}/.cargo/bin:${PATH}"
   # install packages
@@ -297,7 +297,7 @@ function do_asdf_packages() {
 # ===============================================================
 # useful tools
 
-function do_additional_tools() {
+do_additional_tools() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   # helm plugins
   if (type helm &>/dev/null); then
@@ -341,7 +341,7 @@ function do_additional_tools() {
   fi
 }
 
-function install_yazi() {
+install_yazi() {
   export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
   local GITHUB_PROJECT="sxyazi/yazi"
   local PROGRAM="$(basename "${GITHUB_PROJECT}")"
@@ -369,7 +369,7 @@ function install_yazi() {
 # ===============================================================
 # docker
 
-function do_docker_debian() {
+do_docker_debian() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   install_pkg_debian ca-certificates curl
   sudo install -m 0755 -d /etc/apt/keyrings
@@ -385,21 +385,21 @@ function do_docker_debian() {
   do_docker_post_install
 }
 
-function do_docker_ubuntu() {
+do_docker_ubuntu() {
   do_docker_debian
 }
 
-function do_docker_arch() {
+do_docker_arch() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   install_pkg_arch docker docker-compose docker-buildx containerd
   do_docker_post_install
 }
 
-function do_docker_manjaro() {
+do_docker_manjaro() {
   do_docker_arch
 }
 
-function do_docker_rhel() {
+do_docker_rhel() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   sudo dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
   sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/rhel/docker-ce.repo
@@ -407,7 +407,7 @@ function do_docker_rhel() {
   do_docker_post_install
 }
 
-function do_docker_fedora() {
+do_docker_fedora() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   sudo dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
   sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
@@ -415,11 +415,11 @@ function do_docker_fedora() {
   do_docker_post_install
 }
 
-function do_docker_rocky() {
+do_docker_rocky() {
   do_docker_rhel
 }
 
-function do_docker_almalinux() {
+do_docker_almalinux() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   sudo dnf ${DNF_OPTS} install dnf-plugins-core yum-utils
   sudo dnf config-manager addrepo https://download.docker.com/linux/centos/docker-ce.repo
@@ -427,7 +427,7 @@ function do_docker_almalinux() {
   do_docker_post_install
 }
 
-function do_docker_post_install() {
+do_docker_post_install() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   # https://docs.docker.com/engine/daemon/#configure-the-docker-daemon
   if [ ! -f "/etc/docker/daemon.json.example" ]; then
@@ -456,7 +456,7 @@ EOF
   docker --version
 }
 
-function do_ansible_galaxy() {
+do_ansible_galaxy() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
   if (type ansible-galaxy &>/dev/null); then
     _info "Installing ansible community.sops ..."

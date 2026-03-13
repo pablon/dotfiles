@@ -8,7 +8,7 @@ set -aeuo pipefail
 
 source "$(dirname "${0}")/.functions" || exit 1
 
-function do_darwin() {
+do_darwin() {
 	# Ask for the administrator password upfront
 	sudo -v
 	# Disable Apple School Manager
