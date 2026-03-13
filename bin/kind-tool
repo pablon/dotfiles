@@ -52,14 +52,14 @@ for dep in "${deps[@]}"; do
   unset dep
 done
 if [ "${#deps_missing[@]}" -gt "0" ]; then
-  echo -e "${YELLOW}⚠️ Found [${#deps_missing[@]}] missing dependencies, please install: ${MAGENTA}${deps_missing[*]}${NC}\n"
+  echo -e "${YELLOW}  Found [${#deps_missing[@]}] missing dependencies, please install: ${MAGENTA}${deps_missing[*]}${NC}\n"
   exit 1
 fi
 
 gather_info() {
   divider
   get_cluster_name() {
-    read -rp "Enter new cluster name: " KIND_CLUSTER_NAME
+    read -rp " 󱃾 Enter new cluster name: " KIND_CLUSTER_NAME
     while [ -z "${KIND_CLUSTER_NAME}" ]; do get_cluster_name; done
     export KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME}"
   }
@@ -74,7 +74,7 @@ gather_info() {
     export KIND_NODE_VERSION="kindest/node:${KIND_NODE_TAG}"
   }
   get_cluster_nodes() {
-    read -rp "Enter number of nodes (1-3), Hit enter for default [1]: " KIND_CLUSTER_NODES
+    read -rp " 󰢒 Enter number of nodes (1-3), Hit enter for default [1]: " KIND_CLUSTER_NODES
     [[ ! ${KIND_CLUSTER_NODES} ]] && KIND_CLUSTER_NODES="1"
     if [ "${KIND_CLUSTER_NODES}" -ne "${KIND_CLUSTER_NODES}" ] || [ "${KIND_CLUSTER_NODES}" -eq "0" ] || [ "${KIND_CLUSTER_NODES}" -gt "3" ]; then
       echo "// maximum number of nodes is 3, please try again"
@@ -104,7 +104,7 @@ create_cluster() {
 
   if [ "${MODE}" != "dryrun" ]; then
     echo
-    read -rp "❓ Proceed with cluster creation? [Y/n]: " START
+    read -rp "  Proceed with cluster creation? [Y/n]: " START
     case "${START}" in
     N | n)
       echo
@@ -117,7 +117,7 @@ create_cluster() {
   fi
 
   echo
-  echo -e "${GREEN}🛠️ Adding control-plane to kind-config..${NC}"
+  echo -e "${GREEN} 󱌣 Adding control-plane to kind-config..${NC}"
   cat <<EOF >"${KIND_CONFIG}"
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
@@ -131,32 +131,33 @@ nodes:
         nodeRegistration:
           kubeletExtraArgs:
             node-labels: "ingress-ready=true"
-    # extraPortMappings:
-    #   - containerPort: 80
-    #     hostPort: 80
-    #     protocol: TCP
-    #   - containerPort: 443
-    #     hostPort: 443
-    #     protocol: TCP
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
 EOF
 
   if [ "${KIND_WORKER_NODES}" ]; then
     for i in $(seq 1 ${KIND_WORKER_NODES}); do
-      echo -e "${GREEN}🛠️ Adding worker #${i} to kind-config..${NC}"
+      echo -e "${GREEN} 󱌣 Adding worker #${i} to kind-config..${NC}"
       echo -e "  # worker #${i}\n  - role: worker" >>"${KIND_CONFIG}"
     done
   fi
 
-  COMMAND="kind create cluster --name ${KIND_CLUSTER_NAME} --image ${KIND_NODE_VERSION} --kubeconfig ${KIND_KUBECONFIG} --config ${KIND_CONFIG}"
+  CREATE_COMMAND="kind create cluster --name ${KIND_CLUSTER_NAME} --image ${KIND_NODE_VERSION} --kubeconfig ${KIND_KUBECONFIG} --config ${KIND_CONFIG}"
 
   if [ "${MODE}" == "dryrun" ]; then
     echo
-    echo -e "${RED}🛟 DRY-RUN -- kind-config:\n${YELLOW}$(cat "${KIND_CONFIG}")${NC}"
+    echo -e "${RED} 󰡾 DRY-RUN -- kind-config:\n${YELLOW}$(cat "${KIND_CONFIG}")${NC}"
     echo
-    echo -e "${RED}🛟 DRY-RUN -- create cluster command:\n${GREEN}${COMMAND}${NC}"
+    echo -e "${RED} 󰡾 DRY-RUN -- create cluster command:\n${GREEN}${CREATE_COMMAND}${NC}"
   else
     echo
-    eval "${COMMAND}"
+    eval "${CREATE_COMMAND}"
+    eval "kubectl cluster-info --context "kind-${KIND_CLUSTER_NAME}" --kubeconfig "${KIND_KUBECONFIG}""
   fi
 
   # cleanup
@@ -175,9 +176,9 @@ install_nginx_ingress() {
     divider
     export KUBECONFIG="${KIND_KUBECONFIG}"
     local NGINX_INGRESS_MANIFEST="https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"
-    echo -e "${GREEN}📦 Installing ingress-nginx controller:${NC}"
+    echo -e "${GREEN}  Installing ingress-nginx controller:${NC}"
     kubectl apply -f "${NGINX_INGRESS_MANIFEST}"
-    echo -e "${GREEN}⌛️ Waiting for pods to be ready..${NC}"
+    echo -e "${GREEN} 󰔟 Waiting for pods to be ready..${NC}"
     sleep 2
     kubectl wait \
       --namespace ingress-nginx \
@@ -195,19 +196,21 @@ install_nginx_ingress() {
 
 install_caretta() {
   if [ "${MODE}" != "dryrun" ]; then
+    HELM_REPO="caretta"
+    HELM_REPO_URI="https://helm.groundcover.com/"
     divider
     export KUBECONFIG="${KIND_KUBECONFIG}"
-    echo -e "${GREEN}📦 Installing caretta, a service dependency map tool${NC}"
-    helm repo add groundcover https://helm.groundcover.com/ &>/dev/null &&
-      helm repo up &>/dev/null
+    echo -e "${GREEN}  Installing caretta, a service dependency map tool${NC}"
+    (helm repo list | grep "^${HELM_REPO}" &>/dev/null) || helm repo add ${HELM_REPO_URI} &>/dev/null
+    helm repo up ${HELM_REPO} &>/dev/null
     helm upgrade --install caretta \
       --namespace caretta --create-namespace \
       --set resources.limits.cpu=350m \
       --set resources.limits.memory=650Mi \
       --set grafana.grafana\.ini.adminUser=admin \
-      --set grafana.grafana\.ini.adminPassword=caretta \
+      --set grafana.grafana\.ini.adminPassword=admin \
       groundcover/caretta
-    echo -e "${GREEN}⌛️ Waiting for pods to be ready..${NC}"
+    echo -e "${GREEN} 󰔟 Waiting for pods to be ready..${NC}"
     kubectl wait \
       --namespace caretta \
       --for=condition=ready pod \
@@ -221,7 +224,7 @@ show_cluster_objects() {
     echo
     divider
     export KUBECONFIG="${KIND_KUBECONFIG}"
-    echo -e "${GREEN}🔍 Cluster ${KIND_CLUSTER_NAME} pods:${NC}"
+    echo -e "${GREEN} 󰍉 Cluster ${KIND_CLUSTER_NAME} pods:${NC}"
     kubectl get pods -A
     echo
   fi
@@ -232,14 +235,14 @@ get_kubeconfig() {
     export THIS_CLUSTER="$(kind get clusters 2>/dev/null | fzf --layout reverse --border --height 25% --prompt='󱃾 ' --ghost="select cluster")"
     [ -z "${THIS_CLUSTER}" ] && exit 0
     if [ "${MODE}" == "kubeconfig" ]; then
-      echo -e "${YELLOW}🔐 Getting KUBECONFIG for cluster [${THIS_CLUSTER}]${NC}"
+      echo -e "${YELLOW} 󰌾 Getting KUBECONFIG for cluster [${THIS_CLUSTER}]${NC}"
     fi
     local KUBECONFIG_RAW="$(kind get kubeconfig --name ${THIS_CLUSTER})"
     local CLUSTER_AUTHORITY_DATA="$(echo "${KUBECONFIG_RAW}" | yq -r '.clusters[0].cluster."certificate-authority-data"')"
     export KUBECONFIG_YAML="$(rg -l "${CLUSTER_AUTHORITY_DATA}" "${KUBECONFIG_DIR}"/*)"
     if [ "${MODE}" == "kubeconfig" ]; then
       divider
-      echo -e "${GREEN}🪪 KUBECONFIG location for cluster [${THIS_CLUSTER}]${NC}:\n   ${KUBECONFIG_YAML}"
+      echo -e "${GREEN} 󰄤 KUBECONFIG location for cluster [${THIS_CLUSTER}]${NC}:\n   ${KUBECONFIG_YAML}"
       divider
       if (type bat &>/dev/null); then
         echo "${KUBECONFIG_RAW}" | cut -c1-77 | sed '/data:/ s|$|...|' | bat --style=snip -S --paging never -l yaml -
@@ -257,9 +260,9 @@ delete_cluster() {
   get_kubeconfig # get THIS_CLUSTER and KUBECONFIG_YAML
   if [ "${MODE}" == "delete" ]; then
     if [ ! -z "$(kind get clusters)" ]; then
-      echo -e "${YELLOW}⚠️ WARNING: this action cannot be undone!!!${NC}"
+      echo -e "${YELLOW} 󰈸 WARNING: this action cannot be undone!!!${NC}"
       if [ "${MODE}" != "dryrun" ]; then
-        read -rp "⚠️ Proceed with cluster [${THIS_CLUSTER}] deletion? [y/N]: " DELETE
+        read -rp " 󰈸 Proceed with cluster [${THIS_CLUSTER}] deletion? [y/N]: " DELETE
         case "${DELETE}" in
         Y | y)
           true
@@ -271,9 +274,9 @@ delete_cluster() {
         esac
       fi
       kind delete clusters ${THIS_CLUSTER} &&
-        echo -e "${GREEN}✅ Deleted cluster [${THIS_CLUSTER}]${NC}" &&
+        echo -e "${GREEN} ✔${STRONG} Deleted cluster [${THIS_CLUSTER}]${NC}" &&
         rm -vf "${KUBECONFIG_YAML}" &&
-        echo -e "${GREEN}✅ Deleted KUBECONFIG [${KUBECONFIG_YAML}]${NC}"
+        echo -e "${GREEN} ✔${STRONG} Deleted KUBECONFIG [${KUBECONFIG_YAML}]${NC}"
     else
       exit 0
     fi

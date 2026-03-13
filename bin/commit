@@ -23,9 +23,10 @@ YELLOW="\033[1;93m"
 NC="\033[0m"
 
 PRETTY_FORMAT="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C(reset)"
+GIT_LOG_OPTS="--date=relative --author="$(git config --get user.email)" --format="${PRETTY_FORMAT}" --color --stat --decorate --graph -1"
 
 # functions
-function _info() {
+_info() {
   if [ "${DRY_RUN}" ]; then
     echo -e "==> ${RED}󰡾${MAGENTA} DRY_RUN${NC} ${STRONG}${1}${NC}"
   else
@@ -33,26 +34,26 @@ function _info() {
   fi
 }
 
-function _warning() {
+_warning() {
   echo -e "==> ${YELLOW} ${1}${NC}"
 }
 
-function _success() {
+_success() {
   echo -e "==> ${GREEN}✔ ${NC}${1}"
 }
 
-function _error() {
+_error() {
   echo -e "==> ${RED}✘ ${MAGENTA}${1}${NC}\n"
   exit "${2:-1}"
 }
 
-function divider() {
+divider() {
   [[ "${COLUMNS}" ]] || local COLUMNS=80
   eval "printf '─%.0s' {1..$COLUMNS}"
   echo
 }
 
-function _help() {
+_help() {
   cat <<EOF
   Interactive Git commit helper with enhanced features:
 
@@ -68,7 +69,7 @@ EOF
   exit "${1:-0}"
 }
 
-function is_in_git_repo() {
+is_in_git_repo() {
   git rev-parse --is-inside-work-tree &>/dev/null
 }
 
@@ -270,11 +271,7 @@ else
 
     if [ "${PUSH_RC}" -eq "0" ]; then
       # show the commit (git log)
-      echo && git log \
-        --date=relative \
-        --author="$(git config --get user.email)" \
-        --format="${PRETTY_FORMAT}" \
-        --color --stat --decorate --graph -1
+      echo && git log ${GIT_LOG_OPTS}
     else
       _error "Push failed with code = ${PUSH_RC}" 3
     fi

@@ -20,7 +20,7 @@ GREEN="\033[1;92m"
 RED="\033[1;31m"
 YELLOW="\033[1;93m"
 
-function _info() {
+_info() {
 	echo -e "${BLUE}==> ${STRONG}${1}${CLEAR}"
 }
 

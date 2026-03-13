@@ -55,7 +55,7 @@ done
 
 CALLER="${SUDO_USER}" # who invoked me?
 
-function in_subnet {
+in_subnet {
   readonly cidr_subnet="${1}"
   readonly ip_addr="${2}"
   local subnet_ip cidr_mask netmask ip_addr_subnet subnet RC
@@ -68,7 +68,7 @@ function in_subnet {
   return $RC
 }
 
-function ip_to_int {
+ip_to_int {
   readonly ip_addr="${1}"
   local octet_1 octet_2 octet_3 octet_4
   octet_1=$(echo "${ip_addr}" | cut -d'.' -f1)
@@ -78,7 +78,7 @@ function ip_to_int {
   echo $((octet_1 * 256 ** 3 + octet_2 * 256 ** 2 + octet_3 * 256 + octet_4))
 }
 
-function get_kubeconfig_servers() {
+get_kubeconfig_servers() {
   declare -a OUTPUT
   local LOCAL_USER_HOME="$(awk -F':' "/${CALLER}/ {print \$6}" /etc/passwd)"
   local THIS_KUBECONFIG="${LOCAL_USER_HOME}/.kube/config"
@@ -100,7 +100,7 @@ function get_kubeconfig_servers() {
   echo "${OUTPUT[@]}"
 }
 
-function fix_routes() {
+fix_routes() {
   echo -e "${STRONG}-- Searching for k8s API servers...${NC}"
   declare -a K8S_ENDPOINTS=($(get_kubeconfig_servers))
   if [[ -n ${K8S_ENDPOINTS} ]]; then
@@ -158,7 +158,7 @@ function fix_routes() {
   echo -e "${STRONG}-- Your default gateway:${NC}\n${GREEN}$(ip r | grep ^default | column -t | sed 's|^|  |')${NC}"
 }
 
-function fix_resolvconf() {
+fix_resolvconf() {
   echo -e "${STRONG}-- /etc/resolv.conf:${NC}"
   echo "# created $(date +%F\ %T) by $(basename ${0})" >/etc/resolv.conf
   for ns in ${NAMESERVERS}; do

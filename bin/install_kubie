@@ -41,7 +41,7 @@ for program in curl jq; do
   fi
 done
 
-function get_latest_ver() {
+get_latest_ver() {
   if [[ "${i}" == "kubie" ]]; then
     PROJECT="${GITHUB_PROJECT_KUBIE}"
   elif [[ "${i}" == "fzf" ]]; then
@@ -51,7 +51,7 @@ function get_latest_ver() {
   echo "${LATEST}"
 }
 
-function get_system() {
+get_system() {
   if [[ "$(uname)" == "Linux" ]]; then
     export THIS_OS='linux'
   elif [[ "$(uname)" == "Darwin" ]]; then
@@ -84,7 +84,7 @@ function get_system() {
   fi
 }
 
-function add_bash_completion() {
+add_bash_completion() {
   if [[ "$(echo $(basename ${SHELL}))" == "bash" ]] && [[ "${THIS_OS}" = "linux" ]] && [[ ! -f ~/.kube/kubie.bash ]]; then
     echo -e "==> ${YELLOW}Installing kubie's shell completion${NC} as ${STRONG}~/.kube/kubie.bash${NC}"
     curl -fsSL -o ~/.kube/kubie.bash 'https://raw.githubusercontent.com/sbstp/kubie/master/completion/kubie.bash'
@@ -92,7 +92,7 @@ function add_bash_completion() {
   fi
 }
 
-function install_update() {
+install_update() {
   get_system
   WORKDIR="$(mktemp -d)" && cd ${WORKDIR}/ || exit 1
   ACTION="${4}"
@@ -123,7 +123,7 @@ function install_update() {
   echo -e "> ${1} --version\n${GREEN}$(${1} --version)${NC}\n"
 }
 
-function create_kubie_yaml() {
+create_kubie_yaml() {
   if [[ ! -d ${HOME}/.kube ]]; then # JIC...
     mkdir -vp ${HOME}/.kube
   fi

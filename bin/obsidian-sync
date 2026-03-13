@@ -7,7 +7,7 @@
 
 VAULT_DIR="${OBSIDIAN_VAULT_DIR:-${HOME}/obsidian-vault}"
 
-function obsidian_sync() {
+obsidian_sync() {
   [ "${1}" == "-d" ] && local DEBUG='1'
   (
     cd "${VAULT_DIR}/" || exit 1
