@@ -109,29 +109,32 @@ return {
     },
   },
   config = function()
-    -- Use tmux provider inside tmux, otherwise fallback to snacks
     local provider = vim.env.TMUX and "tmux" or "snacks"
     vim.g.opencode_opts = {
       provider = {
         enabled = provider,
         tmux = {
+          start_insert = true,
+          auto_insert = true,
           win = {
             enter = true,
+            position = "left",
           },
           focus = true,
           allow_passthrough = false,
         },
         snacks = {
-          auto_close = true, -- Close the terminal when `opencode` exits
+          start_insert = true,
+          auto_insert = true,
+          auto_close = true,
+          focus = true,
           win = {
             enter = true,
+            position = "left",
             bo = {
-              -- Make it easier to target for customization, and prevent possibly unintended `"snacks_terminal"` targeting.
-              -- e.g. the recommended edgy.nvim integration puts all `"snacks_terminal"` windows at the bottom.
               filetype = "opencode_terminal",
             },
           },
-          focus = true,
         },
       },
     }

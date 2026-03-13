@@ -4,10 +4,14 @@ return {
   "zbirenbaum/copilot.lua",
   -- optional = true,
   opts = {
+    suggestion = {
+      auto_trigger = true,
+      hide_during_completion = vim.g.ai_cmp,
+    },
     filetypes = {
       filetypes = {
         help = true,
-        markdown = false,
+        markdown = true,
         yaml = true,
       },
     },
