@@ -15,24 +15,26 @@ for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
   unset plugin plugin_dir plugin_file
 done
 
-# load ~/.zshrc_custom
+# load ~/.zshrc_base (setup)
+[ -r "${HOME}/.zshrc_base" ] && source "${HOME}/.zshrc_base"
+# load ~/.zshrc_custom (user) if exists
 [ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# atuin
+# load atuin
 [ -x "${HOME}/.atuin/bin/env" ] && source "${HOME}/.atuin/bin/env" &>/dev/null
 eval "$(atuin init zsh)"
 
-# starship
+# load starship
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
 eval "$(starship init zsh)"
 
 # load direnv hook
 (type direnv &>/dev/null) && eval "$(direnv hook zsh)"
 
-# print a random cookie
+# print a random cookie （╯°□°）╯ ┻━┻
 cookie
 
 # list tmux sessions if not in tmux

@@ -60,6 +60,16 @@ if [ "${#deps_missing[@]}" -gt "0" ]; then
 fi
 unset deps deps_missing
 
+# 7. Migrate previous .zshrc_custom to .zshrc_base (before 2026-03-10)
+if [ -f "${SCRIPT_DIR}/.zshrc_custom" ] && [ -l "${HOME}/.zshrc_custom" ]; then
+  ZSHRC_CUSTOM_BACKUP="${HOME}/.zshrc_custom.backup-$(date +%Y%m%d-%H%M%S)"
+  [[ -l "${HOME}/.zshrc_custom" ]] &&
+    unlink "${HOME}/.zshrc_custom" &&
+    mv -vf "${SCRIPT_DIR}/.zshrc_custom" "${ZSHRC_CUSTOM_BACKUP}"
+  echo -e "#$(divider)\n# Add your zsh customizations here.\n# it will be sourced  automatically when you start a new shell session.\n$(divider)\n" >"${HOME}/.zshrc_custom"
+  _success "Your ${CYAN}.zshrc_custom${STRONG} has been migrated. Please review ${ZSHRC_CUSTOM_BACKUP} and copy any customizations you want to keep into ${HOME}/.zshrc_custom"
+fi
+
 # --- MAIN EXECUTION ---
 
 # PHASE 1: Run Setup Scripts
@@ -71,12 +81,12 @@ if [ -d "${SETUP_DIR}" ]; then
     divider
     _info "Running script: ${GREEN}${script_name}"
     # Subshell for isolation
-    (cd "${SETUP_DIR}/" && bash "${script_name}")
+    RC="$(cd "${SETUP_DIR}/" && bash "${script_name}")"
 
-    if [ "${?}" -eq "0" ]; then
+    if [ "${RC}" -eq "0" ]; then
       _success "${script_name} Done"
     else
-      _warning "${script_name} Done (rc=$?)"
+      _warning "${script_name} Done (RC=${RC})"
     fi
   done
 fi

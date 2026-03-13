@@ -3,31 +3,31 @@
 _clipboardApp="$(if ( command xclip -v &>/dev/null ) ; then echo xclip ; elif ( command -v pbcopy &>/dev/null ) ; then echo pbcopy ; fi)"
 #===============================================================
 # multi purpose banners
-function _info() {
+_info() {
   echo -e "${CYAN}==>  ${STRONG}${1}${NC}"
 }
 
-function _warning() {
+_warning() {
   echo -e "${YELLOW}==>  ${1}${NC}"
 }
 
-function _success() {
+_success() {
   echo -e "${GREEN}==> ✔ ${NC}${1}"
 }
 
-function _error() {
+_error() {
   echo -e "${RED}==> ✘ ${MAGENTA}${1}${NC}\n"
 }
 alias _fail='_error'
 
-function divider() {
+divider() {
   [[ "${COLUMNS}" ]] || local COLUMNS=80
   eval "printf '─%.0s' {1..$COLUMNS}"
   echo
 }
 #===============================================================
 # v for nvim
-function v() {
+v() {
   if [ "${1}" ]; then
     nvim "${1}"
   else
@@ -36,12 +36,12 @@ function v() {
 }
 #===============================================================
 # Create a new directory and enter it
-function md() {
+md() {
   mkdir -vp "${1}" && cd "${1}" && _info "cd ${CYAN}$(pwd)/"
 }
 #===============================================================
 # find shorthand
-function f() {
+f() {
   local SEARCH="$(fd . --one-file-system --strip-cwd-prefix=always | fzf --header='󱞽 Copy path/file to clipboard' --preview 'bat --color=always --line-range :500 {}')"
   if [ -n "${SEARCH}" ] ; then
     echo -n "${SEARCH}" | $_clipboardApp
@@ -49,7 +49,7 @@ function f() {
   fi
 }
 #===============================================================
-function asdf_install() {
+asdf_install() {
   local PLUGIN="${1}"
   # https://asdf-vm.com/guide/getting-started.html
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list all | fzf --reverse --accept-nth=1 --prompt="Select plugin > ")"
@@ -80,7 +80,7 @@ function asdf_install() {
   _success "Done"
 }
 
-function asdf_upgrade() {
+asdf_upgrade() {
   # update all refs
   asdf plugin update --all
   # TODO:
@@ -95,7 +95,7 @@ function asdf_upgrade() {
   done
 }
 
-function asdf_uninstall() {
+asdf_uninstall() {
   local PLUGIN="${1}"
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
   [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
@@ -105,7 +105,7 @@ function asdf_uninstall() {
   _success "Done"
 }
 
-function asdf_remove() {
+asdf_remove() {
   local PLUGIN="${1}"
   [ -z "${PLUGIN}" ] && local PLUGIN="$(asdf plugin list | fzf --reverse --accept-nth=1)"
   [ -z "${PLUGIN}" ] && echo "No plugin provided" && return 1
@@ -119,13 +119,34 @@ function asdf_remove() {
 }
 #===============================================================
 # kill tmux sessions
-function tmux-kill() {
-  tmux kill-session -t $(tmux ls 2>/dev/null | fzf -0 -m --delimiter=':' --accept-nth='1' --marker='✘' --prompt='󱞽 Select session(s) to kill') 2>/dev/null
+tmux-kill() {
+  (tmux ls &>/dev/null) || return 0 # check for existing sessions
+  [ -z "${TMUX}" ] || return 0      # don't run inside a tmux session
+  tmux kill-session -t $(tmux ls 2>/dev/null | fzf -0 -m --delimiter=':' --accept-nth='1' --marker='✘' --prompt=' Select session to kill > ') 2>/dev/null
 }
+
+tmux-attach() {
+  (tmux ls &>/dev/null) || return 0 # check for existing sessions
+  [ -z "${TMUX}" ] || return 0      # don't run inside a tmux session
+  local session="$(tmux ls 2>/dev/null | fzf -0 -m --delimiter=':' --accept-nth='1' --marker='✘' --prompt=' Select session to attach > ')"
+  [ -n "${session}" ] && tmux attach-session -t $(echo "${session}" | cut -d: -f1)
+}
+
+tmux-clone() {
+  (tmux ls &>/dev/null) || return 0 # check for existing sessions
+  [ -z "${TMUX}" ] || return 0      # don't run inside a tmux session
+  local session="$(tmux ls 2>/dev/null | fzf -0 --delimiter=':' --accept-nth='1' --prompt='󱞽 Select session to clone > ')"
+  [ -n "${session}" ] && tmux new-session -s "copy-$(echo "${session}" | cut -d: -f1)" -t $(echo "${session}" | cut -d: -f1)
+}
+
+tmux-new() {
+  tmux new -s "$(date +%F)-${RANDOM}"
+}
+
 #===============================================================
 # Start an HTTP server from a directory, optionally specifying the port
 # https://appdividend.com/2023/03/20/modulenotfounderror-no-module-named-simplehttpserver/
-function server() {
+server() {
   local port="${1:-8000}"
   open "http://localhost:${port}/"
   # Set the default Content-Type to 'text/plain' instead of 'application/octet-stream'
@@ -135,12 +156,12 @@ function server() {
 }
 #===============================================================
 # Copy w/ progress
-function cp_p () {
+cp_p () {
   rsync -WavP -h --progress "${1}" "${2}"
 }
 #===============================================================
 # copy dir w/file hierarchies with tar
-function cp_tar() {
+cp_tar() {
   local SRC="${1}"
   local DST="${2}"
   [ -d "${SRC}" ] || _error "Source directory does not exist" && return 1
@@ -149,7 +170,7 @@ function cp_tar() {
 }
 #===============================================================
 # quick backup of files/dirs w/timestamp
-function bkp() {
+bkp() {
   for i in "${@}" ; do
     BKP="${i}.$(date +%Y%m%d.%H%M%S)"
     if [ -d ${i} ] ; then
@@ -167,31 +188,31 @@ function bkp() {
 #===============================================================
 # Test if HTTP compression (RFC 2616 + SDCH) is enabled for a given URL.
 # Send a fake UA string for sites that sniff it instead of using the Accept-Encoding header. (Looking at you, ajax.googleapis.com!)
-function httpcompression() {
+httpcompression() {
   encoding="$(curl -LIs -H 'User-Agent: Mozilla/5 Gecko' -H 'Accept-Encoding: gzip,deflate,compress,sdch' "$1" | grep '^Content-Encoding:')" && echo "$1 is encoded using ${encoding#* }" || echo "$1 is not using any encoding"
 }
 #===============================================================
 # All the dig info
-function digga() {
+digga() {
   dig +nocmd any +multiline +all +answer +authority "$1"
 }
 #===============================================================
 # Escape UTF-8 characters into their 3-byte format
-function escape() {
+escape() {
   printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u)
   echo # newline
 }
 #===============================================================
 # Decode \x{ABCD}-style Unicode escape sequences
-function unidecode() {
+unidecode() {
   if ( command -v perl &>/dev/null ) ; then
     perl -e "binmode(STDOUT, ':utf8'); print \"$*\""
-    echo # newline
+    echo
   fi
 }
 #===============================================================
 # flush dns
-function flushdns() {
+flushdns() {
   if [[ "$(uname)" == "Darwin" ]] ; then
     if [ -r "/etc/resolv.conf.bkp" ] ; then
       sudo cp -f /etc/resolv.conf.bkp /etc/resolv.conf
@@ -209,50 +230,50 @@ function flushdns() {
       sudo resolvectl flush-caches &>/dev/null || \
       sudo systemd-resolve --flush-caches &>/dev/null
   fi
-  _info "Now clear DNS cache on your browser\n"
+  _warning "Now clear DNS cache on your browser\n"
 }
 #===============================================================
 # check host for dns availability
-function checkdns() {
+checkdns() {
   local HOST="${1}"
   until (host ${HOST} &>/dev/null); do echo -e "[$(date +%F\ %T)] $(host ${HOST})" ; sleep 5 ; done
   _info "${HOST} is alive\n$(host ${HOST})"
 }
 #===============================================================
 # print random fortune with cowsay & fortune
-function cookie() {
+cookie() {
   if ( command -v fortune &>/dev/null ) ; then
     echo -e "\n${CYAN}$(fortune -s | sed 's|^|  |')${NC}\n"
   fi
 }
 #===============================================================
 # left trim
-function ltrim() {
+ltrim() {
   sed 's/^[ \t]*//'
 }
 # right trim
-function rtrim() {
+rtrim() {
   sed 's/[ \t]*$//'
 }
 # both
-function trim() {
+trim() {
   sed 's/^[ \t]*//;s/[ \t]*$//;s/^.$//;s/^$/d'
 }
 #===============================================================
 # find shell history with fzf
-function fh() {
+fh() {
   eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history -i) | fzf +s --tac | sed 's/ *[0-9]* *//')
 }
 #===============================================================
 # get tls cert from URL
-function curl-cert() {
+curl-cert() {
   local HOST="${1}"
   local PORT="${2}"
   openssl s_client -showcerts -connect "${HOST}":${PORT:-443} -servername ${HOST}
 }
 #===============================================================
 # yazi wrapper - https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
-function y() {
+y() {
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
   command yazi "$@" --cwd-file="$tmp"
   IFS= read -r -d '' cwd < "$tmp"
@@ -262,7 +283,7 @@ function y() {
 #===============================================================
 # spawn subshell into an aws profile
 # NOTE: better tool to use https://github.com/radiusmethod/awsd
-function awsprofile() {
+awsprofile() {
   if ( type zsh &>/dev/null ) ; then
     local AWSSHELL='zsh'
   elif ( type bash &>/dev/null ) ; then
@@ -284,9 +305,9 @@ function awsprofile() {
 }
 #===============================================================
 # ¯\_(ツ)_/¯
-function disappointed() { echo -n " ಠ_ಠ " | tee /dev/tty | $_clipboardApp; }
-function flip() { echo -n "（╯°□°）╯ ┻━┻" | tee /dev/tty | $_clipboardApp; }
-function shrug() { echo -n "¯\_(ツ)_/¯" | tee /dev/tty | $_clipboardApp; }
+disappointed() { echo -n " ಠ_ಠ " | tee /dev/tty | $_clipboardApp; }
+flip() { echo -n "（╯°□°）╯ ┻━┻" | tee /dev/tty | $_clipboardApp; }
+shrug() { echo -n "¯\_(ツ)_/¯" | tee /dev/tty | $_clipboardApp; }
 
 ################################################################
 # vagrant
@@ -295,14 +316,14 @@ function shrug() { echo -n "¯\_(ツ)_/¯" | tee /dev/tty | $_clipboardApp; }
 #===============================================================
 # List all vagrant boxes available in the system including its
 # status, and try to access the selected one via ssh
-function vagrant_shell(){
+vagrant_shell(){
   if [ -r "${HOME}/.vagrant.d/data/machine-index/index" ] ; then
     ( cd $(cat ${HOME}/.vagrant.d/data/machine-index/index | jq '.machines[] | {name, vagrantfile_path, state}' | jq '.name + "," + .state  + "," + .vagrantfile_path'| sed 's/^"\(.*\)"$/\1/'| column -s, -t | sort -rk 2 | fzf | awk '{print $3}'); vagrant ssh &>/dev/null )
   fi
 }
 
 # list/save/restore vagrant snapshots
-function vagrant_snapshot() {
+vagrant_snapshot() {
   local VM_NAME="$(vagrant status --machine-readable | awk -F',' '/metadata/ {print $2}')"
   case "${1}" in
     list)
@@ -339,33 +360,39 @@ function vagrant_snapshot() {
 # docker
 #===============================================================
 
-for alias in da ds drm drmi ; do unalias ${alias} &>/dev/null ; done
+for alias in da dl ds drm drmi ; do unalias ${alias} &>/dev/null ; done
 
 #===============================================================
 # Select a docker container to start and attach to
-function da() {
-  local cid=$(docker ps -a | sed 1d | fzf -0 -q "$1" --accept-nth='1')
+da() {
+  local cid=$(docker ps -a | sed 1d | fzf -0 -q "$1" --accept-nth='1' --prompt='Attach to container > ')
   [ -n "$cid" ] && docker start "$cid" && docker attach "$cid"
 }
 #===============================================================
+# Select a docker container to start and attach to
+dl() {
+  local cid=$(docker ps -a | sed 1d | fzf -0 -q "$1" --accept-nth='1' --prompt='Watch container logs > ')
+  [ -n "$cid" ] && docker logs -tf "$cid"
+}
+#===============================================================
 # Select running container(s) to stop
-function ds() {
+ds() {
   if (type docker &>/dev/null); then
     local CLI="docker"
   elif (type crictl &>/dev/null); then
     local CLI="crictl"
   fi
-  ${CLI} ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='1' | xargs -r ${CLI} rm -f
+  ${CLI} ps -a | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='1' --prompt='Stop container(s) > ' | xargs -r ${CLI} rm -f
 }
 #===============================================================
 # Select container image(s) to remove
-function drmi() {
+drmi() {
   if (type docker &>/dev/null); then
     local CLI="docker"
   elif (type crictl &>/dev/null); then
     local CLI="crictl"
   fi
-  ${CLI} images --format table | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' | xargs -r ${CLI} rmi -f
+  ${CLI} images --format table | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' --prompt='Delete contaienr image(s) > ' | xargs -r ${CLI} rmi -f
 }
 
 ################################################################
@@ -378,19 +405,19 @@ _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
 _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | bat --style=numbers'"
 _viewGitLogLineUnfancy="$_gitLogLineToHash | xargs -I % sh -c 'git show %'"
 
-function glNoGraph() {
+glNoGraph() {
   git log --color --date=format:"%F %H:%M" \
   --format="%C(auto)%h%C(reset) %s %C(green)(%ad) %C(bold blue)<%an>%C(reset)" \
   --graph "$@"
 }
 
-function is_in_git_repo() {
+is_in_git_repo() {
   git rev-parse --is-inside-work-tree >/dev/null 2>&1
 }
 
 #===============================================================
 # take this repo and copy it to somewhere else minus the .git stuff
-function gitexport(){
+gitexport(){
   is_in_git_repo || return
   if [ ! -d "${1}" ] ; then
     mkdir -vp "${1}" && git archive HEAD | tar -x -C "${1}"
@@ -400,7 +427,7 @@ function gitexport(){
 }
 #===============================================================
 # git commit browser with previews and vim integration
-function git-log() {
+git-log() {
   is_in_git_repo || return
   glNoGraph |
     fzf --no-sort --reverse --tiebreak=index --no-multi --exact \
@@ -418,7 +445,7 @@ function git-log() {
 alias gls=git-log
 
 #===============================================================
-function stash-explorer() {
+stash-explorer() {
   while out=$(git stash list "$@" |
     fzf --header="ctrl-a: apply | ctrl-b: branch | ctrl-p: pop | ctrl-x: drop | ESC" \
     --ansi --no-sort --reverse --print-query --query="$query" \
@@ -469,7 +496,7 @@ function stash-explorer() {
   done
 }
 #===============================================================
-function rebaser() {
+rebaser() {
   glNoGraph | fzf \
     --ansi \
     --reverse \
@@ -507,7 +534,7 @@ function rebaser() {
 
 #===============================================================
 # use gh+fzf+bat to explore pull requests, and checkout the PR branch
-function pr-checkout() {
+pr-checkout() {
   is_in_git_repo || return
   local jq_template pr_number
   jq_template='"'\
@@ -540,7 +567,7 @@ function pr-checkout() {
 #===============================================================
 # use glab+fzf+bat to explore merge requests, and checkout
 # the MR branch to start collaborating
-function mr-checkout() {
+mr-checkout() {
   is_in_git_repo || return
   local jq_template mr_number
   jq_template='"'\
@@ -577,7 +604,7 @@ function mr-checkout() {
 }
 #===============================================================
 # gh-watch -- watch the current github action
-function gh-watch() {
+gh-watch() {
   is_in_git_repo || return
   gh run list \
     --branch $(git rev-parse --abbrev-ref HEAD) \
@@ -587,7 +614,7 @@ function gh-watch() {
 }
 #===============================================================
 # Filter branches.
-function git-br() {
+git-br() {
   is_in_git_repo || return
   local tags branches target
   tags=$(git tag | awk '{print "tag\t" $1}') || return
@@ -600,7 +627,7 @@ function git-br() {
 }
 #===============================================================
 # Filter branches and checkout the selected one with <enter> key,
-function git-co() {
+git-co() {
   is_in_git_repo || return
   git checkout $(git-br)
 }
@@ -611,7 +638,7 @@ function git-co() {
 
 #===============================================================
 # helm create function
-function helm_create() {
+helm_create() {
   if [ -z "${1}" ] ; then
     _info "Usage:\n  helm_create <chart-name>\n"
   elif [ ! -d "${1}" ] ; then
@@ -633,7 +660,7 @@ EOF
 }
 #===============================================================
 # kubectl exec selector
-function kx () {
+kx () {
   local pod=($(kubectl get pods --no-headers -o wide | fzf --accept-nth='1'))
   local attr=${@}
   _info "kubectl exec -it ${pod[1]} ${attr} -- {shell}"
@@ -645,7 +672,7 @@ function kx () {
 
 #===============================================================
 # kubectl logs selector
-function kl () {
+kl () {
   local pod=($(kubectl get pods --no-headers -o wide | fzf --accept-nth='1'))
   local attr=${@:-""}
   _info "kubectl logs --timestamps -f ${attr} ${pod[1]}"
@@ -653,7 +680,7 @@ function kl () {
 }
 #===============================================================
 # export kubernetes objects using https://github.com/itaysk/kubectl-neat
-function kexport() {
+kexport() {
   if ( ! type kubectl-neat &>/dev/null ) ; then
     echo "Install kubectl-neat first -- https://github.com/itaysk/kubectl-neat"
     return 1
@@ -666,13 +693,13 @@ function kexport() {
 
 #===============================================================
 # k8s: decode secret data
-function decode_secret() {
+decode_secret() {
   kubectl get secret ${@} -o json | jq '.data | map_values(@base64d)'
 }
 
 #===============================================================
 # k8s: check tls certs expiration date
-function get-tls-certs() {
+get-tls-certs() {
   _info "Checking TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NC}\n"
   kubectl get certificates --no-headers -A 2>/dev/null | awk '{print $1" "$2}' | while read -r tls_cert ; do
     CERT_NAMESPACE="$(echo "${tls_cert}" | awk '{print $1}')"
@@ -731,7 +758,7 @@ function get-tls-certs() {
 
 #===============================================================
 # k8s: check cert-manager tls certs expiration date
-function get-cm-certs() {
+get-cm-certs() {
   _info "Checking cert-manager TLS certificates in cluster: ${GREEN}$(kubectl config current-context)${NC}\n"
   kubectl get certificates -A --no-headers | awk '{print $1" "$2}' | while read -r namespace cert ; do
     cmctl status certificate -n ${namespace} ${cert} | grep --colour=never -E 'Name|^-|^Not\ |^Renewal' | grep -iv 'issuer'
@@ -743,7 +770,7 @@ function get-cm-certs() {
 
 #===============================================================
 # k8s: list node count+version
-function get-node-versions() {
+get-node-versions() {
   date
   _info "Cluster: ${GREEN}$(kubectl config current-context)"
   for i in $(kubectl get node --no-headers | awk '{print $5}'| sort | uniq | xargs) ; do echo "${i} $(kubectl get node --no-headers | grep -c "${i}") nodes" ; done | column -t
@@ -753,14 +780,14 @@ function get-node-versions() {
 
 #===============================================================
 # k8s: list nodepools count+version
-function get-nodepools() {
+get-nodepools() {
   _info "Nodepools: ${GREEN}$(kubectl config current-context)"
   for i in $(kubectl get nodepools -o custom-columns=':.metadata.name' | xargs) ; do echo "${i} $(kubectl get node --show-labels | grep -c "nodepool=${i}") nodes" ; done | column -tx
 }
 
 #===============================================================
 # k8s: get node resources
-function get-node-resources() {
+get-node-resources() {
   if ( ! command -v numfmt &>/dev/null ) ; then
     echo "${MAGENTA}numfmt${NC} not found - install coreutils package"
     return 1
@@ -807,7 +834,7 @@ ${NODE_PRESSURE}"
 
 #===============================================================
 # k8s: get PersistentVolume info
-function get-pv-info() {
+get-pv-info() {
   function show_help() {
     cat << EOF
 Usage:
@@ -888,7 +915,7 @@ EOF
   echo
 }
 
-function kdescribe() {
+kdescribe() {
   local QUERY="${1}"
   local RES_NAME="$(kubectl api-resources | awk "/(^${QUERY}|\ ${QUERY}\ |${QUERY}$) / {print \$1}" 2>/dev/null)"
   if [ -z "${RES_NAME}" ]; then
@@ -907,12 +934,12 @@ check_azcli() {
   (command -v az &>/dev/null) || { echo "Azure CLI not found - install it first -- https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"; return 1; }
 }
 
-function aks-get-clusters() {
+aks-get-clusters() {
   check_azcli
   az aks list --query "[].{Cluster:name, ResourceGroup:resourceGroup, Location:location, Version:kubernetesVersion, Status:powerState.code}" -o table
 }
 
-function aks-get-credentials() {
+aks-get-credentials() {
   aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱃾 Get KUBECONFIG for cluster > " | read -r CLUSTER RESOURCEGROUP
   if [ -n "${CLUSTER}" ]; then
     az aks get-credentials --name ${CLUSTER} --resource-group ${RESOURCEGROUP} --overwrite-existing &&
@@ -920,7 +947,7 @@ function aks-get-credentials() {
   fi
 }
 
-function aks-get-upgrades() {
+aks-get-upgrades() {
   aks-get-clusters | sed '1,2d' | fzf -0 --accept-nth='1,2' --prompt="󱃾 Select cluster > " | read -r CLUSTER RESOURCEGROUP
   if [ -n "${CLUSTER}" ]; then
     _info "Available upgrades for cluster: ${GREEN}${CLUSTER}"
@@ -930,5 +957,6 @@ function aks-get-upgrades() {
 }
 
 ################################################################
-# Add your custom functions below
+# Add your custom functions in ~/.functions_custom and they will 
+# be loaded automatically when you start a new shell session.
 ################################################################

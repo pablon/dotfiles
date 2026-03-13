@@ -1,8 +1,12 @@
 --ignore=.DS_Store
+--ignore=.aliases_custom
+--ignore=.exports
+--ignore=.functions_custom
 --ignore=.gitconfig
 --ignore=.helm
 --ignore=.pre-commit-config.yaml
 --ignore=.stowrc
+--ignore=.zshrc_custom
 --ignore=AGENTS.md
 --ignore=docs
 --ignore=setup

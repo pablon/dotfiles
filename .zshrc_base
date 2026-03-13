@@ -14,6 +14,15 @@ export NC="\033[0m"
 # clipboard tool
 _clipboardApp="$(if (command xclip -v &>/dev/null); then echo xclip; elif (type pbcopy &>/dev/null); then echo pbcopy; fi)"
 
+# ######################################################################
+# # load custom aliases & functions
+# ALIASES_WORK="${HOME}/.aliases_work"
+# SECRETS_FILE="${HOME}/.secrets"
+# for file in ${HOME}/{.aliases,.exports,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}"; do
+#   [ -r "${file}" ] && source "${file}"
+# done
+# unset file
+
 ######################################################################
 # load custom aliases & functions
 ALIASES_WORK="${HOME}/.aliases_work"
@@ -95,7 +104,7 @@ FPATH_DIRS=(
 for i in "${FPATH_DIRS[@]}"; do
   [ -d "${i}" ] && FPATH+=":${i}"
 done
-(type brew &>/dev/null) && FPATH+=":/opt/homebrew/share/zsh/site-functions"
+(type brew &>/dev/null) && FPATH+=":${HOMEBREW_PREFIX}/share/zsh/site-functions"
 export FPATH="${FPATH}"
 
 # You may need to manually set your MANPATH
@@ -138,8 +147,10 @@ if (type fzf &>/dev/null); then
   --color=header:#cba6f7,prompt:#cba6f7,pointer:#cba6f7,scrollbar:#fab387"
   # icons: ◆ ← ▶ ❯ ✔ ✘  
 
-  export FZF_DEFAULT_OPTS="${FZF_COLORS} --border='rounded' --border-label=''
-  --preview-window='border-double'
+  [ -n "${TMUX}" ] && FZF_TMUX_OPTS="--tmux center,90%"
+
+  export FZF_DEFAULT_OPTS="${FZF_COLORS} ${FZF_TMUX_OPTS:-} --border='rounded'
+  --border-label='' --preview-window='border-double' 
   --bind='ctrl-p:change-preview-window(down|hidden|)'
   --marker='✘' --pointer='❯' --separator='─'
   --scrollbar='│' --style=full --cycle --ghost='Search..'"
@@ -214,10 +225,18 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 # zoxide init
 (type zoxide &>/dev/null) && eval "$(zoxide init zsh)"
 # worktrunk init
-(type wt &>/dev/null) && eval "$(command wt config shell init zsh)"; fi
+(command -v wt | grep 'bin' &>/dev/null) && eval "$(command wt config shell init zsh)"
 
 ######################################################################
 # ssh-add
 [[ "$(uname)" == "Darwin" ]] && ssh-add --apple-load-keychain &>/dev/null
 
+######################################################################
+
+######################################################################
+# Add your customizations to ~/.zshrc_custom. 
+# You can create this file if it doesn't exist, it will be sourced 
+# automatically when you start a new shell session. This way, you can 
+# keep your customizations organized and separate from the base 
+# configuration be loaded automatically when you start a new shell session.
 ######################################################################

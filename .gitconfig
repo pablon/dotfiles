@@ -83,7 +83,7 @@
 
 [alias]
   a         = "!git add $(git status --porcelain | fzf -m --accept-nth=2 --header='󱞽 Select file(s) to stage\n  Press ? to inspect untracked files' --preview-window='right:60%' --preview 'git diff --color=always {-1}' --bind '?:preview:bat --color=always --line-range :500 {-1}') && git status -uno -s"  ; (fzf) select modified+untracked files to stage
-  amend     = commit -a --amend
+  amend     = commit -a -s --amend
   ca        = commit -asm
   cm        = commit -sm
   co        = checkout
