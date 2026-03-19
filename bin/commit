@@ -22,8 +22,8 @@ RED="\033[1;31m"
 YELLOW="\033[1;93m"
 NC="\033[0m"
 
-PRETTY_FORMAT="%C(bold yellow)%h %C(reset)%s %C(green)(%ad) %C(bold blue)<%cn>%C(reset)"
-GIT_LOG_OPTS="--date=relative --author="$(git config --get user.email)" --format="${PRETTY_FORMAT}" --color --stat --decorate --graph -1"
+PRETTY_FORMAT="%C(bold)%C(yellow)%h%x20%C(reset)%s%x20%C(green)(%ad)%x20%C(bold)%C(blue)<%cn>%C(reset)"
+GIT_LOG_OPTS="--date=relative --author=$(git config --get user.name) --format=${PRETTY_FORMAT} --color --stat --decorate --graph -1"
 
 # functions
 _info() {
