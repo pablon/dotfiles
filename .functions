@@ -430,8 +430,6 @@ git-log() {
     --bind "enter:execute:$_viewGitLogLine | less -R" \
     --bind "ctrl-e:execute:$_viewGitLogLineUnfancy | vim -" \
     --bind "ctrl-y:execute:$_gitLogLineToHash | $_clipboardApp"
-
-    # --color=label:italic:yellow,preview-bg:#343434 \
 }
 alias gls=git-log
 
@@ -446,11 +444,9 @@ stash-explorer() {
     --bind "ctrl-k:preview-up" \
     --bind "ctrl-j:preview-down" \
     --border --border-label-pos=3 \
-    --border-label=' stash diff' \
+    --border-label=' Stash Explorer' \
     --preview="echo {} | cut -d':' -f1 | xargs git stash show --color -p" \
     --preview-window='right:55%') ;
-
-      # --color='label:italic:yellow,preview-bg:#212121' \
   do
     # Tokenize selection by newline
     selection=("${(f)out}")
