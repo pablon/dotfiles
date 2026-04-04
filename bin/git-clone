@@ -21,7 +21,7 @@ RED="\033[1;31m"
 YELLOW="\033[1;93m"
 
 _info() {
-	echo -e "${BLUE}==> ${STRONG}${1}${CLEAR}"
+  echo -e "${BLUE}==> ${STRONG}${1}${CLEAR}"
 }
 
 WORKDIR=${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}
@@ -29,22 +29,22 @@ CLONE_URL="${1:?missing git clone url}"
 PATTERN='(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+).git$'
 
 if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
-	REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
-	CLONE_PATH="$(dirname "${REPO_DIR}")"
-	if [ -d "${REPO_DIR}" ]; then
-		_info "  Project already exists in ${CLEAR}${REPO_DIR}"
-		echo
-	else
-		_info "${RED}${STRONG} Cloning ${CYAN}${CLONE_URL}${STRONG}"
-		_info "${GREEN} ${STRONG} into    ${YELLOW}${REPO_DIR//${HOME}/\~}" &&
-			mkdir -p "${CLONE_PATH}" &&
-			git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
-			_info "${GREEN} ${STRONG} Done!" &&
-			_info "${BLUE} ${STRONG} Latest changes:" &&
-			git -C "${REPO_DIR}/" log --color --decorate --format="${PRETTY_FORMAT}" --all | head -5
-		echo
-	fi
+  REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
+  CLONE_PATH="$(dirname "${REPO_DIR}")"
+  if [ -d "${REPO_DIR}" ]; then
+    _info "  Project already exists in ${CLEAR}${REPO_DIR//${HOME}/\~}"
+    echo
+  else
+    _info "${RED}${STRONG} Cloning ${CYAN}${CLONE_URL}${STRONG}"
+    _info "${GREEN} ${STRONG} into    ${YELLOW}${REPO_DIR//${HOME}/\~}" &&
+      mkdir -p "${CLONE_PATH}" &&
+      git -C "${CLONE_PATH}" clone "${CLONE_URL}" &&
+      _info "${GREEN} ${STRONG} Done!" &&
+      _info "${BLUE} ${STRONG} Latest changes:" &&
+      git -C "${REPO_DIR}/" log --color --decorate --format="${PRETTY_FORMAT}" --all | head -5
+    echo
+  fi
 else
-	_info "${RED}  Unsupported git uri: ${YELLOW}${CLONE_URL}"
-	exit 1
+  _info "${RED}  Unsupported git uri: ${YELLOW}${CLONE_URL}"
+  exit 1
 fi
