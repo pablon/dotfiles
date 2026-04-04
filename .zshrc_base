@@ -153,7 +153,7 @@ if (type fzf &>/dev/null); then
   --border-label='' --preview-window='border-double' 
   --bind='ctrl-p:change-preview-window(down|hidden|)'
   --marker='✘' --pointer='❯' --separator='─'
-  --scrollbar='│' --style=full --cycle --ghost='Search..'"
+  --scrollbar='│' --cycle --ghost='Search..'"
 
   export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target --preview 'bat -n --color=always {}'"
 

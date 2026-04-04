@@ -383,7 +383,7 @@ drmi() {
   elif (type crictl &>/dev/null); then
     local CLI="crictl"
   fi
-  ${CLI} images --format table | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' --prompt='Delete contaienr image(s) > ' | xargs -r ${CLI} rmi -f
+  ${CLI} images --format table | sed 1d | fzf -q "$1" --no-sort -m --tac --accept-nth='3' --prompt='Delete container image(s) > ' | xargs -r ${CLI} rmi -f
 }
 
 ################################################################

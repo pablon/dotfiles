@@ -38,10 +38,11 @@ alias egrep="egrep --color=auto"
 alias grep="grep --color=auto"
 alias history='history -i'
 if (type eza &>/dev/null); then
-  alias ll="eza --group-directories-first -al --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -s type"
-  alias lld="eza --group-directories-first -al --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -D"
-  alias llt="eza --group-directories-first -alT --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -s type"
-  alias ls="eza --group-directories-first -a --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed -s type"
+  EZA_OPTS="--group-directories-first --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed"
+  alias ll="eza ${EZA_OPTS} -al -s type"
+  alias lld="eza ${EZA_OPTS} -al -D"
+  alias llt="eza ${EZA_OPTS} -alT -s type"
+  alias ls="eza ${EZA_OPTS} -a -s type"
 else
   alias ll="ls -Gahop"
   alias lld="ls -lad"
@@ -51,7 +52,7 @@ fi
 alias l="ls"
 alias monitor="tail -f /var/log/*.log"
 (type socat &>/dev/null) && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
-(type python3 &>/dev/null) && alias python="$(which python3)"
+# (type python3 &>/dev/null) && alias python="$(which python3)"
 (type gsed &>/dev/null) && alias sed="$(which gsed)"
 alias stat='stat -x'
 alias tm='tmux'
@@ -60,6 +61,7 @@ alias tmc='tmux-clone'  # see .functions
 alias tmk='tmux-kill'   # see .functions
 alias tmn='tmux-new'    # see .functions
 alias tmls='tmux ls'
+alias v.='nvim .'
 alias v='nvim'
 alias vi='nvim'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"

@@ -429,30 +429,13 @@ do_docker_almalinux() {
 
 do_docker_post_install() {
   _info "Executing function ${MAGENTA}${FUNCNAME}"
-  # https://docs.docker.com/engine/daemon/#configure-the-docker-daemon
-  if [ ! -f "/etc/docker/daemon.json.example" ]; then
-    [ -d "/etc/docker" ] || sudo mkdir -p /etc/docker &>/dev/null
-    sudo cat <<EOF >/etc/docker/daemon.json.example
-{
-  "insecure-registries": [
-    "my.registry.example.com:8443"
-  ]
-},
-{
-  "data-root": "/mnt/docker"
-}
-EOF
-  fi
-
   # add user to docker group
   if [ "$(id -u)" -ne "0" ]; then
     _info "Adding $(whoami) to 'docker' group"
     sudo usermod -aG docker $(whoami) && id $(whoami)
   fi
-
   # enable docker service
   sudo systemctl enable --now docker.service &>/dev/null || true
-
   docker --version
 }
 

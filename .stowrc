@@ -1,3 +1,4 @@
+--ignore=*.bkp
 --ignore=.DS_Store
 --ignore=.aliases_custom
 --ignore=.exports
