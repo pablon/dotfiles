@@ -108,36 +108,36 @@ return {
       desc = "OpenCode optimize",
     },
   },
-  config = function()
-    local provider = vim.env.TMUX and "tmux" or "snacks"
-    vim.g.opencode_opts = {
-      provider = {
-        enabled = provider,
-        tmux = {
-          start_insert = true,
-          auto_insert = true,
-          win = {
-            enter = true,
-            position = "left",
-          },
-          focus = true,
-          allow_passthrough = false,
-        },
-        snacks = {
-          start_insert = true,
-          auto_insert = true,
-          auto_close = true,
-          focus = true,
-          win = {
-            enter = true,
-            position = "left",
-            bo = {
-              filetype = "opencode_terminal",
-            },
-          },
-        },
-      },
-    }
-    vim.o.autoread = true
-  end,
+  -- config = function()
+  --   local provider = vim.env.TMUX and "tmux" or "snacks"
+  --   vim.g.opencode_opts = {
+  --     provider = {
+  --       enabled = provider,
+  --       tmux = {
+  --         start_insert = true,
+  --         auto_insert = true,
+  --         win = {
+  --           enter = true,
+  --           position = "left",
+  --         },
+  --         focus = true,
+  --         allow_passthrough = false,
+  --       },
+  --       snacks = {
+  --         start_insert = true,
+  --         auto_insert = true,
+  --         auto_close = true,
+  --         focus = true,
+  --         win = {
+  --           enter = true,
+  --           position = "left",
+  --           bo = {
+  --             filetype = "opencode_terminal",
+  --           },
+  --         },
+  --       },
+  --     },
+  --   }
+  --   vim.o.autoread = true
+  -- end,
 }

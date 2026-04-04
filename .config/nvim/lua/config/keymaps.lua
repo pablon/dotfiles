@@ -116,7 +116,7 @@ vim.keymap.set("n", "<leader>mtu", "<cmd>Mtoc update<cr>", { desc = "Markdown TO
 vim.keymap.set("n", "<leader>mtr", "<cmd>Mtoc remove<cr>", { desc = "Markdown TOC Remove" })
 
 -- render-markdown
-vim.keymap.set("n", "<leader>mt", "<cmd>RenderMarkdown toggle<cr>", { desc = "RenderMarkdown toggle" })
+vim.keymap.set("n", "<leader>mr", "<cmd>RenderMarkdown toggle<cr>", { desc = "RenderMarkdown toggle" })
 
 -- to list
 vim.keymap.set({ "n", "v" }, "<leader>mlu", "<cmd>'<,'>s/^/- /<cr><esc>", { desc = "Markdown list bullet" })
