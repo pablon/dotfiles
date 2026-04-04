@@ -6,43 +6,22 @@ installing it on your machine.
 
 ## Step 1
 
-Start an Ubuntu 24.04 container:
+Start an Ubuntu 24.04 container invoking the whole setup process in one command:
 
 ```sh
-DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --name dotfiles-test ubuntu:24.04
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name pablon-dotfiles ubuntu:24.04 sh -uelic '
+ export DEBIAN_FRONTEND="noninteractive"
+ apt update && apt install -yq sudo git zsh
+ useradd -m -s /usr/bin/zsh test-user
+ echo "test-user ALL=(ALL:ALL) NOPASSWD:ALL" >/etc/sudoers.d/test-user
+ su -l test-user bash -c "cd ; git clone https://github.com/pablon/dotfiles.git && cd ./dotfiles/ && ./setup.sh"
+'
 ```
 
 ## Step 2
 
-Once inside the container, run as **root**:
-
-```sh
-# requirements
-export DEBIAN_FRONTEND="noninteractive"
-apt update && apt install -yq git sudo
-
-# create a test user, as the setup script can't be run as root
-useradd -m -s $(command -v bash) testuser
-echo 'testuser    ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/testuser
-
-# now become 'testuser'
-su - testuser
-```
-
-Run as **testuser**:
-
-```sh
-# clone the repo
-git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
-
-# start the setup
-./setup.sh
-```
-
-## Step 3
-
 Once `setup.sh` has finished:
 
-1. Logout from 'testuser', run: `exit` (you'll see the root prompt)
-2. Become 'testuser' again, run: `su - testuser`
+1. **Logout** from 'testuser' by pressing `Ctrl-d` or running `exit` (_you'll see the root prompt_)
+2. **Become** 'testuser' again, run: `su - testuser`
 3. Start playing around :rocket:
