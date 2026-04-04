@@ -132,7 +132,7 @@ format = '[\($symbol $project\)]($style) '
 symbol = "󰠅"
 style = 'bold blue'
 format = '[\($symbol $subscription\)]($style) '
-# disabled = false
+disabled = false
 
 [docker_context]
 symbol = ' '
