@@ -39,7 +39,8 @@ call plug#end()
 filetype plugin indent on | syntax enable
 set nocompatible encoding=utf8 fileformats=unix,dos background=dark
 set number relativenumber signcolumn=yes cursorline cursorcolumn colorcolumn=80
-set mouse=a clipboard=unnamed title history=2000 path+=** hidden autoread
+" clipboard: unnamed (macOS/X11 primary), unnamedplus (X11/Wayland clipboard)
+set mouse=a clipboard=unnamed,unnamedplus title history=2000 path+=** hidden autoread
 set splitbelow splitright switchbuf=useopen,usetab,newtab showtabline=2 laststatus=2 noshowmode ruler cmdheight=1
 set scrolloff=7 sidescrolloff=8 whichwrap+=<,>,h,l backspace=eol,start,indent
 set ignorecase smartcase incsearch hlsearch showmatch matchtime=2
@@ -99,6 +100,8 @@ endfunction
 nnoremap <leader>w :w!<cr>
 nnoremap <leader>W :wall!<cr>
 nnoremap <leader>qq :qall!<cr>
+" NOTE: <C-S>/<C-Q> conflict with terminal XON/XOFF on Linux.
+"       Add `stty -ixon` to ~/.bashrc or ~/.zshrc to enable these.
 nnoremap <C-S> :w<CR>
 nnoremap <C-Q> :q!<CR>
 
@@ -216,7 +219,7 @@ let g:fzf_colors = {
   \ 'info': ['fg','PreProc'], 'border': ['fg','Ignore'], 'prompt': ['fg','Conditional'],
   \ 'pointer': ['fg','Exception'], 'marker': ['fg','Keyword'],
   \ 'spinner': ['fg','Label'], 'header': ['fg','Comment'] }
-set rtp+=/usr/local/opt/fzf
+" (fzf rtp auto-added by junegunn/fzf plugin via plug#install)
 
 " Trailing whitespace match (highlight styled in vimrc_highlights)
 highlight default ExtraWhiteSpace ctermbg=red guibg=red

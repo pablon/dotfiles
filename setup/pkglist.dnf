@@ -8,6 +8,7 @@ btop
 ca-certificates
 coreutils
 cowsay
+ctags
 curl
 dialog
 dnf-utils
@@ -18,6 +19,7 @@ file
 fontawesome-fonts-all
 fontconfig
 fortune-mod
+fzf
 gawk
 git
 git-delta
@@ -46,8 +48,9 @@ tar
 tasksel
 tmux
 unzip
-vim
+vim-enhanced
 wget
+wl-clipboard
 xclip
 yq
 yum-utils

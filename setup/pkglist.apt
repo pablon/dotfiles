@@ -14,11 +14,11 @@ dos2unix
 eza
 fd-find
 ffmpeg
-fzf
 fontconfig
 fonts-font-awesome
 fonts-liberation
 fortune
+fzf
 gawk
 git
 git-delta
@@ -56,9 +56,11 @@ sudo
 tar
 tasksel
 tmux
+universal-ctags
 unzip
-vim
+vim-gtk3
 wget
+wl-clipboard
 xclip
 yq
 zoxide
