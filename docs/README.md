@@ -8,10 +8,12 @@ Personal configuration files for **macOS** and **Linux**.
 
 ```bash
 git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
-./setup.sh
+./setup.sh          # full install (default)
+./setup.sh --help   # show all options
 ```
 
-Post-setup: logout/login, then verify with `git --version && zsh --version && nvim --version`.
+Post-setup: open a new terminal session, then verify with
+`git --version && zsh --version && nvim --version`.
 
 ## Setup
 
@@ -23,8 +25,17 @@ Post-setup: logout/login, then verify with `git --version && zsh --version && nv
 ### How It Works
 
 Bootstrapping is **idempotent**, **robust**, and **cross-platform**. Uses GNU Stow for symlink
-management (conflicts backed up to `*.backup-<timestamp>`). Runs in Strict Mode (`set -euo pipefail`),
-auto-detects OS (Homebrew/APT/Pacman/DNF), executes numbered scripts sequentially.
+management — conflicts are backed up to `*.YYYYMMDD-HHMMSS` before re-linking.
+Runs in Strict Mode (`set -euo pipefail`), auto-detects OS (Homebrew/APT/Pacman/DNF),
+and executes numbered scripts sequentially.
+
+`setup.sh` supports two modes:
+
+| Command                                  | Purpose                                               |
+| ---------------------------------------- | ----------------------------------------------------- |
+| `./setup.sh` or `./setup.sh install`     | Full setup for a new machine                          |
+| `./setup.sh update`                      | Pull latest changes, re-link dotfiles, update plugins |
+| `./setup.sh --dry-run [install\|update]` | Preview without modifying anything                    |
 
 ### Setup Scripts
 
@@ -78,9 +89,10 @@ Optional shell config files (auto-sourced if present):
 ### Maintenance
 
 ```bash
-git pull --stat --rebase && ./setup.sh   # update + re-run
-stow -v .                                # re-link only
-( cd ~/dotfiles && stow -vD . )          # unlink
+./setup.sh update                        # pull + re-link + update plugins
+./setup.sh --dry-run update              # preview update without changes
+stow -v .                                # re-link only (manual)
+( cd ~/dotfiles && stow -vD . )          # unlink all
 rm -rf ~/dotfiles                        # full removal
 ```
 
@@ -88,7 +100,7 @@ rm -rf ~/dotfiles                        # full removal
 
 ```text
 ~/dotfiles/
-├── .aliases / .functions / .zshrc / .zshrc_custom / .vimrc / .tmux.conf / .gitconfig
+├── .aliases / .functions / .zshrc / .zshrc_base / .vimrc / .tmux.conf / .gitconfig
 ├── .config/
 │   ├── atuin/  lazygit/  nvim/  starship/  yazi/
 │   └── bat/    gh/       ghostty/  glab-cli/
@@ -143,7 +155,7 @@ Branch prefix → commit type: `feat/` → `feat:` · `fix/` → `fix:` · `docs
 | GNU Stow not installed  | `brew install stow` / `apt install stow` / `pacman -S stow` |
 | Permission denied       | Run as non-root user with sudo access                       |
 | OS not supported        | Check supported distros above                               |
-| Stow conflicts          | Remove `*.backup-*` files from `$HOME` then re-run          |
+| Stow conflicts          | Run `./setup.sh --dry-run install` to preview, then re-run  |
 
 ```bash
 pre-commit install && pre-commit run -a   # run all quality hooks

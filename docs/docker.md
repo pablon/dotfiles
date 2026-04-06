@@ -14,7 +14,7 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name pablon-dotfiles u
  apt update && apt install -yq sudo git zsh
  useradd -m -s /usr/bin/zsh test-user
  echo "test-user ALL=(ALL:ALL) NOPASSWD:ALL" >/etc/sudoers.d/test-user
- su -l test-user bash -c "cd ; git clone https://github.com/pablon/dotfiles.git && cd ./dotfiles/ && ./setup.sh"
+ su -l test-user bash -c "cd ; git clone https://github.com/pablon/dotfiles.git && cd ./dotfiles/ && ./setup.sh install"
 '
 ```
 
