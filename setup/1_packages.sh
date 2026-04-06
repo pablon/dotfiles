@@ -255,11 +255,13 @@ do_asdf() {
       ;;
     esac
     _info "Installing asdf"
-    cd /tmp/ &&
-      curl -fSL --progress-bar -o "${TARBALL}" "https://github.com/${GITHUB_PROJECT}/releases/download/${LATEST}/${PROGRAM}-${LATEST}-${PLATFORM}-${ARCH}.tar.gz" &&
-      tar xfz "${TARBALL}" "${PROGRAM}" &&
-      sudo install ${INSTALL_OPTS} "${PROGRAM}" "${INSTALL_TARGET}/" &&
-      rm -f ${PROGRAM}* || {
+    (
+      cd /tmp/ &&
+        curl -fSL --progress-bar -o "${TARBALL}" "https://github.com/${GITHUB_PROJECT}/releases/download/${LATEST}/${PROGRAM}-${LATEST}-${PLATFORM}-${ARCH}.tar.gz" &&
+        tar xfz "${TARBALL}" "${PROGRAM}" &&
+        sudo install ${INSTALL_OPTS} "${PROGRAM}" "${INSTALL_TARGET}/" &&
+        rm -f ${PROGRAM}*
+    ) || {
       _error "asdf installation failed" && return 3
     }
   fi
