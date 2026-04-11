@@ -1,3 +1,0 @@
-ci: pipeline ci
-co: mr checkout
-runs: ci view -b $(git rev-parse --abbrev-ref HEAD)
