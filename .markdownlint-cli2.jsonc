@@ -1,0 +1,11 @@
+{
+  "config": {
+    "default": false,
+    "line-length": false,
+    "no-inline-html": false,
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules", "CHANGELOG.md"],
+  "gitignore": true,
+  "fix": true,
+}
