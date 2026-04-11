@@ -34,6 +34,11 @@ unset file
 
 ######################################################################
 # zsh
+
+# Prevent zsh-autocomplete's internal ZSH_AUTOSUGGEST_USE_ASYNC=yes from enabling
+# dual async handlers — causes zle reentrancy deadlock with zsh-autosuggestions.
+unset ZSH_AUTOSUGGEST_USE_ASYNC
+
 export HISTFILE=~/.zsh_history
 export HISTSIZE=13000
 export SAVEHIST=10000
@@ -57,9 +62,12 @@ unsetopt flowcontrol
 setopt auto_menu # show completion menu on successive tab press
 setopt complete_in_word
 setopt always_to_end
-# async mode for autocompletion
+# zsh-autosuggestions config
+# NOTE: ZSH_AUTOSUGGEST_USE_ASYNC is intentionally NOT set here.
+# zsh-autocomplete sets it internally, but having both plugins' async
+# handlers active simultaneously causes a zle reentrancy deadlock (blank prompt hang).
+# Autosuggestions runs synchronously — autocomplete handles async completion.
 export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-export ZSH_AUTOSUGGEST_USE_ASYNC=true
 export ZSH_HIGHLIGHT_MAXLENGTH=300
 
 export SPACESHIP_PROMPT_ASYNC=true

@@ -1,4 +1,4 @@
-# shellcheck disable=SC2148
+# shellcheck disable=SC2149
 # start zsh profiling
 zmodload zsh/zprof
 

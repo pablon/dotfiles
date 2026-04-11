@@ -12,7 +12,6 @@ ZSH_PLUGINS=(
   'marlonrichert/zsh-autocomplete'
   'zsh-users/zsh-autosuggestions'
   'zsh-users/zsh-syntax-highlighting'
-  'MichaelAquilina/zsh-you-should-use'
 )
 
 if (! command -v zsh &>/dev/null); then
