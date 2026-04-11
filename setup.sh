@@ -138,8 +138,7 @@ update_zsh_plugins() {
     'marlonrichert/zsh-autocomplete'
     'zsh-users/zsh-autosuggestions'
     'zsh-users/zsh-syntax-highlighting'
-    'MichaelAquilina/zsh-you-should-use'
-  )
+    )
 
   [ -d "${HOME}/.zsh" ] || mkdir -p "${HOME}/.zsh"
 
