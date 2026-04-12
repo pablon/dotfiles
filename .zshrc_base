@@ -35,9 +35,8 @@ unset file
 ######################################################################
 # zsh
 
-# Prevent zsh-autocomplete's internal ZSH_AUTOSUGGEST_USE_ASYNC=yes from enabling
-# dual async handlers — causes zle reentrancy deadlock with zsh-autosuggestions.
-unset ZSH_AUTOSUGGEST_USE_ASYNC
+# NOTE: zsh-autocomplete async and ZSH_AUTOSUGGEST_USE_ASYNC are disabled
+# in .zshrc BEFORE the plugin loop (must be set before init, not after).
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=13000
@@ -54,7 +53,7 @@ setopt HIST_NO_STORE           # Don't store history commands
 setopt HIST_REDUCE_BLANKS      # remove unnecessary blanks
 setopt HIST_SAVE_NO_DUPS       # Do not write a duplicate event to the history file.
 setopt HIST_VERIFY             # Do not execute immediately upon history expansion.
-setopt INC_APPEND_HISTORY      # Write to the history file immediately, not when the shell exits.
+# setopt INC_APPEND_HISTORY      # redundant — INC_APPEND_HISTORY_TIME already includes this behavior
 setopt INC_APPEND_HISTORY_TIME # append command to history file immediately after execution
 setopt SHARE_HISTORY           # Share history between all sessions.
 unsetopt menu_complete         # do not autoselect the first completion entry
@@ -69,6 +68,9 @@ setopt always_to_end
 # Autosuggestions runs synchronously — autocomplete handles async completion.
 export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 export ZSH_HIGHLIGHT_MAXLENGTH=300
+
+# Require at least 1 char before triggering completions (avoids empty completion cycles)
+zstyle ':autocomplete:*' min-input 1
 
 export SPACESHIP_PROMPT_ASYNC=true
 export SPACESHIP_PROMPT_ADD_NEWLINE=true

@@ -7,6 +7,11 @@ zmodload zsh/zprof
 [[ "$(uname)" == "Darwin" ]] && (type gdate &>/dev/null) && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
 
+# zsh-autocomplete: disable async BEFORE plugin load (checked at init time, not precmd)
+zstyle ':autocomplete:async' enabled no
+# zsh-autosuggestions: disable async to prevent dual fd-handler deadlock with autocomplete
+typeset -g ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
 # load zsh plugins
 for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
   plugin_dir="${HOME}/.zsh/${plugin}"
@@ -25,7 +30,7 @@ done
 
 # load atuin
 [ -x "${HOME}/.atuin/bin/env" ] && source "${HOME}/.atuin/bin/env" &>/dev/null
-eval "$(atuin init zsh)"
+eval "$(atuin init --disable-up-arrow zsh)"
 
 # load starship
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
@@ -48,5 +53,6 @@ _zsh_end="$(date +%s%3N)"
 printf " %.3f s\\n" "$((${_zsh_end} - ${_zsh_start}))e-3"
 unset _zsh_start _zsh_end
 
-# save zsh profiling
+# save zsh profiling and unload profiler to avoid overhead during session
 zprof 2>&1 >~/.zsh.profiling
+zmodload -u zsh/zprof
