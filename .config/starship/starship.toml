@@ -5,44 +5,12 @@ command_timeout = 2000
 follow_symlinks = false
 palette = 'catppuccin_mocha'
 
-[custom.git_email_azure]
-command = "git config --get user.email"
-symbol = '󰠅 '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin &>/dev/null | grep 'azure'"
-require_repo = true
-
-[custom.git_email_github]
-command = "git config --get user.email"
-symbol = '󰊤 '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin &>/dev/null | grep 'github'"
-require_repo = true
-
-[custom.git_email_gitlab]
-command = "git config --get user.email"
-symbol = ' '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin &>/dev/null | grep 'gitlab'"
-require_repo = true
-
-[custom.git_email_forgejo]
-command = "git config --get user.email"
-symbol = ' '
-style = 'fg:#595959'
-format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin &>/dev/null | grep -E 'codeberg|forgejo'"
-require_repo = true
-
-[custom.git_email_generic]
+[custom.git_email]
 command = "git config --get user.email"
 symbol = '󰊢 '
 style = 'fg:#595959'
 format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin &>/dev/null | grep -vE 'azure|github|gitlab|codeberg|forgejo'"
+when = "git remote get-url --push origin 2>/dev/null"
 require_repo = true
 
 [directory]
