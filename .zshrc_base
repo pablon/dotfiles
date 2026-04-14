@@ -14,23 +14,23 @@ export NC="\033[0m"
 # clipboard tool
 _clipboardApp="$(if (command xclip -v &>/dev/null); then echo xclip; elif (type pbcopy &>/dev/null); then echo pbcopy; fi)"
 
-# ######################################################################
-# # load custom aliases & functions
-# ALIASES_WORK="${HOME}/.aliases_work"
-# SECRETS_FILE="${HOME}/.secrets"
-# for file in ${HOME}/{.aliases,.exports,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}"; do
-#   [ -r "${file}" ] && source "${file}"
-# done
-# unset file
-
 ######################################################################
-# load custom aliases & functions
-ALIASES_WORK="${HOME}/.aliases_work"
-SECRETS_FILE="${HOME}/.secrets"
-for file in ${HOME}/{.aliases,.exports,.functions} "${ALIASES_WORK}" "${SECRETS_FILE}"; do
+# load default & custom zsh sources
+
+DEFAULT_SOURCES=(
+  "${HOME}/.aliases"
+  "${HOME}/.aliases_custom"
+  "${HOME}/.exports"
+  "${HOME}/.functions"
+  "${HOME}/.functions_custom"
+  "${HOME}/.secrets"
+  "${HOME}/.zshrc_custom"
+)  
+
+for file in "${DEFAULT_SOURCES[@]}"; do
   [ -r "${file}" ] && source "${file}"
 done
-unset file
+unset file 
 
 ######################################################################
 # zsh
