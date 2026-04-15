@@ -102,13 +102,14 @@ rm -rf ~/dotfiles                        # full removal
 ~/dotfiles/
 ├── .aliases / .functions / .zshrc / .zshrc_base / .vimrc / .tmux.conf / .gitconfig
 ├── .config/
-│   ├── atuin/  lazygit/  nvim/  starship/  yazi/
-│   └── bat/    gh/       ghostty/  glab-cli/
+│   ├── atuin/  gh-dash/  lazygit/  nvim/  starship/  yazi/
+│   └── bat/    gh/       ghostty/  k9s/
 ├── bin/
 │   ├── commit        # interactive conventional commit helper
 │   ├── git-clone     # clone to ~/projects/<host>/<user>/<repo>/
-│   ├── vpn-fix       # fix DNS/routes after VPN connection
-│   └── install_kubie # kubie installer
+│   ├── install_kubie # kubie installer
+│   ├── obsidian-sync # sync Obsidian vault
+│   └── vpn-fix       # fix VPN DNS + routes
 ├── setup/            # 0_*.sh – 8_*.sh + .functions + pkglist.*
 └── docs/
 ```
@@ -143,6 +144,7 @@ ga  gd  gs  gll  gls   # add, diff, status, pretty log, log navigator
 bin/commit              # interactive conventional commit
 bin/git-clone URL       # clone → ~/projects/<host>/<user>/<repo>/
 sudo bin/vpn-fix        # fix VPN DNS + routes
+bin/obsidian-sync       # sync Obsidian vault
 ```
 
 Branch prefix → commit type: `feat/` → `feat:` · `fix/` → `fix:` · `docs/` → `docs:`
@@ -163,7 +165,7 @@ stow -nv .                                # dry-run stow
 bash -n script.sh                         # syntax-check a script
 ```
 
-**Pre-commit hooks**: shellcheck · yamllint · markdown-link-check · detect-private-key · check-added-large-files
+**Pre-commit hooks**: shellcheck · yamllint · markdown-link-check · markdownlint-cli2 · detect-private-key · check-added-large-files · check-executables-have-shebangs · check-merge-conflict · check-symlinks
 
 ## Contributing
 

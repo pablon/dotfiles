@@ -22,6 +22,6 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name pablon-dotfiles u
 
 Once `setup.sh` has finished:
 
-1. **Logout** from 'testuser' by pressing `Ctrl-d` or running `exit` (_you'll see the root prompt_)
-2. **Become** 'testuser' again, run: `su - testuser`
+1. **Logout** from 'test-user' by pressing `Ctrl-d` or running `exit` (_you'll see the root prompt_)
+2. **Become** 'test-user' again, run: `su - test-user`
 3. Start playing around :rocket:

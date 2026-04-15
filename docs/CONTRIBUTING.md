@@ -64,7 +64,7 @@ bash -n script.sh          # syntax check
 stow -nv .                 # dry-run stow
 ```
 
-**Pre-commit hooks**: shellcheck · yamllint · markdown-link-check · detect-private-key · check-added-large-files
+**Pre-commit hooks**: shellcheck · yamllint · markdown-link-check · markdownlint-cli2 · detect-private-key · check-added-large-files · check-executables-have-shebangs · check-merge-conflict · check-symlinks
 
 ## Git Workflow
 
