@@ -213,11 +213,11 @@ do_batcat_fix() {
   fi
 }
 
-do_fdfinfd_fix() {
-  # link fdfinfd -> fd
-  if (type fdfinfd &>/dev/null) && (! type fd &>/dev/null); then
-    local BINDIR="$(dirname "$(command -v fdfinfd)")"
-    sudo ln -s "${BINDIR}/fdfinfd" "${BINDIR}/fd"
+do_fdfind_fix() {
+  # link fdfind -> fd
+  if (type fdfind &>/dev/null) && (! type fd &>/dev/null); then
+    local BINDIR="$(dirname "$(command -v fdfind)")"
+    sudo ln -s "${BINDIR}/fdfind" "${BINDIR}/fd"
   fi
 }
 
@@ -461,7 +461,7 @@ echo
 eval "set_github_token"
 eval "do_prepare_${OS}"
 eval "do_batcat_fix"
-eval "do_fdfinfd_fix"    # debian-based distros
+eval "do_fdfind_fix"     # debian-based distros
 eval "do_ansible_galaxy" # debian-based distros
 if (type docker &>/dev/null); then
   _success "Docker is already installed ($(docker --version))"
