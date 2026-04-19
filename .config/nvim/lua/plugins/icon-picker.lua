@@ -9,8 +9,6 @@ return {
   config = function()
     require("icon-picker").setup({ disable_legacy_commands = true })
 
-    local opts = { noremap = true, silent = true }
-
     vim.keymap.set("n", "<leader>ia", "<cmd>IconPickerNormal alt_font<cr>", { desc = "Icon Picker alt_font" })
     vim.keymap.set("n", "<leader>ic", "<cmd>IconPickerNormal html_colors<cr>", { desc = "Icon Picker html_colors" })
     vim.keymap.set("n", "<leader>ie", "<cmd>IconPickerNormal emoji<cr>", { desc = "Icon Picker emoji" })

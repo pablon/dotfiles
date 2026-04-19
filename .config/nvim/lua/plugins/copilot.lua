@@ -6,14 +6,12 @@ return {
   opts = {
     suggestion = {
       auto_trigger = true,
-      hide_during_completion = vim.g.ai_cmp,
+      hide_during_completion = true,
     },
     filetypes = {
-      filetypes = {
-        help = true,
-        markdown = true,
-        yaml = true,
-      },
+      help = true,
+      markdown = true,
+      yaml = true,
     },
     server_opts_overrides = {
       settings = {

@@ -10,7 +10,7 @@ return {
   ft = { "markdown" },
   build = function(plugin)
     if vim.fn.executable("npx") then
-      vim.cmd("!cd " .. plugin.dir .. " && cd app && npx --yes yarn install")
+      vim.fn.system({ "npx", "--yes", "yarn", "install", "--cwd", plugin.dir .. "/app" })
     else
       vim.cmd([[Lazy load markdown-preview.nvim]])
       vim.fn["mkdp#util#install"]()

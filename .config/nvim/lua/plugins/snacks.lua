@@ -29,21 +29,28 @@ return {
     indent = { enabled = true },
     input = { enabled = true },
     git = { enabled = true },
-    explorer = {
-      cycle = true,
-      auto_close = true,
-      jump = { close = true },
-      layout = { preview = "main" },
-    },
+    explorer = {},
     picker = {
       enabled = true,
-      hidden = true,
-      ignored = true,
       ui_select = false,
-      exclude = {
-        ".ansible*",
-        ".git",
-        "node_modules",
+      sources = {
+        files = {
+          hidden = true,
+          ignored = true,
+          exclude = {
+            ".ansible*",
+            ".git",
+            "node_modules",
+          },
+        },
+        explorer = {
+          cycle = true,
+          auto_close = true,
+          jump = { close = true },
+          layout = { preview = "main" },
+          hidden = true,
+          ignored = true,
+        },
       },
     },
     notifier = { enabled = true },
@@ -51,11 +58,14 @@ return {
     scroll = { enabled = false },
     statuscolumn = { enabled = true },
     words = { enabled = true },
-    img_dirs = { "img", "images", "assets", "static", "public", "media", "attachments", ".media", "_media" },
     image = {
-      resolve = function(path, src)
-        local api = require("obsidian.api")
-        if api.path_is_note(path) then
+      img_dirs = { "img", "images", "assets", "static", "public", "media", "attachments", ".media", "_media" },
+      resolve = function(file, src)
+        local ok, api = pcall(require, "obsidian.api")
+        if not ok then
+          return nil
+        end
+        if api.path_is_note(file) then
           return api.resolve_attachment_path(src)
         end
       end,

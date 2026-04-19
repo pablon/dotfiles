@@ -3,7 +3,6 @@
 return {
   "lewis6991/gitsigns.nvim",
   event = "LazyFile",
-  lazy = true,
   opts = {
     signs = {
       add = { text = "▎" },
@@ -72,8 +71,6 @@ return {
       map("n", "<leader>ghp", gs.preview_hunk_inline, "Preview Hunk Inline")
       map("n", "<leader>gb", function() gs.blame_line({ full = true }) end, "Blame Line")
       map("n", "<leader>ghb", function() gs.blame() end, "Blame Buffer")
-      map("n", "<leader>ghd", gs.diffthis, "Diff This")
-      -- Enable wrap in both diff windows
       map("n", "<leader>ghd", function() gs.diffthis() vim.cmd("windo set wrap") end, "Diff This")
       map("n", "<leader>ghD", function() gs.diffthis("~") end, "Diff This ~")
       map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")

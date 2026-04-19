@@ -3,15 +3,14 @@
 
 return {
   "NStefan002/screenkey.nvim",
-  lazy = false,
   version = "*",
-  config = function()
-    require("screenkey").setup({
-      disable = {
-        buftypes = { "terminal" },
-      },
-    })
-
-    vim.keymap.set({ "n" }, "<leader>k", "<cmd>Screenkey toggle<CR>", { desc = "Screenkey toggle" })
-  end,
+  cmd = "Screenkey",
+  keys = {
+    { "<leader>k", "<cmd>Screenkey toggle<CR>", desc = "Screenkey toggle" },
+  },
+  opts = {
+    disable = {
+      buftypes = { "terminal" },
+    },
+  },
 }

@@ -3,8 +3,9 @@
 
 return {
   "b0o/incline.nvim",
-  event = "BufReadPre", -- Load this plugin before reading a buffer
-  priority = 1200, -- Set the priority for loading this plugin
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  event = "BufReadPre",
+  priority = 1200,
   config = function()
     local helpers = require("incline.helpers")
     local devicons = require("nvim-web-devicons")
