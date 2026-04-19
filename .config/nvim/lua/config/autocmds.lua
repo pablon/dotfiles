@@ -26,3 +26,16 @@ vim.filetype.add({
     [".*%.yaml%.gotmpl"] = "helm",
   },
 })
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "SnacksDashboardOpened",
+  callback = function()
+    vim.opt.laststatus = 0
+  end,
+})
+vim.api.nvim_create_autocmd("User", {
+  pattern = "SnacksDashboardClosed",
+  callback = function()
+    vim.opt.laststatus = 3
+  end,
+})
