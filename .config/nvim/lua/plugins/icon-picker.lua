@@ -3,17 +3,15 @@
 
 return {
   "ziontee113/icon-picker.nvim",
-  dependencies = {
-    "stevearc/dressing.nvim",
+  dependencies = { "stevearc/dressing.nvim" },
+  cmd = { "IconPickerNormal", "IconPickerInsert", "IconPickerYank" },
+  keys = {
+    { "<leader>ia", "<cmd>IconPickerNormal alt_font<cr>", desc = "Icon Picker alt_font" },
+    { "<leader>ic", "<cmd>IconPickerNormal html_colors<cr>", desc = "Icon Picker html_colors" },
+    { "<leader>ie", "<cmd>IconPickerNormal emoji<cr>", desc = "Icon Picker emoji" },
+    { "<leader>ii", "<cmd>IconPickerNormal<cr>", desc = "Icon Picker (all)" },
+    { "<leader>in", "<cmd>IconPickerNormal nerd_font<cr>", desc = "Icon Picker nerd_font" },
+    { "<leader>is", "<cmd>IconPickerNormal symbols<cr>", desc = "Icon Picker symbols" },
   },
-  config = function()
-    require("icon-picker").setup({ disable_legacy_commands = true })
-
-    vim.keymap.set("n", "<leader>ia", "<cmd>IconPickerNormal alt_font<cr>", { desc = "Icon Picker alt_font" })
-    vim.keymap.set("n", "<leader>ic", "<cmd>IconPickerNormal html_colors<cr>", { desc = "Icon Picker html_colors" })
-    vim.keymap.set("n", "<leader>ie", "<cmd>IconPickerNormal emoji<cr>", { desc = "Icon Picker emoji" })
-    vim.keymap.set("n", "<leader>ii", "<cmd>IconPickerNormal<cr>", { desc = "Icon Picker (all)" })
-    vim.keymap.set("n", "<leader>in", "<cmd>IconPickerNormal nerd_font<cr>", { desc = "Icon Picker nerd_font" })
-    vim.keymap.set("n", "<leader>is", "<cmd>IconPickerNormal symbols<cr>", { desc = "Icon Picker symbols" })
-  end,
+  opts = { disable_legacy_commands = true },
 }

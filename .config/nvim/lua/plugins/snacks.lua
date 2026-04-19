@@ -43,10 +43,21 @@ return {
             "node_modules",
           },
         },
+        grep = {
+          hidden = true,
+          ignored = true,
+          regex = false,
+          args = { "--ignore-case" },
+          exclude = {
+            ".ansible*",
+            ".git",
+            "node_modules",
+          },
+        },
         explorer = {
           cycle = true,
-          auto_close = true,
-          jump = { close = true },
+          auto_close = false,
+          jump = { close = false },
           layout = { preview = "main" },
           hidden = true,
           ignored = true,

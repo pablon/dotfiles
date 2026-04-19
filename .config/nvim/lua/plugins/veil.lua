@@ -3,9 +3,8 @@
 
 return {
   "Gentleman-Programming/veil.nvim",
-  config = function()
-    require("veil").setup({
-      highlight = { fg = "#f1e89d" },
-    })
-  end,
+  cmd = "Veil",
+  opts = {
+    highlight = { fg = "#f1e89d" },
+  },
 }

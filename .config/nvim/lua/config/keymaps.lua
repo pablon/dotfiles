@@ -22,14 +22,15 @@ vim.keymap.set("n", "<F2>", function()
   vim_opt_toggle("paste", true, false, "Paste mode")
 end)
 
--- enable/disable completion
-vim.keymap.set("n", "<leader>p", '<cmd>lua require("cmp").setup { enabled = true }<cr>', { desc = "Enable completion" })
-vim.keymap.set(
-  "n",
-  "<leader>P",
-  '<cmd>lua require("cmp").setup { enabled = false }<cr>',
-  { desc = "Disable completion" }
-)
+-- enable/disable completion (blink.cmp)
+vim.keymap.set("n", "<leader>p", function()
+  vim.g.blink_cmp_enabled = true
+  vim.notify("Completion Enabled")
+end, { desc = "Enable completion" })
+vim.keymap.set("n", "<leader>P", function()
+  vim.g.blink_cmp_enabled = false
+  vim.notify("Completion Disabled")
+end, { desc = "Disable completion" })
 
 -- buffer resize
 vim.keymap.set("n", "<leader><left>", ":vertical resize +20<cr>", { desc = "Vertical resize +20" })
@@ -48,9 +49,6 @@ vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Ls
 
 -- undotree
 vim.keymap.set("n", "<leader>U", vim.cmd.UndotreeToggle, { desc = "Undotree Toggle" })
-
--- surrounding words
-vim.keymap.set("n", "<leader>wsq", 'ciw""<Esc>P', { desc = "Word Surround Quotes" })
 
 -- replace backward slash
 vim.keymap.set("n", "<leader>rbs", "<cmd>%s/\\//g<CR>", { desc = "Replace Backward Slash" })
@@ -145,16 +143,9 @@ vim.keymap.set("n", "<CR>", function()
 end, { desc = "[P]Toggle fold" })
 
 local function set_foldmethod_expr()
-  -- These are lazyvim.org defaults but setting them just in case a file
-  -- doesn't have them set
-  if vim.fn.has("nvim-0.10") == 1 then
-    vim.opt.foldmethod = "expr"
-    vim.opt.foldexpr = "v:lua.require'lazyvim.util'.treesitter.foldexpr()"
-    vim.opt.foldtext = ""
-  else
-    vim.opt.foldmethod = "indent"
-    vim.opt.foldtext = "v:lua.require'lazyvim.util'.ui.foldtext()"
-  end
+  vim.opt.foldmethod = "expr"
+  vim.opt.foldexpr = "v:lua.require'lazyvim.util'.treesitter.foldexpr()"
+  vim.opt.foldtext = ""
   vim.opt.foldlevel = 99
 end
 

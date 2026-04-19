@@ -3,5 +3,5 @@
 --  browse and switch between different undo branches.
 return {
   "mbbill/undotree",
-  -- keymaps in ../config/keymaps.lua
+  cmd = "UndotreeToggle",
 }

@@ -14,7 +14,8 @@ bootstrap_dir(vault_path)
 return {
   "obsidian-nvim/obsidian.nvim",
   version = "*",
-  lazy = true,
+  event = "BufReadPre *.md",
+  cmd = "Obsidian",
   opts = {
     legacy_commands = false,
     notes_subdir = "inbox",
