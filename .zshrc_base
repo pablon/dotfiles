@@ -15,28 +15,7 @@ export NC="\033[0m"
 _clipboardApp="$(if (command xclip -v &>/dev/null); then echo xclip; elif (type pbcopy &>/dev/null); then echo pbcopy; fi)"
 
 ######################################################################
-# load default & custom zsh sources
-
-DEFAULT_SOURCES=(
-  "${HOME}/.aliases"
-  "${HOME}/.aliases_custom"
-  "${HOME}/.exports"
-  "${HOME}/.functions"
-  "${HOME}/.functions_custom"
-  "${HOME}/.secrets"
-  "${HOME}/.zshrc_custom"
-)  
-
-for file in "${DEFAULT_SOURCES[@]}"; do
-  [ -r "${file}" ] && source "${file}"
-done
-unset file 
-
-######################################################################
 # zsh
-
-# NOTE: zsh-autocomplete async and ZSH_AUTOSUGGEST_USE_ASYNC are disabled
-# in .zshrc BEFORE the plugin loop (must be set before init, not after).
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=13000
@@ -57,24 +36,27 @@ setopt INC_APPEND_HISTORY_TIME # append command to history file immediately afte
 setopt SHARE_HISTORY           # Share history between all sessions.
 unsetopt menu_complete         # do not autoselect the first completion entry
 unsetopt flowcontrol
-setopt auto_menu # show completion menu on successive tab press
+setopt auto_menu               # show completion menu on successive tab press
 setopt complete_in_word
 setopt always_to_end
-# zsh-autosuggestions config
-# NOTE: ZSH_AUTOSUGGEST_USE_ASYNC is intentionally NOT set here.
-# zsh-autocomplete sets it internally, but having both plugins' async
-# handlers active simultaneously causes a zle reentrancy deadlock (blank prompt hang).
-# Autosuggestions runs synchronously — autocomplete handles async completion.
-export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 export ZSH_HIGHLIGHT_MAXLENGTH=300
 
-# Require at least 1 char before triggering completions (avoids empty completion cycles)
+# zsh-autocomplete config (async enabled, PR #856 FD leak fix applied locally)
+# Real-time type-ahead: ON. Tab: fzf ** triggers → fallback to autocomplete's complete-word.
+# zsh-autosuggestions excluded (segfault issue #725 with autocomplete).
 zstyle ':autocomplete:*' min-input 1
+#
+# NOTE: PR #856 fix applied locally to ~/.zsh/zsh-autocomplete/Functions/Init/.autocomplete__async
+#   https://github.com/marlonrichert/zsh-autocomplete/pull/856
+# Fixed: variable name typo in async:clear() + TTY check replaced with FD peek (3 locations).
+# Once PR is merged upstream: cd ~/.zsh/zsh-autocomplete && git pull (local patch will be replaced)
 
 export SPACESHIP_PROMPT_ASYNC=true
 export SPACESHIP_PROMPT_ADD_NEWLINE=true
 
+export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_DATA_HOME="${HOME}/.local/share"
 
 # TERM
 export TERM="xterm-256color"
@@ -143,7 +125,7 @@ export BUILDKIT_COLORS="run=light-blue:error=light-red:cancel=light-magenta:warn
 # .Net stuff
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
-# fzf
+# fzf (Tab coexists with zsh-autocomplete: ** triggers fzf, otherwise falls through to autocomplete)
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
 if (type fzf &>/dev/null); then
   source <(fzf --zsh 2>/dev/null)
@@ -154,7 +136,6 @@ if (type fzf &>/dev/null); then
   --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
   --color=preview-fg:#f5e0dc,preview-bg:#2E3440,label:#cba6f7,spinner:cyan
   --color=header:#cba6f7,prompt:#cba6f7,pointer:#cba6f7,scrollbar:#fab387"
-  # icons: ◆ ← ▶ ❯ ✔ ✘  
 
   [ -n "${TMUX}" ] && FZF_TMUX_OPTS="--tmux center,90%"
 
@@ -165,12 +146,9 @@ if (type fzf &>/dev/null); then
   --scrollbar='│' --cycle --ghost='Search..'"
 
   export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target --preview 'bat -n --color=always {}'"
-
   export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude '.git' . | awk -F'/' '{print NF-1, \$0}' | sort -n | cut -d' ' -f2-"
-
   export FZF_COMPLETION_OPTS='--border --info=inline'
   export FZF_COMPLETION_DIR_COMMANDS="cd pushd rmdir tree"
-
   export FZF_COMPLETION_PATH_OPTS='--walker file,dir,follow,hidden --walker-skip .git,node_modules'
   export FZF_COMPLETION_DIR_OPTS='--walker dir,follow --walker-skip .git,node_modules'
 
@@ -214,23 +192,6 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 ######################################################################
 # auto completion
 
-# (command -v aws_completer &>/dev/null) && complete -C "$(command -v aws_completer)" aws
-# AUTO_COMPLETION=(docker helm kubectl kops)
-# for app in ${AUTO_COMPLETION}; do
-#   (type ${app} &>/dev/null) && source <(${app} completion zsh)
-# done
-# unset app
-#
-# for app in gh glab; do
-#   (type ${app} &>/dev/null) && source <(${app} completion -s zsh)
-# done
-# unset app
-# (type op &>/dev/null) && eval "$(\op completion zsh)"
-# compdef _op op
-# (type opencode &>/dev/null) && source <(opencode completion)
-# (type stern &>/dev/null) && source <(stern --completion zsh)
-# [[ "$(uname)" == "Darwin" ]] && (type az &>/dev/null) && source "${HOMEBREW_PREFIX}/etc/bash_completion.d/az"
-
 # zoxide init
 (type zoxide &>/dev/null) && eval "$(zoxide init zsh)"
 # worktrunk init
@@ -241,6 +202,22 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 [[ "$(uname)" == "Darwin" ]] && ssh-add --apple-load-keychain &>/dev/null
 
 ######################################################################
+# load zsh sources
+
+DEFAULT_SOURCES=(
+  "${HOME}/.aliases"
+  "${HOME}/.aliases_custom"
+  "${HOME}/.exports"
+  "${HOME}/.functions"
+  "${HOME}/.functions_custom"
+  "${HOME}/.secrets"
+  "${HOME}/.zshrc_custom"
+)  
+
+for file in "${DEFAULT_SOURCES[@]}"; do
+  [ -r "${file}" ] && source "${file}"
+done
+unset file 
 
 ######################################################################
 # Add your customizations to ~/.zshrc_custom. 

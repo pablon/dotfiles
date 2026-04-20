@@ -7,26 +7,19 @@
 [[ "$(uname)" == "Darwin" ]] && (type gdate &>/dev/null) && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
 
-# zsh-autocomplete: disable async BEFORE plugin load (checked at init time, not precmd)
-zstyle ':autocomplete:async' enabled no
-# zsh-autosuggestions: disable async to prevent dual fd-handler deadlock with autocomplete
-typeset -g ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-
-# load zsh plugins
+# load zsh plugins (skip list: plugins that conflict with zsh-autocomplete)
+typeset -a ZSH_PLUGINS_SKIP=(zsh-autosuggestions)
 for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
+  (( ${ZSH_PLUGINS_SKIP[(Ie)${plugin}]} )) && continue
   plugin_dir="${HOME}/.zsh/${plugin}"
   plugin_file="$(find "${plugin_dir}" -maxdepth 1 -type f -name '*.plugin.zsh' 2>/dev/null | head -1)"
   [[ -n "${plugin_file}" ]] && source "${plugin_file}"
   unset plugin plugin_dir plugin_file
 done
+unset ZSH_PLUGINS_SKIP
 
 # load ~/.zshrc_base (setup)
 [ -r "${HOME}/.zshrc_base" ] && source "${HOME}/.zshrc_base"
-# load ~/.zshrc_custom (user) if exists
-[ -r "${HOME}/.zshrc_custom" ] && source "${HOME}/.zshrc_custom"
-
-# fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # load atuin
 [ -x "${HOME}/.atuin/bin/env" ] && source "${HOME}/.atuin/bin/env" &>/dev/null
