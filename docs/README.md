@@ -53,7 +53,7 @@ and executes numbered scripts sequentially.
 
 ### What Gets Installed
 
-- **Shell**: Zsh + oh-my-zsh (completions, autosuggestions, syntax highlighting)
+- **Shell**: Zsh + zsh-autocomplete (real-time completions), zsh-syntax-highlighting, atuin history
 - **Editors**: Vim and Neovim
 - **Version Manager**: ASDF (Python, Node.js, Go, Rust)
 - **Containers**: Docker with Compose and Buildx
@@ -100,7 +100,9 @@ rm -rf ~/dotfiles                        # full removal
 
 ```text
 ~/dotfiles/
-├── .aliases / .functions / .zshrc / .zshrc_base / .vimrc / .tmux.conf / .gitconfig
+├── .aliases / .functions / .gitconfig / .tmux.conf / .vimrc
+├── .zshrc          # plugin loader & orchestrator
+├── .zshrc_base     # all zsh config: PATH, FPATH, fzf, completions
 ├── .config/
 │   ├── atuin/  gh-dash/  lazygit/  nvim/  starship/  yazi/
 │   └── bat/    gh/       ghostty/  k9s/
@@ -151,13 +153,14 @@ Branch prefix → commit type: `feat/` → `feat:` · `fix/` → `fix:` · `docs
 
 ## Troubleshooting
 
-| Issue                   | Fix                                                         |
-| ----------------------- | ----------------------------------------------------------- |
-| Missing core dependency | Install `git` / `curl` via system package manager           |
-| GNU Stow not installed  | `brew install stow` / `apt install stow` / `pacman -S stow` |
-| Permission denied       | Run as non-root user with sudo access                       |
-| OS not supported        | Check supported distros above                               |
-| Stow conflicts          | Run `./setup.sh --dry-run install` to preview, then re-run  |
+| Issue                         | Fix                                                         |
+| ----------------------------- | ----------------------------------------------------------- |
+| Missing core dependency       | Install `git` / `curl` via system package manager           |
+| GNU Stow not installed        | `brew install stow` / `apt install stow` / `pacman -S stow` |
+| Permission denied             | Run as non-root user with sudo access                       |
+| OS not supported              | Check supported distros above                               |
+| Stow conflicts                | Run `./setup.sh --dry-run install` to preview, then re-run  |
+| Zsh keybindings stop working  | Known async bug — fixed in current config. Open a new terminal session. |
 
 ```bash
 pre-commit install && pre-commit run -a   # run all quality hooks

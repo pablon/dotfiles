@@ -1,9 +1,8 @@
 # Contributing
 
 1. Follow the established naming conventions and coding standards
-2. Write comprehensive tests for new features
-3. Update documentation for any changes
-4. Ensure security best practices are followed
+2. Update documentation for any changes
+3. Ensure security best practices are followed
 
 Feel free to use this repository as inspiration for your own setup.
 
