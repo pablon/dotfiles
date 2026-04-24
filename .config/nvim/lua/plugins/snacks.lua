@@ -1,5 +1,4 @@
 -- https://github.com/folke/snacks.nvim
---
 -- A collection of small QoL plugins for Neovim.
 
 return {

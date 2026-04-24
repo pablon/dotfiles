@@ -1,5 +1,6 @@
 -- https://github.com/johmsalas/text-case.nvim
 -- all in one plugin for converting text case
+
 return {
   "johmsalas/text-case.nvim",
   dependencies = { "nvim-telescope/telescope.nvim" },

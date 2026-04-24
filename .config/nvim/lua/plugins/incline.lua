@@ -1,5 +1,5 @@
--- URL: https://github.com/b0o/incline.nvim
--- Description: A Neovim plugin for showing the current filename in a floating window.
+-- https://github.com/b0o/incline.nvim
+-- A Neovim plugin for showing the current filename in a floating window.
 
 return {
   "b0o/incline.nvim",
