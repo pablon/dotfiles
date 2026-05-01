@@ -20,9 +20,20 @@ local function is_prose_line(lnum, lines)
   return true
 end
 
+local skip_wrap_files = {
+  ["AGENTS.md"] = true,
+  ["CLAUDE.md"] = true,
+  ["SKILL.md"] = true,
+}
+
 vim.api.nvim_create_autocmd("BufWritePre", {
   buffer = 0,
   callback = function()
+    local fname = vim.fn.expand("%:t")
+    if skip_wrap_files[fname] then
+      return
+    end
+
     local cursor = vim.api.nvim_win_get_cursor(0)
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     local total = #lines
