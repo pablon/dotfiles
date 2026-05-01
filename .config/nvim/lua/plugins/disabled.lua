@@ -2,6 +2,10 @@
 
 return {
   {
+    "mfussenegger/nvim-ansible",
+    enabled = false,
+  },
+  {
     "zbirenbaum/copilot.lua",
     enabled = true,
   },
