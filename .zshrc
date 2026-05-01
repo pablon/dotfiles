@@ -8,7 +8,7 @@
 _zsh_start="$(date +%s%3N)"
 
 # load zsh plugins (skip list: plugins that conflict with zsh-autocomplete)
-typeset -a ZSH_PLUGINS_SKIP=(zsh-autosuggestions)
+# typeset -a ZSH_PLUGINS_SKIP=(zsh-autosuggestions)
 for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
   (( ${ZSH_PLUGINS_SKIP[(Ie)${plugin}]} )) && continue
   plugin_dir="${HOME}/.zsh/${plugin}"

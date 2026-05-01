@@ -207,11 +207,12 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 DEFAULT_SOURCES=(
   "${HOME}/.aliases"
   "${HOME}/.aliases_custom"
-  "${HOME}/.exports"
+  "${HOME}/.aliases_work"
   "${HOME}/.functions"
   "${HOME}/.functions_custom"
-  "${HOME}/.secrets"
   "${HOME}/.zshrc_custom"
+  "${HOME}/.exports"
+  "${HOME}/.secrets"
 )  
 
 for file in "${DEFAULT_SOURCES[@]}"; do
