@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-add_newline = false
+add_newline = true
 command_timeout = 2000
 follow_symlinks = false
 palette = 'catppuccin_mocha'
@@ -10,7 +10,7 @@ command = "git config --get user.email"
 symbol = '󰊢 '
 style = 'fg:#595959'
 format = "\n[$symbol($output)]($style)"
-when = "git remote get-url --push origin 2>/dev/null"
+when = "git rev-parse --is-inside-work-tree &>/dev/null"
 require_repo = true
 
 [directory]
