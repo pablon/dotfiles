@@ -24,7 +24,21 @@ setup/
   pkglist.{brew,apt,pacman,dnf,asdf}
 bin/{commit,git-clone,vpn-fix,obsidian-sync,...}
 .config/{nvim,starship,lazygit,k9s,gh-dash,atuin,bat,gh,ghostty,yazi}
+.zshrc                # Orchestrator: plugin loader, skip list, atuin/starship/direnv init
+.zshrc_base           # All zsh config: history, PATH, FPATH, fzf, completions
 ```
+
+## ZSH PLUGIN CONFIG
+
+Load order: `.zshrc` plugins → `.zshrc_base` → `.zshrc_custom` → atuin → starship → direnv.
+
+**zsh-autocomplete**: async enabled, PR #856 FD leak fix applied locally at `~/.zsh/zsh-autocomplete/Functions/Init/.autocomplete__async`. When PR merges upstream, `git pull` replaces patch.
+
+**zsh-autosuggestions**: TEMPORARILY RE-ENABLED (skip line commented out in `.zshrc`). Known segfault risk via issue #725 in `complist.so`. If crashes appear, restore `ZSH_PLUGINS_SKIP=(zsh-autosuggestions)` in `.zshrc` and consult `_zsh-fixes.md` in Obsidian vault.
+
+**fzf + autocomplete Tab coexistence**: fzf saves `$fzf_default_completion=complete-word` at init. `**<Tab>` → fzf fuzzy; `<Tab>` → autocomplete's `complete-word` (replaced in precmd via `zle -C`).
+
+Config lives in `.zshrc_base` (NOT `.zshrc`). `.zshrc` is a thin orchestrator only.
 
 ## PRE-COMMIT HOOKS
 
