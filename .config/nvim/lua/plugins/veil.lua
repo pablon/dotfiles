@@ -4,6 +4,7 @@
 return {
   "Gentleman-Programming/veil.nvim",
   cmd = "Veil",
+  event = "LazyFile",
   opts = {
     highlight = { fg = "#f1e89d" },
   },

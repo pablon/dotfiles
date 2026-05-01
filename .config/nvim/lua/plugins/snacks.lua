@@ -56,7 +56,7 @@ return {
         explorer = {
           cycle = true,
           auto_close = false,
-          jump = { close = false },
+          jump = { close = true },
           layout = { preview = "main" },
           hidden = true,
           ignored = true,
