@@ -87,7 +87,7 @@ repos:
           - --quiet
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.0
+    rev: v0.22.1
     hooks:
       - id: markdownlint-cli2
         args: ["--config", ".markdownlint-cli2.jsonc"]
