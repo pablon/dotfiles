@@ -35,7 +35,6 @@ BLUE="\033[1;94m"
 STRONG="\033[1;37m"
 CYAN="\033[1;96m"
 GREEN="\033[1;92m"
-MAGENTA="\033[1;95m"
 YELLOW="\033[1;93m"
 RED="\033[1;31m"
 NC="\033[0m"
@@ -55,7 +54,7 @@ done
 
 CALLER="${SUDO_USER}" # who invoked me?
 
-in_subnet {
+in_subnet() {
   readonly cidr_subnet="${1}"
   readonly ip_addr="${2}"
   local subnet_ip cidr_mask netmask ip_addr_subnet subnet RC
@@ -68,7 +67,7 @@ in_subnet {
   return $RC
 }
 
-ip_to_int {
+ip_to_int() {
   readonly ip_addr="${1}"
   local octet_1 octet_2 octet_3 octet_4
   octet_1=$(echo "${ip_addr}" | cut -d'.' -f1)
