@@ -128,7 +128,7 @@ nnoremap <leader>h :bprevious<cr>
 nnoremap <leader>tn :tabnew<cr>
 nnoremap <leader>to :tabonly<cr>
 nnoremap <leader>tc :tabclose<cr>
-nnoremap <leader>tm :tabmove 
+nnoremap <leader>tm :tabmove
 nnoremap <leader>tl :exe "tabn ".g:lasttab<CR>
 nnoremap <leader>te :tabedit <C-r>=expand("%:p:h")<cr>/
 

@@ -944,6 +944,6 @@ aks-get-upgrades() {
 }
 
 ################################################################
-# Add your custom functions in ~/.functions_custom and they will 
+# Add your custom functions in ~/.functions_custom and they will
 # be loaded automatically when you start a new shell session.
 ################################################################

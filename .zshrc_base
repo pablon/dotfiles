@@ -140,7 +140,7 @@ if (type fzf &>/dev/null); then
   [ -n "${TMUX}" ] && FZF_TMUX_OPTS="--tmux center,90%"
 
   export FZF_DEFAULT_OPTS="${FZF_COLORS} ${FZF_TMUX_OPTS:-} --border='rounded'
-  --border-label='' --preview-window='border-double' 
+  --border-label='' --preview-window='border-double'
   --bind='ctrl-p:change-preview-window(down|hidden|)'
   --marker='✘' --pointer='❯' --separator='─'
   --scrollbar='│' --cycle --ghost='Search..'"
@@ -213,17 +213,17 @@ DEFAULT_SOURCES=(
   "${HOME}/.zshrc_custom"
   "${HOME}/.exports"
   "${HOME}/.secrets"
-)  
+)
 
 for file in "${DEFAULT_SOURCES[@]}"; do
   [ -r "${file}" ] && source "${file}"
 done
-unset file 
+unset file
 
 ######################################################################
-# Add your customizations to ~/.zshrc_custom. 
-# You can create this file if it doesn't exist, it will be sourced 
-# automatically when you start a new shell session. This way, you can 
-# keep your customizations organized and separate from the base 
+# Add your customizations to ~/.zshrc_custom.
+# You can create this file if it doesn't exist, it will be sourced
+# automatically when you start a new shell session. This way, you can
+# keep your customizations organized and separate from the base
 # configuration be loaded automatically when you start a new shell session.
 ######################################################################
