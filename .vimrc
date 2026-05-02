@@ -31,6 +31,8 @@ call plug#begin('~/.vim/autoload/plugged')
   Plug 'ryanoasis/vim-devicons'
   " LSP / completion
   Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+  " Completion / AI
+  Plug 'github/copilot.vim'
 call plug#end()
 
 "===============================================================
