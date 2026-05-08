@@ -14,14 +14,11 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name pablon-dotfiles u
  apt update && apt install -yq sudo git zsh
  useradd -m -s /usr/bin/zsh test-user
  echo "test-user ALL=(ALL:ALL) NOPASSWD:ALL" >/etc/sudoers.d/test-user
- su -l test-user bash -c "cd ; git clone https://github.com/pablon/dotfiles.git && cd ./dotfiles/ && ./setup.sh install"
-'
+ su -l test-user bash -c "cd ; git clone https://github.com/pablon/dotfiles.git && cd ./dotfiles/ && ./setup.sh install" ; exec su -l test-user'
 ```
 
 ## Step 2
 
-Once `setup.sh` has finished:
+Once `setup.sh` has finished tou can start playing around :rocket:
 
-1. **Logout** from 'test-user' by pressing `Ctrl-d` or running `exit` (_you'll see the root prompt_)
-2. **Become** 'test-user' again, run: `su - test-user`
-3. Start playing around :rocket:
+**Note:** once you logout the container is gone; no cleanup required.
