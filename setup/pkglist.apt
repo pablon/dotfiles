@@ -18,7 +18,6 @@ fontconfig
 fonts-font-awesome
 fonts-liberation
 fortune
-fzf
 gawk
 git
 git-delta
