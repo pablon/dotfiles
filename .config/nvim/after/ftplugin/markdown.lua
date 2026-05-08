@@ -1,6 +1,6 @@
 vim.diagnostic.enable(false, { bufnr = 0 })
 vim.opt_local.wrap = false
-vim.opt_local.textwidth = 80
+vim.opt_local.textwidth = 120
 vim.opt_local.formatoptions:append("t")
 
 local function is_prose_line(lnum, lines)
