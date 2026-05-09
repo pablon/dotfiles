@@ -12,9 +12,11 @@
 ^\.github$
 ^\.gitignore$
 ^\.helm$
+^\.markdownlint-cli2\.jsonc$
 ^\.pre-commit-config\.yaml$
 ^\.stow-local-ignore$
 ^\.zshrc_custom$
+^bin$
 ^docs$
 ^setup$
 ^setup\.sh$
