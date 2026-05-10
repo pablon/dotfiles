@@ -17,8 +17,10 @@ if [ ! -f "${SSH_KEY}" ]; then
   ssh-keygen -t ${SSH_KEY_TYPE} -f "${SSH_KEY}" -qN '' || exit 1
 fi
 
-if [ ! -f "${SSH_CONFIG_FILE}" ]; then
-  # create ${SSH_CONFIG_FILE}
+# create ${SSH_CONFIG_FILE} if it does not exist
+if [ -f "${SSH_CONFIG_FILE}" ]; then
+  _warning "${SSH_CONFIG_FILE} already exists - skipping"
+else
   _info "Creating ${CYAN}${SSH_CONFIG_FILE}"
   cat <<'EOF' >"${SSH_CONFIG_FILE}"
 # Read other configs if needed:
@@ -37,6 +39,7 @@ Host *
   PreferredAuthentications publickey
   SendEnv                  LANG LC_*
   ServerAliveInterval      15
+  StrictHostKeyChecking    accept-new
   UseKeychain              yes
 
 # Github
@@ -49,6 +52,4 @@ Host gitlab.com
   HostName gitlab.com
   User git
 EOF
-else
-  _success "${SSH_CONFIG_FILE} already exists - skipping"
 fi
