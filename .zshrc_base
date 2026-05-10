@@ -80,6 +80,7 @@ for i in "${PATH_DIRS[@]}"; do
   [ -d "${i}" ] && PATH+=":${i}"
 done
 export PATH="${PATH}"
+unset PATH_DIRS
 
 # TODO: shell completion with carapace
 # export CARAPACE_BRIDGES='zsh'
@@ -97,6 +98,7 @@ for i in "${FPATH_DIRS[@]}"; do
 done
 (type brew &>/dev/null) && FPATH+=":${HOMEBREW_PREFIX}/share/zsh/site-functions"
 export FPATH="${FPATH}"
+unset FPATH_DIRS
 
 # You may need to manually set your MANPATH
 export MANPATH="/usr/local/man:${MANPATH}"
@@ -218,7 +220,7 @@ DEFAULT_SOURCES=(
 for file in "${DEFAULT_SOURCES[@]}"; do
   [ -r "${file}" ] && source "${file}"
 done
-unset file
+unset file DEFAULT_SOURCES
 
 ######################################################################
 # Add your customizations to ~/.zshrc_custom.
