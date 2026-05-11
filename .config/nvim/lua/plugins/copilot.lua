@@ -3,7 +3,7 @@
 
 return {
   "zbirenbaum/copilot.lua",
-  -- optional = true,
+  event = "InsertEnter",
   opts = {
     suggestion = {
       auto_trigger = true,
