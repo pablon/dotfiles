@@ -7,8 +7,26 @@
 [[ "$(uname)" == "Darwin" ]] && (type gdate &>/dev/null) && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
 
+# Export core paths before plugins: zsh-autocomplete runs compinit during plugin load.
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_DATA_HOME="${HOME}/.local/share"
+
+FPATH_DIRS=(
+  "${HOME}/.completions"
+  "${HOME}/.docker/completions"
+  "${HOME}/.zsh/zsh-completions/src"
+)
+for i in "${FPATH_DIRS[@]}"; do
+  [ -d "${i}" ] && FPATH+=":${i}"
+done
+(type brew &>/dev/null) && [ -n "${HOMEBREW_PREFIX:-}" ] && FPATH+=":${HOMEBREW_PREFIX}/share/zsh/site-functions"
+export FPATH="${FPATH}"
+unset FPATH_DIRS
+
 # load zsh plugins (skip list: plugins that conflict with zsh-autocomplete)
-# typeset -a ZSH_PLUGINS_SKIP=(zsh-autosuggestions)
+typeset -a ZSH_PLUGINS_SKIP=(zsh-completions)
+# ZSH_PLUGINS_SKIP+=(zsh-autosuggestions)
 for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
   ((${ZSH_PLUGINS_SKIP[(Ie)${plugin}]})) && continue
   plugin_dir="${HOME}/.zsh/${plugin}"
@@ -31,9 +49,6 @@ eval "$(starship init zsh)"
 
 # load direnv hook
 (type direnv &>/dev/null) && eval "$(direnv hook zsh)"
-
-# print a random cookie （╯°□°）╯ ┻━┻
-cookie
 
 # list tmux sessions if not in tmux
 if [ -z "${TMUX}" ]; then

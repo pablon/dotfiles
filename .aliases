@@ -11,7 +11,7 @@ alias .....="cd ../../../.."
 # brew
 #===============================================================
 
-if (type brew &>/dev/null); then
+if command -v brew &>/dev/null; then
   alias brew_prune="brew cleanup --prune=all -v"
   alias brew_update_all="brew update && brew upgrade && brew cleanup --prune=all -v"
 fi
@@ -22,8 +22,8 @@ fi
 
 alias htop='sudo htop'
 if [[ "$(uname)" == "Darwin" ]]; then
-  (type powermetrics &>/dev/null) && alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
-  (type osx-cpu-temp &>/dev/null) && alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
+  command -v powermetrics &>/dev/null && alias tempcheck="sudo powermetrics --samplers smc | grep -i 'CPU die temperature'"
+  command -v osx-cpu-temp &>/dev/null && alias tempwatch="watch -d 'osx-cpu-temp -cgCf'"
 fi
 
 #===============================================================
@@ -33,11 +33,11 @@ fi
 alias cdate='echo -n "$(date +%F\ %T\ %Z)" | $_clipboardApp'     # full-date local TZ
 alias cdateu='echo -n "$(date -u +%F\ %T\ %Z)" | $_clipboardApp' # full-date UTC
 alias curl="curl --progress-bar --connect-timeout 3 -m 3 -s -H 'User-Agent: Mozilla/5 Gecko'"
-(type colordiff &>/dev/null) && alias diff='colordiff'
+command -v colordiff &>/dev/null && alias diff='colordiff'
 alias egrep="egrep --color=auto"
 alias grep="grep --color=auto"
 alias history='history -i'
-if (type eza &>/dev/null); then
+if command -v eza &>/dev/null; then
   EZA_OPTS="--group-directories-first --icons=always --git-ignore -F always -o --no-user --git --color-scale all --color-scale-mode fixed"
   alias ll="eza ${EZA_OPTS} -al -s type"
   alias lld="eza ${EZA_OPTS} -al -D"
@@ -51,9 +51,9 @@ else
 fi
 alias l="ls"
 alias monitor="tail -f /var/log/*.log"
-(type socat &>/dev/null) && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
+command -v socat &>/dev/null && alias monsocat="watch -d \"ps ax | grep socat | egrep -v 'grep|netstat' ; netstat -tn | grep '127.0.0.1.443'\""
 # (type python3 &>/dev/null) && alias python="$(which python3)"
-(type gsed &>/dev/null) && alias sed="$(which gsed)"
+command -v gsed &>/dev/null && alias sed='gsed'
 alias stat='stat -x'
 alias tm='tmux'
 alias tma='tmux-attach' # see .functions
@@ -65,12 +65,12 @@ alias v.='nvim .'
 alias v='nvim'
 alias vi='nvim'
 alias wget="wget -U 'User-Agent: Mozilla/5 Gecko' -ct 3 -T 3 --show-progress --progress=bar --no-cache"
-(type yamllint &>/dev/null) && alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
-if (type zoxide &>/dev/null); then
+command -v yamllint &>/dev/null && alias yamllint="yamllint -d '{extends: relaxed, rules: {line-length: {max: 280}}}'"
+if command -v zoxide &>/dev/null; then
   alias cd="z"
   alias cdi="zi"
 fi
-(type nc &>/dev/null) && alias nc="nc -vvz -w 3"
+command -v nc &>/dev/null && alias nc="nc -vvz -w 3"
 
 #===============================================================
 # misc
@@ -88,8 +88,8 @@ alias oo="_info '📝 Opening Obsidian' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian
 alias os="_info '🔎 Opening Obsidian search' ; ( cd "${OBSIDIAN_VAULT_DIR:-~/obsidian-vault}/" && nvim -c 'Obsidian search' )"
 
 alias reload="reset ; source ${HOME}/.zshrc"
-(type cmatrix &>/dev/null) && alias cmatrix='cmatrix -abs'
-(type ghostty &>/dev/null) && alias boo='ghostty +boo'
+command -v cmatrix &>/dev/null && alias cmatrix='cmatrix -abs'
+command -v ghostty &>/dev/null && alias boo='ghostty +boo'
 
 #===============================================================
 # fzf preview/edit
@@ -115,20 +115,20 @@ alias gss='git status -s'
 alias gu='git unstage'
 alias lp="git lp"
 alias st="git st"
-(type gh &>/dev/null) && alias gh-create='gh repo create --private --source=. --remote=origin && git push -u --all && gh browse'
+command -v gh &>/dev/null && alias gh-create='gh repo create --private --source=. --remote=origin && git push -u --all && gh browse'
 # git tuis
-if (type lazygit &>/dev/null); then
+if command -v lazygit &>/dev/null; then
   alias gt="lazygit log -ucd ~/.config/lazygit"
-elif (type gitui &>/dev/null); then
+elif command -v gitui &>/dev/null; then
   alias gt="gitui"
 fi
 # delta -- https://github.com/dandavison/delta
-if (type delta &>/dev/null); then
+if command -v delta &>/dev/null; then
   alias delta="delta -n"
 fi
 # worktrunk -- https://github.com/max-sixty/worktrunk
 # at this point (after init) wt is a shell function from ~/.zshrc_base
-if (type wt | grep 'shell function from' &>/dev/null); then
+if (( ${+functions[wt]} )); then
   wta() {
     [[ "${1}" ]] && wt switch --create "${1}"
   }
@@ -150,8 +150,8 @@ fi
 # docker
 #===============================================================
 
-if (type docker &>/dev/null); then
-  alias alpine="docker run --rm -it -w /mnt -v $(pwd):/mnt:rw alpine:latest ash"
+if command -v docker &>/dev/null; then
+  alias alpine='docker run --rm -it -w /mnt -v "${PWD}":/mnt:rw alpine:latest ash'
   alias d="docker"
   alias db='docker buildx build --no-cache'
   alias dc='docker compose'
@@ -164,20 +164,22 @@ if (type docker &>/dev/null); then
   alias dsta='docker stop $(docker ps -q)'
   alias dvprune='docker volume prune'
 fi
-(type slim &>/dev/null) && alias slim='slim build --http-probe-off --continue-after 1 --include-cert-all --include-cert-dirs --include-cert-pk-all --include-cert-pk-dirs --include-shell'
+command -v slim &>/dev/null && alias slim='slim build --http-probe-off --continue-after 1 --include-cert-all --include-cert-dirs --include-cert-pk-all --include-cert-pk-dirs --include-shell'
 
 #===============================================================
 # ACT - check ~/.actrc
 #===============================================================
 
-(type act &>/dev/null) && (type gh &>/dev/null) && alias act="act --rm -b --use-new-action-cache --detect-event -s GITHUB_TOKEN=\"$(gh auth token)\""
+if command -v act &>/dev/null && command -v gh &>/dev/null; then
+  alias act='act --rm -b --use-new-action-cache --detect-event -s GITHUB_TOKEN="$(gh auth token)"'
+fi
 
 #===============================================================
 # kubernetes
 #===============================================================
 
-if (type kubectl &>/dev/null); then
-  if (type kubecolor &>/dev/null); then
+if command -v kubectl &>/dev/null; then
+  if command -v kubecolor &>/dev/null; then
     alias k='kubecolor'
     alias kubectl='kubecolor'
   else
@@ -185,7 +187,7 @@ if (type kubectl &>/dev/null); then
   fi
 
   # check if it works
-  (type complete &>/dev/null) && complete -o default -F __start_kubectl k
+  command -v complete &>/dev/null && complete -o default -F __start_kubectl k
 
   alias kcp='kubectl cp'
   alias kdel='kubectl delete'
@@ -217,7 +219,7 @@ if (type kubectl &>/dev/null); then
   alias get-taints='kubectl get node -o name | while read node ; do echo -en "$(basename ${node})\t" ; kubectl describe ${node} | grep Taint | column -tx ; done'
   alias get-all-certs='kubectl get secrets --field-selector type=kubernetes.io/tls'
   # krew stuff
-  (type kubeconform &>/dev/null) && alias kubeconform='kubeconform -output pretty -summary -strict -verbose'
+  command -v kubeconform &>/dev/null && alias kubeconform='kubeconform -output pretty -summary -strict -verbose'
   # custom pods
   alias pod_alpine="kubectl run -it --rm alpine --image alpine:latest --restart=Never -- ash"
   alias pod_debian="kubectl run -it --rm debian --image debian:latest --restart=Never -- bash"
@@ -225,25 +227,17 @@ if (type kubectl &>/dev/null); then
   alias pod_ubuntu="kubectl run -it --rm ubuntu --image ubuntu:latest --restart=Never -- bash"
 fi
 # kubie
-if (type kubie &>/dev/null); then
+if command -v kubie &>/dev/null; then
   alias kc='kubie ctx' # context selector
   alias kn='kubie ns'  # namespace selector
 fi
 # stern
-if (type stern &>/dev/null); then
+if command -v stern &>/dev/null; then
   alias stern="stern --only-log-lines -td -H '(?i)debug|info|warn[i][n][g]|auth|fail[e][d]|error|critical|unknown|unhealthy'"
 fi
 # helm
-if (type helm-docs &>/dev/null); then
+if command -v helm-docs &>/dev/null; then
   alias helm-docs='helm-docs -b plastic -u'
-fi
-# minikube
-if (type minikube &>/dev/null); then
-  alias mk='minikube'
-  alias mks='minikube profile list && minikube status'
-  alias mkstart='start --addons=storage-provisioner,metallb --delete-on-failure=true --cni=calico && mks'
-  alias mkt="minikube tunnel --cleanup=true --bind-address='*'"
-  alias mku="minikube update-context"
 fi
 
 #===============================================================
