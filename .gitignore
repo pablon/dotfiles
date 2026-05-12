@@ -2,9 +2,14 @@
 **/*.bkp
 **/*.disabled
 **/.DS_Store
+**/.aliases_custom
 **/.aliases_work
+**/.exports
+**/.functions_custom
 **/.secrets
+**/.stowrc
 **/.tool-versions
+**/.zshrc_custom
 **/lazy-lock.json
 **/spell
 **/state.yml
