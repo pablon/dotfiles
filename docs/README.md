@@ -1,6 +1,12 @@
 # Dotfiles Documentation
 
-Personal configuration files for **macOS** and **Linux**.
+## Scope
+
+This documentation covers the repository layout, setup flow, contributing rules, and selected configuration notes for these dotfiles. It does not duplicate the full implementation details of each config file.
+
+## Audience
+
+For people setting up the dotfiles, maintaining them, or contributing changes.
 
 ## Quick Start
 
@@ -114,6 +120,10 @@ rm -rf ~/dotfiles                        # full removal
 │   └── vpn-fix       # fix VPN DNS + routes
 ├── setup/            # 0_*.sh – 8_*.sh + .functions + pkglist.*
 └── docs/
+    ├── CODE_OF_CONDUCT.md
+    ├── CONTRIBUTING.md
+    ├── README.md
+    └── docker.md
 ```
 
 ### Key Configs
@@ -169,6 +179,12 @@ bash -n script.sh                         # syntax-check a script
 ```
 
 **Pre-commit hooks**: shellcheck · yamllint · markdown-link-check · markdownlint-cli2 · detect-private-key · check-added-large-files · check-executables-have-shebangs · check-merge-conflict · check-symlinks
+
+## Related Documentation
+
+- [Try with docker](docker.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Contributing
 

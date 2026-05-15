@@ -1,5 +1,13 @@
 # Contributing
 
+## Scope
+
+This guide covers contribution conventions for the dotfiles repo. It does not replace the individual README files for each tool or subsystem.
+
+## Audience
+
+Contributors who edit shell scripts, Lua configs, or documentation.
+
 1. Follow the established naming conventions and coding standards
 2. Update documentation for any changes
 3. Ensure security best practices are followed
