@@ -21,7 +21,7 @@ opt.spelllang = { "en,es" }
 opt.swapfile = false
 opt.tabstop = 2
 opt.textwidth = 100
-opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+opt.undodir = os.getenv("HOME") .. "/.nvim/undodir"
 
 -- folding
 opt.foldenable = true

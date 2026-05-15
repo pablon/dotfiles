@@ -17,10 +17,20 @@ local function vim_opt_toggle(opt, on, off, name)
   vim.notify(message)
 end
 
--- Togle paste mode
+-- Toggle paste mode
 vim.keymap.set("n", "<F2>", function()
   vim_opt_toggle("paste", true, false, "Paste mode")
 end)
+
+-- Toggle wrap mode
+vim.keymap.set("n", "<F10>", function()
+  vim_opt_toggle("wrap", true, false, "Line wrap")
+end)
+
+-- Toggle zen mode
+vim.keymap.set("n", "<F12>", function()
+  Snacks.zen()
+end, { desc = "Toggle Zen Mode" })
 
 -- enable/disable completion (blink.cmp)
 vim.keymap.set("n", "<leader>p", function()
