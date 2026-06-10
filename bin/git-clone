@@ -14,6 +14,7 @@ PRETTY_FORMAT='%C(auto)%h%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>'
 
 # colors
 BLUE="\033[1;94m"
+CYAN="\033[1;96m"
 STRONG="\033[1;37m"
 CLEAR="\033[0m"
 GREEN="\033[1;92m"
@@ -24,11 +25,16 @@ _info() {
   echo -e "${BLUE}==> ${STRONG}${1}${CLEAR}"
 }
 
-WORKDIR=${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}
+WORKDIR="${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}"
 CLONE_URL="${1:?missing git clone url}"
-PATTERN='(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+).git$'
+PATTERN='^(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)\.git$'
 
 if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
+  if [[ -z "${BASH_REMATCH[3]:-}" || -z "${BASH_REMATCH[4]:-}" || -z "${BASH_REMATCH[5]:-}" ]]; then
+    _info "${RED}  Unsupported git uri: ${YELLOW}${CLONE_URL}"
+    exit 1
+  fi
+
   REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
   CLONE_PATH="$(dirname "${REPO_DIR}")"
   if [ -d "${REPO_DIR}" ]; then

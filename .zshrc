@@ -32,7 +32,7 @@ unset FPATH_DIRS
 
 # load zsh plugins (skip list: plugins that conflict with zsh-autocomplete)
 typeset -a ZSH_PLUGINS_SKIP=(zsh-completions)
-# ZSH_PLUGINS_SKIP+=(zsh-autosuggestions)
+# ZSH_PLUGINS_SKIP+=(zsh-autosuggestions) # skips  waiting for https://github.com/marlonrichert/zsh-autocomplete/pull/8560
 for plugin in $(\ls -1 ${HOME}/.zsh/ | sort | xargs); do
   ((${ZSH_PLUGINS_SKIP[(Ie)${plugin}]})) && continue
   plugin_dir="${HOME}/.zsh/${plugin}"

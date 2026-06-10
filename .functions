@@ -137,7 +137,7 @@ tmux-clone() {
 }
 
 tmux-new() {
-  tmux new -s "$(date +%F)-${RANDOM}"
+  tmux new -s "$(date +%F)"
 }
 
 #===============================================================
@@ -925,6 +925,69 @@ aks-get-upgrades() {
     az aks get-upgrades --name ${CLUSTER} --resource-group ${RESOURCEGROUP} -o table 2>/dev/null
     echo
   fi
+}
+
+#===============================================================
+# github/gitlab auth check
+#
+# Usage:
+#   1. echo -e "export {GITHUB,GITLAB}_TOKEN='<your-PAT>'\nsource ~/.functions && repo_auth_check" > <your-repo-path>/.envrc
+#   2. cd <your-repo-path>/.envrc && direnv allow
+
+repo_auth_check() {
+  local REMOTE_URL="$(git remote get-url origin 2>/dev/null || true)"
+  local REMOTE_HOST="${REMOTE_URL}"
+  local REMOTE_HOST="${REMOTE_HOST#ssh://}"
+  local REMOTE_HOST="${REMOTE_HOST#git@}"
+  local REMOTE_HOST="${REMOTE_HOST#https://}"
+  local REMOTE_HOST="${REMOTE_HOST#http://}"
+  local REMOTE_HOST="${REMOTE_HOST#*://}"
+  local REMOTE_HOST="${REMOTE_HOST##*@}"
+  local REMOTE_HOST="${REMOTE_HOST%%[:/]*}"
+  local REMOTE_PROVIDER=""
+
+  case "${REMOTE_HOST}" in
+    *github*)
+      REMOTE_PROVIDER="GitHub"
+      REMOTE_CLI="gh"
+      ;;
+    *gitlab*)
+      REMOTE_PROVIDER="GitLab"
+      REMOTE_CLI="glab"
+      ;;
+    *)
+      if glab auth status --hostname "${REMOTE_HOST}" >/dev/null 2>&1; then
+        REMOTE_PROVIDER="GitLab"
+        REMOTE_CLI="glab"
+      elif gh auth status --hostname "${REMOTE_HOST}" >/dev/null 2>&1; then
+        REMOTE_PROVIDER="GitHub"
+        REMOTE_CLI="gh"
+      fi
+      ;;
+  esac
+
+  if [ -z "${REMOTE_HOST}" ] || [ -z "${REMOTE_PROVIDER}" ]; then
+    _error "Could not detect GitLab or GitHub host from origin remote: ${REMOTE_URL}"
+    unset REMOTE_URL REMOTE_HOST REMOTE_PROVIDER REMOTE_CLI
+    return 1
+  fi
+
+  if [ "${REMOTE_CLI}" = "glab" ] && glab auth status --hostname "${REMOTE_HOST}" >/dev/null 2>&1; then
+    _success "Authenticated to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+  elif [ "${REMOTE_CLI}" = "gh" ] && gh auth status --hostname "${REMOTE_HOST}" >/dev/null 2>&1; then
+    _success "Authenticated to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+  else
+    _error "Not authenticated to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+  fi
+
+  if [ "${REMOTE_CLI}" = "glab" ] && glab api --hostname "${REMOTE_HOST}" user >/dev/null 2>&1; then
+    _success "API access to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+  elif [ "${REMOTE_CLI}" = "gh" ] && gh api --hostname "${REMOTE_HOST}" user >/dev/null 2>&1; then
+    _success "API access to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+  else
+    _error "API access to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+  fi
+  unset REMOTE_URL REMOTE_HOST REMOTE_PROVIDER REMOTE_CLI
 }
 
 ################################################################

@@ -19,7 +19,7 @@ alias .....="cd ../../../.."
 
 if command -v brew &>/dev/null; then
   alias brew_prune="brew cleanup --prune=all -v"
-  alias brew_update_all="brew update && brew upgrade && brew cleanup --prune=all -v"
+  alias brew_update_all="brew update && brew upgrade --yes && brew cleanup --prune=all"
 fi
 
 #===============================================================
@@ -107,6 +107,7 @@ alias pf="fzf --preview='less {}' --bind shift-up:preview-page-up,shift-down:pre
 # git
 #===============================================================
 
+alias clone="git-clone"
 alias g="git"
 alias ga='git a'
 alias gb='git branch'
@@ -205,6 +206,7 @@ if command -v kubectl &>/dev/null; then
   alias kgea="kubectl get event --no-headers=true -Aw"
   alias kgee='kubectl events --no-headers=true --types=Warning -w'
   alias kgn='kubectl get node --sort-by=".metadata.creationTimestamp"'
+  alias kgnf='kubectl get node --field-selector="spec.unschedulable=true"'
   alias kgnl='kubectl get node --sort-by=".metadata.creationTimestamp" --show-labels'
   alias kgns='kubectl get namespace'
   alias kgnsl='kubectl get namespace --show-labels'
