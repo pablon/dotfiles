@@ -119,9 +119,9 @@ rm -rf ~/dotfiles                        # full removal
 │   ├── obsidian-sync # sync Obsidian vault
 │   └── vpn-fix       # fix VPN DNS + routes
 ├── setup/            # 0_*.sh – 8_*.sh + .functions + pkglist.*
+├── CONTRIBUTING.md
 └── docs/
     ├── CODE_OF_CONDUCT.md
-    ├── CONTRIBUTING.md
     ├── README.md
     └── docker.md
 ```
@@ -183,9 +183,9 @@ bash -n script.sh                         # syntax-check a script
 ## Related Documentation
 
 - [Try with docker](docker.md)
-- [Contributing Guide](CONTRIBUTING.md)
+- [Contributing Guide](../CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Contributing
 
-[Contributing Guide](CONTRIBUTING.md) • [Code of Conduct](CODE_OF_CONDUCT.md)
+[Contributing Guide](../CONTRIBUTING.md) • [Code of Conduct](CODE_OF_CONDUCT.md)
