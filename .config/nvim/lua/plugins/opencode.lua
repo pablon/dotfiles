@@ -1,19 +1,77 @@
--- https://github.com/NickvanDyke/opencode.nvim
+-- https://github.com/nickjvandyke/opencode.nvim
 -- Integrate the opencode AI assistant with Neovim — streamline editor-aware
 -- research, reviews, and requests.
 
--- config.lua: https://github.com/NickvanDyke/opencode.nvim/blob/main/lua/opencode/config.lua
+-- config.lua: https://github.com/nickjvandyke/opencode.nvim/blob/main/lua/opencode/config.lua
+
+local opencode_cmd = "opencode --port"
+
+local function opencode_terminal_opts()
+  return {
+    win = {
+      position = "right",
+      enter = false,
+    },
+  }
+end
+
+local function show_opencode_terminal()
+  local win = require("snacks.terminal").get(opencode_cmd, { create = false })
+  if win then
+    win:show()
+  end
+end
 
 return {
-  "NickvanDyke/opencode.nvim",
+  "nickjvandyke/opencode.nvim",
   dependencies = {
-    { "folke/snacks.nvim", opts = { input = {}, picker = {}, terminal = {} } },
+    {
+      "folke/snacks.nvim",
+      opts = {
+        input = {},
+        picker = {
+          actions = {
+            opencode_send = function(...)
+              return require("opencode").snacks_picker_send(...)
+            end,
+          },
+          win = {
+            input = {
+              keys = {
+                ["<a-a>"] = { "opencode_send", mode = { "n", "i" } },
+              },
+            },
+          },
+        },
+        terminal = {},
+      },
+    },
   },
+  config = function()
+    ---@type opencode.Opts
+    vim.g.opencode_opts = vim.tbl_deep_extend("force", vim.g.opencode_opts or {}, {
+      server = {
+        start = function()
+          require("snacks.terminal").open(opencode_cmd, opencode_terminal_opts())
+        end,
+      },
+    })
+
+    vim.api.nvim_create_autocmd("User", {
+      pattern = { "OpencodeEvent:tui.command.execute" },
+      callback = function(args)
+        local event = args.data and args.data.event
+        if event and event.properties and event.properties.command == "prompt.submit" then
+          show_opencode_terminal()
+        end
+      end,
+    })
+  end,
   keys = {
     {
       "<leader>aa",
       function()
-        require("opencode").toggle()
+        require("snacks.terminal").toggle(opencode_cmd, opencode_terminal_opts())
       end,
       mode = { "n" },
       desc = "Toggle OpenCode",
@@ -21,7 +79,7 @@ return {
     {
       "<leader>as",
       function()
-        require("opencode").select({ submit = true })
+        require("opencode").select()
       end,
       mode = { "n", "x" },
       desc = "OpenCode select",
@@ -29,7 +87,7 @@ return {
     {
       "<leader>ai",
       function()
-        require("opencode").ask("", { submit = true })
+        require("opencode").ask("")
       end,
       mode = { "n", "x" },
       desc = "OpenCode ask",
@@ -37,7 +95,7 @@ return {
     {
       "<leader>aI",
       function()
-        require("opencode").ask("@this: ", { submit = true })
+        require("opencode").ask("@this: ")
       end,
       mode = { "n", "x" },
       desc = "OpenCode ask with context",
@@ -45,7 +103,7 @@ return {
     {
       "<leader>ab",
       function()
-        require("opencode").ask("@file ", { submit = true })
+        require("opencode").ask("@buffer ")
       end,
       mode = { "n", "x" },
       desc = "OpenCode ask about buffer",
@@ -53,7 +111,7 @@ return {
     {
       "<leader>ap",
       function()
-        require("opencode").prompt("@this", { submit = true })
+        require("opencode").prompt("@this")
       end,
       mode = { "n", "x" },
       desc = "OpenCode prompt",
@@ -62,7 +120,7 @@ return {
     {
       "<leader>ape",
       function()
-        require("opencode").prompt("explain", { submit = true })
+        require("opencode").prompt("explain")
       end,
       mode = { "n", "x" },
       desc = "OpenCode explain",
@@ -70,7 +128,7 @@ return {
     {
       "<leader>apf",
       function()
-        require("opencode").prompt("fix", { submit = true })
+        require("opencode").prompt("fix")
       end,
       mode = { "n", "x" },
       desc = "OpenCode fix",
@@ -78,7 +136,7 @@ return {
     {
       "<leader>apd",
       function()
-        require("opencode").prompt("diagnose", { submit = true })
+        require("opencode").prompt("diagnose")
       end,
       mode = { "n", "x" },
       desc = "OpenCode diagnose",
@@ -86,7 +144,7 @@ return {
     {
       "<leader>apr",
       function()
-        require("opencode").prompt("review", { submit = true })
+        require("opencode").prompt("review")
       end,
       mode = { "n", "x" },
       desc = "OpenCode review",
@@ -94,7 +152,7 @@ return {
     {
       "<leader>apt",
       function()
-        require("opencode").prompt("test", { submit = true })
+        require("opencode").prompt("test")
       end,
       mode = { "n", "x" },
       desc = "OpenCode test",
@@ -102,7 +160,7 @@ return {
     {
       "<leader>apo",
       function()
-        require("opencode").prompt("optimize", { submit = true })
+        require("opencode").prompt("optimize")
       end,
       mode = { "n", "x" },
       desc = "OpenCode optimize",
