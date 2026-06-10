@@ -29,7 +29,3 @@ git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
 ## Contributing
 
 [Contributing Guide](docs/CONTRIBUTING.md) • [Code of Conduct](docs/CODE_OF_CONDUCT.md)
-
-## License
-
-[GPL v3.0](LICENSE.md) - feel free to use, modify, and share.

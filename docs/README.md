@@ -189,7 +189,3 @@ bash -n script.sh                         # syntax-check a script
 ## Contributing
 
 [Contributing Guide](CONTRIBUTING.md) • [Code of Conduct](CODE_OF_CONDUCT.md)
-
-## License
-
-[GPL v3.0](../LICENSE.md) — use, modify, and share freely.

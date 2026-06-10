@@ -92,7 +92,3 @@ stow -nv .                 # dry-run stow
 - Use environment variables for sensitive config
 - Set script permissions: `chmod 0755`
 - Pre-commit hooks will block private keys and large files
-
-## License
-
-[GPL v3.0](../LICENSE.md) — use, modify, and share freely.
