@@ -27,6 +27,7 @@ lua
 luajit
 markdownlint-cli2
 pipx
+pnpm
 pre-commit
 shellcheck
 sops
