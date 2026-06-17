@@ -55,7 +55,7 @@ zstyle ':autocomplete:*' min-input 1
 # NOTE: PR #856 fix applied locally to ~/.zsh/zsh-autocomplete/Functions/Init/.autocomplete__async
 #   https://github.com/marlonrichert/zsh-autocomplete/pull/856
 # Fixed: variable name typo in async:clear() + TTY check replaced with FD peek (3 locations).
-# Once PR is merged upstream: cd ~/.zsh/zsh-autocomplete && git pull (local patch will be replaced)
+# Once PR is merged upstream: cd ~/.zsh/zsh-autocomplete && git reset --hard && git pull --rebase (local patch will be replaced)
 
 # Low-cost completion display tweaks. Do not override zsh-autocomplete's matcher-list.
 zstyle ':completion:*' squeeze-slashes true
@@ -66,14 +66,12 @@ zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
 
-export SPACESHIP_PROMPT_ASYNC=true
-export SPACESHIP_PROMPT_ADD_NEWLINE=true
-
 # TERM
 export TERM="xterm-256color"
 
 # export PATH
 PATH_DIRS=(
+  "/opt/homebrew/opt/gnu-getopt/bin"
   "/usr/games"
   "/usr/local/sbin"
   "${HOME}/.asdf/shims"

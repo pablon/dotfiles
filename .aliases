@@ -125,7 +125,7 @@ alias st="git st"
 command -v gh &>/dev/null && alias gh-create='gh repo create --private --source=. --remote=origin && git push -u --all && gh browse'
 # git tuis
 if command -v lazygit &>/dev/null; then
-  alias gt="lazygit log -ucd ~/.config/lazygit"
+  alias gt="lazygit -ucd ~/.config/lazygit"
 elif command -v gitui &>/dev/null; then
   alias gt="gitui"
 fi
