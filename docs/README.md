@@ -1,14 +1,12 @@
 # Dotfiles Documentation
 
-This repo manages my shell, editor, and terminal configs across macOS and Linux.
-Run `setup.sh` on a fresh machine and it installs everything: packages, dotfiles,
-Zsh plugins, Neovim, Docker, Kubernetes CLIs, and more — all in one shot.
+This repo manages my shell, editor, and terminal configs across macOS and Linux. Run `setup.sh` on a fresh machine and
+it installs everything: packages, dotfiles, Zsh plugins, Neovim, Docker, Kubernetes CLIs, and more — all in one shot.
 
 ## Scope
 
-This page covers the repository layout, setup flow, and key configuration notes.
-It does **not** duplicate every detail from each config file — check the file itself
-or the [Contributing Guide](../CONTRIBUTING.md) for deeper dives.
+This page covers the repository layout, setup flow, and key configuration notes. It does **not** duplicate every detail
+from each config file — check the file itself or the [Contributing Guide](../CONTRIBUTING.md) for deeper dives.
 
 ## Audience
 
@@ -37,12 +35,11 @@ Post-setup: open a new terminal session, then verify with
 ### How It Works
 
 The setup is **safe to re-run** (idempotent), **cross-platform**, and **hands-off**.
-It uses [GNU Stow](https://www.gnu.org/software/stow/) to symlink config files from this
-repo into your home directory — no copying, no manual moves. If a target file already exists,
-Stow backs it up with a timestamp (`*.YYYYMMDD-HHMMSS`) before replacing it.
-Every script runs in Strict Mode (`set -euo pipefail`), auto-detects your OS
-(macOS → Homebrew, Debian → APT, Arch → Pacman, Fedora → DNF),
-and runs numbered phases in order.
+It uses [GNU Stow](https://www.gnu.org/software/stow/) to symlink config files from this repo into your home directory —
+no copying, no manual moves. If a target file already exists, Stow backs it up with a timestamp (`*.YYYYMMDD-HHMMSS`)
+before replacing it.
+Every script runs in Strict Mode (`set -euo pipefail`), auto-detects your OS (macOS → Homebrew, Debian → APT, Arch →
+Pacman, Fedora → DNF), and runs numbered phases in order.
 
 `setup.sh` supports two modes:
 
@@ -82,20 +79,36 @@ and runs numbered phases in order.
 
 ### Post-Setup Configuration
 
-```bash
-# Git identity
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-git config --global user.signingkey ~/.ssh/id_ed25519.pub
+Kubernetes contexts
 
-# Kubernetes contexts
+```sh
 mkdir -p ~/.kube/configs  # place cluster configs here
+```
 
-# More languages via ASDF
+More languages via ASDF
+
+```sh
 asdf plugin add nodejs &&
   asdf install nodejs latest &&
   asdf -u nodejs latest
 ```
+
+Git identity
+
+```sh
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+```
+
+> [!TIP]
+> Add the following block **at the beginning** of your `~/.gitconfig` if you
+> want to get advantage of all pre-cooked git configs, aliases and functions:
+>
+> ```gitconfig
+> [include]
+>   path = ~/dotfiles/.gitconfig
+> ```
 
 **Required** shell config files sourced automatically by `.zshrc`:
 
@@ -138,8 +151,8 @@ rm -rf ~/dotfiles                        # full removal
 ```text
 ~/dotfiles/
 ├── .aliases / .functions / .gitconfig / .tmux.conf / .vimrc
-├── .zshrc          # plugin loader & orchestrator
-├── .zshrc_base     # all zsh config: PATH, FPATH, fzf, completions
+├── .zshrc            # plugin loader & orchestrator
+├── .zshrc_base       # all zsh config: PATH, FPATH, fzf, completions
 ├── .config/
 │   ├── atuin/  gh-dash/  lazygit/  nvim/  starship/  yazi/
 │   └── bat/    gh/       ghostty/  k9s/
@@ -159,16 +172,153 @@ rm -rf ~/dotfiles                        # full removal
 
 ### Key Configs
 
-- **Neovim** (`nvim/`): [LazyVim](https://www.lazyvim.org) base; Obsidian vault integration; Snacks image rendering;
-  multi-language LSP
+- **Neovim** (`nvim/`): see below
 - **Git** (`.gitconfig`): GPG signing, `bin/commit` helper, custom aliases
 - **Lazygit**: Delta diffs, Nerd Fonts v3, branch divergence indicators, auto-commit-prefix (Jira/Azure DevOps)
 - **Kubernetes**: kubie context/namespace switching, kubecolor, helm docs generation
+- **Tmux** (`.tmux.conf`): see below
+
+## Neovim
+
+Built on [LazyVim](https://www.lazyvim.org), which means you get a polished IDE experience out of the box — LSP,
+treesitter, autocompletion, snippet engine, and a sane keymap layer — without maintaining 200 lines of boilerplate.
+Every plugin and option on top is deliberate: no toy plugins, no abandonware.
+
+### Editing that stays out of your way
+
+**Snacks.nvim** is the workhorse — it powers the dashboard, file picker, live grep, file explorer, and git status
+browser, all under the `<leader>` prefix. No startup delay, no external dependencies.
+
+**Markdown is a first-class citizen.** Not just syntax highlighting: `render-markdown.nvim` renders headings,
+checkboxes, callouts, and code blocks inline, so what you see is what you get. Live preview in the browser
+(`<leader>mp`) for when you need to check the final look, and `markdown-toc.nvim` inserts a linked table of contents
+(`<leader>mti`).
+
+**Folding that actually works for writing.** Custom fold keymaps (`zi`, `zj`, `zk`, `zl`, `z;`) let you collapse
+headings by level — fold everything from H1 down, or only H3+ — without memorizing obscure `z` commands. Press `zu` to
+unfold all and reload.
+
+**Obsidian vault management** is fully integrated. `obsidian.nvim` lets you search notes, follow `[[wiki links]]`,
+manage daily notes, toggle checkboxes, extract text into new notes, and open the Obsidian app — all mapped under
+`<leader>o`:
+
+| Key           | Action                          |
+| ------------- | ------------------------------- |
+| `<leader>oo`  | Open note in Obsidian app       |
+| `<leader>oss` | Search all vault notes          |
+| `<leader>onn` | Create new note                 |
+| `<leader>od`  | Insert daily note               |
+| `<leader>ob`  | Show backlinks picker           |
+| `<leader>of`  | Follow `[[wiki link]]` in split |
+| `<leader>ost` | Search by tags                  |
+
+### Git in the editor, not just in the terminal
+
+**Gitsigns** adds blame, hunk navigation, staging, and diff previews to the sign column — you see what changed before
+you commit, without leaving the buffer. Combined with **Lazygit** in a tmux popup (`C-g`), you get a full Git workflow
+without leaving your editor.
+
+### AI, but on your terms
+
+[**Copilot**](https://github.com/zbirenbaum/copilot.lua) runs as a pure Lua client — lightweight, no telemetry, no
+Electron. Completion can be toggled on/off with `<leader>p`/`<leader>P` (useful when tab is for snippets, not AI
+guesses).
+
+[**opencode.nvim**](https://github.com/NickvanDyke/opencode.nvim) adds agentic AI assistance — research, code reviews,
+explanations, and inline prompts — all aware of your editor context.
+
+### Built for ops and infra work
+
+Not every Neovim config handles Helm charts, Ansible playbooks, and encrypted SOPS files. This one does:
+
+- **Helm**: syntax highlighting via `vim-helm`, LSP via `helm_ls` (configured in `helm.lua`)
+- **Ansible**: playbook utilities, filetype detection
+- **SOPS**: encrypt/decrypt secrets in-editor with `nvim-sops`
+- **Jinja**: `*.j2` files get correct syntax highlighting
+- **Gitconfig**: `gitconfig-*` patterns detected automatically
+
+### The rest that matters
+
+| Feature              | What it does                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| **incline.nvim**     | Floating filename label on every window — no more guessing which buffer you're in               |
+| **goto-preview**     | LSP definitions, references, and implementations in a floating popup instead of jumping buffers |
+| **undotree**         | Visual undo history tree — browse and restore any previous state                                |
+| **vim-visual-multi** | Multiple cursors and selections, Sublime-Text style                                             |
+| **text-case.nvim**   | Convert between camelCase, snake_case, kebab-case, Title Case, and more                         |
+| **icon-picker.nvim** | Fuzzy-find and insert Nerd Font icons, emojis, and symbols                                      |
+| **vim-easy-align**   | Align text by any character (`<leader>al`)                                                      |
+| **screenkey.nvim**   | Show pressed keys in a floating window — useful for demos and screencasts                       |
+| **veil.nvim**        | Hide secrets and sensitive content before screen sharing                                        |
+
+### Trying it
+
+Kick it with:
+
+```bash
+nvim .
+```
+
+That's it. The config symlinks via Stow, LazyVim auto-installs all plugins on first launch, and the full plugin roster
+lives in [`lua/plugins/README.md`](.config/nvim/lua/plugins/README.md).
+
+## Tmux
+
+This is not your default tmux. The config is designed to make tmux feel like a natural extension of your terminal — not
+an extra layer you tolerate.
+
+### What makes it different
+
+**Catppuccin Mocha top to bottom**: status bar, pane borders, window tabs, popups — all themed with the same palette as
+the rest of the dotfiles. The status bar sits **at the top** (macOS-style) and shows: session name, current path, active
+command, battery level, and clock.
+
+**C-a prefix**: remapped from the awkward `C-b` to `C-a`. Your right pinky thanks you.
+
+**Popups for everything** — the feature you didn't know you needed:
+
+| Key   | What opens                                                                         |
+| ----- | ---------------------------------------------------------------------------------- |
+| `C-g` | Lazygit, right where you are                                                       |
+| `C-t` | htop                                                                               |
+| `C-v` | Neovim in the current dir                                                          |
+| `C-p` | Floating scratch terminal (via [tmux-floax](https://github.com/omerxx/tmux-floax)) |
+
+**Config menu** — press `C-b d` (prefix + `d`) to get a menu that lets you edit aliases, exports, zshrc, tmux.conf,
+nvim, ghostty, starship — all in popups, no file hunting.
+
+### Smart defaults that save time
+
+- **Pane splits** inherit the current working directory — no more `cd` after splitting
+- **Vi mode keys** in copy mode, mouse selection copies without exiting copy mode
+- **History** bumped to 10,000 lines, escape-time set to 0 (no delay after Escape)
+- **Windows renumber** automatically when you close one (no gaps)
+- **Clipboard** syncs with the system clipboard — no `Shift+Select` dance
+
+### Self-healing plugins
+
+On first run, [TPM (Tmux Plugin Manager)](https://github.com/tmux-plugins/tpm) installs itself and all plugins
+automatically — zero manual steps. Active plugins:
+
+| Plugin                                                           | What it does                                                       |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) | Save and restore sessions, windows, and pane layout across reboots |
+| [tmux-fzf-url](https://github.com/wfxr/tmux-fzf-url)             | Press `u`, pick a URL from the terminal history, open in browser   |
+| [tmux-fzf](https://github.com/sainnhe/tmux-fzf)                  | Fuzzy-find sessions, windows, panes, commands, and key bindings    |
+| [tmux-battery](https://github.com/tmux-plugins/tmux-battery)     | Battery percentage and icon in the status bar                      |
+| [tmux-sensible](https://github.com/tmux-plugins/tmux-sensible)   | Sanity-defaults for cursor, searching, and UTF-8                   |
+| [tmux-yank](https://github.com/tmux-plugins/tmux-yank)           | System clipboard integration on macOS and Linux                    |
+| [tmux-floax](https://github.com/omerxx/tmux-floax)               | Floating scratch terminal with `C-p`                               |
+
+### Start using it
+
+There's nothing to install besides `tmux` itself — the config symlinks via Stow and bootstraps everything on first
+`tmux` launch.
 
 ## Aliases & Tools
 
-These are the main shortcuts you get after setup. The full list lives in `.aliases`
-(auto-sourced by Zsh). Type the alias directly in your terminal — no prefix needed.
+These are the main shortcuts you get after setup. The full list lives in `.aliases` (auto-sourced by Zsh). Type the
+alias directly in your terminal — no prefix needed.
 
 ```bash
 # Navigation — zoxide learns your habits, so `cd` gets smarter over time
@@ -194,8 +344,8 @@ sudo bin/vpn-fix        # fix VPN DNS + routes (run with sudo)
 bin/obsidian-sync       # sync your Obsidian vault
 ```
 
-**Branch prefix = commit type**: branches named `feat/xxx` → `feat:` commits,
-`fix/xxx` → `fix:`, `docs/xxx` → `docs:` — the `bin/commit` tool picks this up automatically.
+**Branch prefix = commit type**: branches named `feat/xxx` → `feat:` commits, `fix/xxx` → `fix:`, `docs/xxx` → `docs:` —
+the `bin/commit` tool picks this up automatically.
 
 ## Troubleshooting
 
