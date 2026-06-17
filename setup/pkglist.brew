@@ -56,6 +56,13 @@ kubecolor
 kubeconform
 kubernetes-cli
 kubie
+lazydocker
+lazygit
+lazyjj
+lazyjournal
+lazymake
+lazysql
+lazyssh
 libpq
 lua
 luajit
