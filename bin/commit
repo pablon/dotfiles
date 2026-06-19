@@ -23,7 +23,7 @@ YELLOW="\033[1;93m"
 NC="\033[0m"
 
 PRETTY_FORMAT="%C(bold)%C(yellow)%h%x20%C(reset)%s%x20%C(green)(%ad)%x20%C(bold)%C(blue)<%cn>%C(reset)"
-GIT_LOG_OPTS="--date=relative --author=$(git config --get user.name) --format=${PRETTY_FORMAT} --color --stat --decorate --graph -1"
+GIT_LOG_OPTS=(--date=relative --author="$(git config --get user.name)" --format="${PRETTY_FORMAT}" --color --stat --decorate --graph -1)
 
 # functions
 _info() {
@@ -271,7 +271,7 @@ else
 
     if [ "${PUSH_RC}" -eq "0" ]; then
       # show the commit (git log)
-      echo && git log ${GIT_LOG_OPTS}
+      echo && git log "${GIT_LOG_OPTS[@]}"
     else
       _error "Push failed with code = ${PUSH_RC}" 3
     fi
