@@ -131,6 +131,7 @@ git config --global user.signingkey ~/.ssh/id_ed25519.pub
 | `~/.exports`          | Additional environment variables                                             |
 | `~/.functions_custom` | Override or extend functions without editing `.functions`                    |
 | `~/.secrets`          | Secrets and API keys (chmod 0600 recommended)                                |
+| `~/.tmux_custom.conf` | Override tmux keybindings and options without editing `.tmux.conf`           |
 | `~/.zshrc_custom`     | Override or extend functions without editing `.zshrc`                        |
 
 > [!TIP]
@@ -260,7 +261,7 @@ nvim .
 ```
 
 That's it. The config symlinks via Stow, LazyVim auto-installs all plugins on first launch, and the full plugin roster
-lives in [`lua/plugins/README.md`](.config/nvim/lua/plugins/README.md).
+lives in [`lua/plugins/README.md`](../.config/nvim/lua/plugins/README.md).
 
 ## Tmux
 
