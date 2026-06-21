@@ -9,7 +9,7 @@ cmatrix
 colordiff
 coreutils
 curl
-diff-so-fancy
+delta
 docker
 docker-buildx
 docker-compose
@@ -36,6 +36,7 @@ golangci-lint
 gpg
 grep
 hadolint
+hashicorp/tap/terraform
 helm
 helm-docs
 helmfile
@@ -78,6 +79,7 @@ pngcheck
 pre-commit
 python3
 ripgrep
+ruff
 rust
 shellcheck
 socat
@@ -85,7 +87,6 @@ sops
 starship
 stern
 stow
-hashicorp/tap/terraform
 terraform
 terraform-docs
 terrascan
@@ -94,6 +95,7 @@ tldr
 tmux
 tree-sitter-cli
 universal-ctags
+uv
 watch
 wget
 worktrunk
