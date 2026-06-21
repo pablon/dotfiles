@@ -5,7 +5,6 @@ automake
 bash
 bat
 btop
-cargo
 cmatrix
 colordiff
 coreutils
@@ -79,6 +78,7 @@ pngcheck
 pre-commit
 python3
 ripgrep
+rust
 shellcheck
 socat
 sops
