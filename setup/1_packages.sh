@@ -29,7 +29,6 @@ set_github_token() {
 }
 
 do_prepare_darwin() {
-  [ "${DEBUG}" ] && _info "Executing function ${MAGENTA}${FUNCNAME}"
   # Detect Apple Silicon chipset + install rosetta
   if [[ "$(uname)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
     if (! arch -x86_64 /usr/bin/true 2>/dev/null); then
