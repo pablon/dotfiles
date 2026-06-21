@@ -50,14 +50,15 @@ do_prepare_darwin() {
     # Disable brew analytics
     brew analytics off
   fi
-  if [ -r "${PKGLIST_BREW}" ] && [ -s "${PKGLIST_BREW}" ]; then
-    _info "Installing packages from $(basename "${PKGLIST_BREW}")"
-    install_pkg_darwin $(xargs <"${PKGLIST_BREW}") || {
-      _error "Failed to install packages from ${PKGLIST_BREW}"
+  PACKAGES="${PKGLIST_BREW}"
+  if [ -r "${PACKAGES}" ] && [ -s "${PACKAGES}" ]; then
+    _info "Installing packages from $(basename "${PACKAGES}")"
+    install_pkg_darwin $(xargs <"${PACKAGES}") || {
+      _error "Failed to install packages from ${PACKAGES}"
       exit 1
     }
   else
-    _error "Package list ${PKGLIST_BREW} not found or is empty."
+    _error "Package list ${PACKAGES} not found or is empty."
     exit 1
   fi
 

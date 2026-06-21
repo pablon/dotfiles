@@ -91,7 +91,7 @@ detect_os
 install_pkg_darwin() {
   # Check if brew exists
   if command -v brew >/dev/null 2>&1; then
-    brew install "$@"
+    brew install --yes "$@"
   else
     _error "Homebrew not found. Cannot install packages."
     return 1

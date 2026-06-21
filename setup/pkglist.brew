@@ -85,9 +85,10 @@ sops
 starship
 stern
 stow
+hashicorp/tap/terraform
+terraform
 terraform-docs
 terrascan
-tflint
 tfsec
 tldr
 tmux
