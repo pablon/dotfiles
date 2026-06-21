@@ -20,5 +20,7 @@ return {
     if vim.fn.executable("npx") then
       vim.g.mkdp_filetypes = { "markdown" }
     end
+    -- Use Zen Browser for preview
+    vim.g.mkdp_browser = "Zen"
   end,
 }
