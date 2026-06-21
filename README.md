@@ -11,19 +11,33 @@ Your dotfiles are how you personalize your system - These are mine.
 
 ---
 
-## Quick Start
-
 **Prerequisites**: `git`, `sudo`
+
+## Quick Start
 
 ```bash
 git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
-
 ./setup.sh --help            # show all options
+```
 
-./setup.sh                   # full install (default)
+**Install**:
+
+```bash
+./setup.sh [install]         # full install (default)
+```
+
+**Update**:
+
+```bash
 ./setup.sh update --dry-run  # preview changes without modifying anything
-./setup.sh update            # pull changes and update
+./setup.sh update            # pull changes, update plugins & re-stow
+```
 
+**Re-stow**:
+
+```bash
+# re-create all symlinks
+stow -R . -t ~
 ```
 
 ## Contributing
