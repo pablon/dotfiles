@@ -55,6 +55,11 @@ repos:
       - id: trailing-whitespace
         exclude: snacks.lua
 
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks-docker
+
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.11.0
     hooks:
