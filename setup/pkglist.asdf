@@ -2,6 +2,7 @@ age
 argocd
 bat
 bun
+direnv
 eza
 fzf
 git-lfs

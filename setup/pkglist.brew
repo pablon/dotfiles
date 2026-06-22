@@ -10,6 +10,7 @@ colordiff
 coreutils
 curl
 delta
+direnv
 docker
 docker-buildx
 docker-compose
