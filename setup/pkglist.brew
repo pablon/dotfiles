@@ -67,7 +67,8 @@ libpq
 lua
 luajit
 mermaid-cli
-minikube
+modem-dev/tap/hunk
+mtr
 neovim
 netcat
 opencode
