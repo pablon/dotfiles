@@ -10,7 +10,7 @@ return {
     enabled = true,
   },
   {
-    "NickvanDyke/opencode.nvim",
+    "nickjvandyke/opencode.nvim",
     enabled = true,
   },
 }
