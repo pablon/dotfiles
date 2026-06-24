@@ -6,6 +6,7 @@ gui:
   showFileIcons: true
   tabWidth: 2
 git:
+  overrideGpg: true
   pagers:
     - colorArg: always
       pager: "delta -n --paging=never --tabs=2"
