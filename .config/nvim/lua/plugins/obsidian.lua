@@ -73,10 +73,12 @@ return {
       time_format = "HH:mm",
       substitutions = {
         yesterday = function(_ctx, _suffix)
-          return os.date("%Y-%m-%d", os.time() - 86400)
+          local util = require("obsidian.util")
+          return os.date("%Y-%m-%d", util.working_day_before(os.time()))
         end,
         tomorrow = function(_ctx, _suffix)
-          return os.date("%Y-%m-%d", os.time() + 86400)
+          local util = require("obsidian.util")
+          return os.date("%Y-%m-%d", util.working_day_after(os.time()))
         end,
       },
     },
