@@ -1,15 +1,19 @@
 # common
-background-blur         = 20
-background-opacity      = 0.99
-font-family             = "JetBrainsMono"
-font-size               = 13
-mouse-hide-while-typing = true
-theme                   = TokyoNight
-window-decoration       = auto
-shell-integration       = zsh
+background-blur               = 20
+background-opacity            = 0.99
+copy-on-select                = true
+font-family                   = "JetBrainsMono"
+font-size                     = 13
+mouse-hide-while-typing       = true
+selection-background          = d79921
+selection-foreground          = 2e2e2e
+shell-integration             = zsh
+theme                         = TokyoNight
+window-decoration             = auto
+split-divider-color           = 3c425f
 # keybindings
-keybind                 = super+-=decrease_font_size:2
-keybind                 = super+bracket_right=increase_font_size:1
-keybind                 = global:super+escape=toggle_quick_terminal
-keybind                 = super+l=clear_screen
-keybind                 = super+w=close_tab:this
+keybind                       = super+-=decrease_font_size:2
+keybind                       = super+bracket_right=increase_font_size:1
+keybind                       = global:super+escape=toggle_quick_terminal
+keybind                       = super+l=clear_screen
+keybind                       = super+w=close_tab:this
