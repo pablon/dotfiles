@@ -7,7 +7,7 @@ Start an Ubuntu [latest](https://hub.docker.com/_/ubuntu/tags) container invokin
 command:
 
 ```bash
-DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name test-dotfiles ubuntu:latest sh -uelic '
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name test-dotfiles ubuntu:latest bash -lc '
  export DEBIAN_FRONTEND="noninteractive"
  apt update && apt upgrade -yq && apt install -yq sudo git zsh
  useradd -m -s /usr/bin/zsh test-dotfiles
