@@ -1,6 +1,9 @@
 **/*.[1-9999]*
-**/*.bkp
+**/*.backup*
+**/*.bkp*
 **/*.disabled
+**/*.log
+**/*.sock
 **/.DS_Store
 **/.aliases_custom
 **/.aliases_work
@@ -8,10 +11,13 @@
 **/.functions_custom
 **/.secrets
 **/.stowrc
+**/.tmux_custom.conf
 **/.tool-versions
 **/.zshrc_custom
 **/lazy-lock.json
+**/session.json
 **/spell
 **/state.yml
 .atl/
+.opencode/
 AGENTS.md
