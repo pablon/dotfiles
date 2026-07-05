@@ -1,0 +1,106 @@
+[theme]
+name = "tokyo-night"
+auto_switch = false
+
+[theme.custom]
+surface_dim = "#3b4261"
+overlay0 = "#565f89"
+accent = "#9ece6a"
+
+[ui]
+mouse_capture = true
+pane_borders = true
+pane_gaps = true
+show_agent_labels_on_pane_borders = true
+prompt_new_tab_name = false
+
+[terminal]
+shell_mode = "auto"
+new_cwd = "follow"
+
+[session]
+pane_history = true
+resume_agents_on_restore = true
+
+[experimental]
+kitty_graphics = true
+
+[keys]
+prefix = "ctrl+a"
+detach = "prefix+ctrl+d"
+help = "prefix+?"
+reload_config = "prefix+r"
+settings = "prefix+s"
+# workspaces
+new_workspace = "prefix+c"
+next_workspace = "prefix+l"
+previous_workspace = "prefix+p"
+switch_workspace = "prefix+1..9"
+workspace_picker = "prefix+w"
+#tabs
+new_tab = "prefix+t"
+rename_tab = "prefix+shift+r"
+switch_tab = "prefix+shift+1..9"
+# splits
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+# panes
+close_pane = "prefix+x"
+cycle_pane_next = "prefix+tab"
+cycle_pane_previous = "prefix+shift+tab"
+resize_mode = "prefix+E"
+swap_pane_down = "prefix+shift+j"
+swap_pane_left = "prefix+shift+h"
+swap_pane_right = "prefix+shift+l"
+swap_pane_up = "prefix+shift+k"
+zoom = "prefix+z"
+# Vi/tmux-like pane navigation.
+focus_pane_left = "prefix+left"
+focus_pane_down = "prefix+down"
+focus_pane_up = "prefix+up"
+focus_pane_right = "prefix+right"
+navigate_pane_left = "h"
+navigate_pane_down = "j"
+navigate_pane_up = "k"
+navigate_pane_right = "l"
+# Move between agents in the sidebar.
+previous_agent = "prefix+alt+k"
+next_agent = "prefix+alt+j"
+# Jump straight to agent N (1..9) as listed in the sidebar.
+focus_agent = "prefix+ctrl+1..9"
+
+[[keys.command]]
+key = "prefix+ctrl+g"
+type = "pane"
+command = "lazygit -ucd ${XDG_CONFIG_HOME:-$HOME/.config}/lazygit"
+description = "run lazygit"
+
+[[keys.command]]
+key = "prefix+ctrl+h"
+type = "pane"
+command = "hunk diff"
+description = "run hunk diff"
+
+[[keys.command]]
+key = "prefix+ctrl+j"
+type = "pane"
+command = "hunk show"
+description = "run hunk show"
+
+[[keys.command]]
+key = "prefix+ctrl+t"
+type = "pane"
+command = "htop"
+description = "run htop"
+
+[[keys.command]]
+key = "prefix+ctrl+v"
+type = "pane"
+command = "nvim ."
+description = "edit current directory"
+
+[[keys.command]]
+key = "prefix+ctrl+p"
+type = "pane"
+command = "nvim ."
+description = "edit current directory"
