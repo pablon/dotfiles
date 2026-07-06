@@ -27,7 +27,7 @@ _info() {
 
 WORKDIR="${GIT_WORKDIR:-${GIT_DEFAULT_WORKDIR}}"
 CLONE_URL="${1:?missing git clone url}"
-PATTERN='^(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)\.git$'
+PATTERN='^(git|https)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)$'
 
 if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
   if [[ -z "${BASH_REMATCH[3]:-}" || -z "${BASH_REMATCH[4]:-}" || -z "${BASH_REMATCH[5]:-}" ]]; then
@@ -35,7 +35,8 @@ if [[ "${CLONE_URL}" =~ ${PATTERN} ]]; then
     exit 1
   fi
 
-  REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${BASH_REMATCH[5]}"
+  REPO_NAME="${BASH_REMATCH[5]%.git}"
+  REPO_DIR="${WORKDIR}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}/${REPO_NAME}"
   CLONE_PATH="$(dirname "${REPO_DIR}")"
   if [ -d "${REPO_DIR}" ]; then
     _info "  Project already exists in ${CLEAR}${REPO_DIR//${HOME}/\~}"
