@@ -1,3 +1,5 @@
+onboarding = false
+
 [theme]
 name = "tokyo-night"
 auto_switch = false
@@ -13,6 +15,9 @@ pane_borders = true
 pane_gaps = true
 show_agent_labels_on_pane_borders = true
 prompt_new_tab_name = false
+
+[ui.toast]
+delivery = "herdr"
 
 [terminal]
 shell_mode = "auto"
@@ -95,12 +100,6 @@ description = "run htop"
 
 [[keys.command]]
 key = "prefix+ctrl+v"
-type = "pane"
-command = "nvim ."
-description = "edit current directory"
-
-[[keys.command]]
-key = "prefix+ctrl+p"
 type = "pane"
 command = "nvim ."
 description = "edit current directory"
