@@ -18,7 +18,3 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run -it --rm --name test-dotfiles ubu
 Once `setup.sh` has finished you can start playing around :rocket:
 
 When you logout, the container is gone: no cleanup required.
-
----
-
-![docker](docker.gif)

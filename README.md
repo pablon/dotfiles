@@ -5,7 +5,7 @@ Your dotfiles are how you personalize your system - These are mine.
 ![Linux](https://img.shields.io/badge/-Linux-gray.svg?style=plastic&logo=Linux)
 ![macOS](https://img.shields.io/badge/-macOS-gray.svg?style=plastic&logo=apple)
 
-[Try with docker](docs/docker.md) • [Read the docs](docs/README.md)
+[Read the docs](docs/README.md) • [Try with docker](docs/docker.md)
 
 </div>
 
