@@ -86,14 +86,13 @@ done
 # --- BANNER ---
 
 echo -e "${YELLOW}
-         __      __  _____ __
-    ____/ /___  / /_/ __(_) /__  _____
-   / __  / __ \\/ __/ /_/ / / _ \\/ ___/
-  / /_/ / /_/ / /_/ __/ / /  __(__  )
-  \\__,_/\\____/\\__/_/ /_/_/\\___/____/
 
-  Cross-platform dotfiles setup ${CYAN}[${MODE}]
-  ${CYAN}https://github.com/pablon/dotfiles${NC}
+  ███▀▀██▄ ▄██▀▀██▄ ▀▀███▀▀ ▄██▀▀███ ▀▀▀ ███      ▄██▀▀███ ▄██▀▀▀▀▀
+  ▒▒▒  ▒▒▒ ▒▒▒  ▒▒▒   ▒▒▒   ▒▒▒▀     ▒▒▒ ▒▒▒      ▒▒▒▀      ▀▀▀▀▒▒▄
+  ███▄▄██▀ ▀██▄▄██▀   ███   ███      ███ ▀██▄▄███ ▀██▄▄███ ███▄▄██▀
+
+                  ${CYAN}github.com/pablon/dotfiles${NC}
+         ${STRONG}Cross-platform dotfiles setup ✦ mode ${RED}${MODE}
 "
 
 # --- SHARED FUNCTIONS ---
@@ -138,7 +137,7 @@ update_zsh_plugins() {
     'marlonrichert/zsh-autocomplete'
     'zsh-users/zsh-autosuggestions'
     'zsh-users/zsh-syntax-highlighting'
-    )
+  )
 
   [ -d "${HOME}/.zsh" ] || mkdir -p "${HOME}/.zsh"
 
