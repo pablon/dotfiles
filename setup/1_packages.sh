@@ -24,7 +24,7 @@ set_github_token() {
   if [ -n "${GITHUB_TOKEN:-}" ]; then
     export GITHUB_AUTH="-H 'Authorization: token ${GITHUB_TOKEN}'"
   else
-    declare -g GITHUB_AUTH
+    GITHUB_AUTH=""
   fi
 }
 
