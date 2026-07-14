@@ -29,15 +29,6 @@ set_github_token() {
 }
 
 do_prepare_darwin() {
-  # Detect Apple Silicon chipset + install rosetta
-  if [[ "$(uname)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
-    if (! arch -x86_64 /usr/bin/true 2>/dev/null); then
-      _warning "${YELLOW}ATTENTION! I detected you're using an Apple Silicon chip - ${CYAN}I'll install Rosetta2 now${NC}"
-      ROSETTA_CMD="/usr/sbin/softwareupdate --install-rosetta --agree-to-license"
-      eval "${ROSETTA_CMD}"
-      echo -e "${ROSETTA_CMD}${NC} = ${YELLOW}$?${NC}"
-    fi
-  fi
   # Install Homebrew
   if (! command -v brew &>/dev/null); then
     _info "Installing ${YELLOW}homebrew"
