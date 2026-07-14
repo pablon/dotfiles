@@ -108,8 +108,9 @@ export VISUAL="${EDITOR}"
 
 # homebrew stuff
 if (type brew &>/dev/null); then
-  export HOMEBREW_NO_ENV_HINTS=1
   export HOMEBREW_NO_ANALYTICS=1
+  export HOMEBREW_NO_ASK=1
+  export HOMEBREW_NO_ENV_HINTS=1
 fi
 
 # iTerm2 Shell Integration
