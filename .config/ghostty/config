@@ -13,7 +13,7 @@ tab-inherit-working-directory    = true
 theme                            = TokyoNight
 window-decoration                = auto
 window-inherit-working-directory = true
-working-directory                = ~/projects
+working-directory                = ~/
 # keybindings
 keybind                          = global:super+escape=toggle_quick_terminal
 keybind                          = super+-=decrease_font_size:2
