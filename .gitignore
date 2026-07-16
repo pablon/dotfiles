@@ -15,6 +15,7 @@
 **/.tool-versions
 **/.zshrc_custom
 **/lazy-lock.json
+**/release-notes.*
 **/session.json
 **/spell
 **/state.yml
