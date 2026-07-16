@@ -13,8 +13,6 @@ IFS=$'\n\t'
 # 2. Force UTF-8 locale for consistent string parsing
 export LC_ALL=C
 export LANG=C
-# export LC_ALL=en_US.UTF-8 2>/dev/null || export LC_ALL=C
-# export LANG=en_US.UTF-8 2>/dev/null || export LANG=C
 
 # 3. Context & Path Definitions
 export SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -85,14 +83,14 @@ done
 
 # --- BANNER ---
 
-echo -e "${YELLOW}
+echo -e "${BLUE}
 
   ███▀▀██▄ ▄██▀▀██▄ ▀▀███▀▀ ▄██▀▀███ ▀▀▀ ███      ▄██▀▀███ ▄██▀▀▀▀▀
   ▒▒▒  ▒▒▒ ▒▒▒  ▒▒▒   ▒▒▒   ▒▒▒▀     ▒▒▒ ▒▒▒      ▒▒▒▀      ▀▀▀▀▒▒▄
   ███▄▄██▀ ▀██▄▄██▀   ███   ███      ███ ▀██▄▄███ ▀██▄▄███ ███▄▄██▀
+                  ${STRONG}${CYAN}github.com/pablon/dotfiles${NC}
 
-                  ${CYAN}github.com/pablon/dotfiles${NC}
-         ${STRONG}Cross-platform dotfiles setup ✦ mode ${RED}${MODE}
+         Cross-platform dotfiles setup ✦ mode ${RED}${MODE}${NC}
 "
 
 # --- SHARED FUNCTIONS ---
@@ -218,7 +216,6 @@ check_dependencies() {
   done
 
   if [ "${#deps_missing[@]}" -gt "0" ]; then
-    # _warning "Installing [${#deps_missing[@]}] missing requirements:${MAGENTA} ${deps_missing[*]}"
     _warning "Installing [${#deps_missing[@]}] missing requirements:${MAGENTA} $(echo "${deps_missing[@]}")"
     install_pkg_"${OS}" "${deps_missing[@]}" || exit 1
   fi
@@ -228,7 +225,7 @@ check_dependencies() {
 
 stow_link() {
   if [ "${DRY_RUN}" = true ]; then
-    _info "[DRY-RUN] Stow would create these links:"
+    _info "Stow would create these links:"
     (cd "${DOTFILES_DIR}/" && stow -nv .) || true
   else
     _info "Resolving stow conflicts..."
@@ -250,13 +247,13 @@ run_install() {
 
   # Run all setup scripts
   if [ -d "${SETUP_DIR}" ]; then
-    _info "Running setup scripts from ${SETUP_DIR}"
+    _info "Running setup scripts from $(echo "${SETUP_DIR}" | sed "s|${HOME}|~|")/"
     for script in "${SETUP_DIR}"/*.sh; do
       local script_name
       script_name="$(basename "${script}")"
 
       if [ "${DRY_RUN}" = true ]; then
-        _info "[DRY-RUN] Would run: ${GREEN}${script_name}"
+        _info "Would run: ${GREEN}${script_name}"
         continue
       fi
 
@@ -288,7 +285,7 @@ run_update() {
   # Pull latest changes
   _info "Pulling latest changes..."
   if [ "${DRY_RUN}" = true ]; then
-    _info "[DRY-RUN] Would run: git pull --rebase"
+    _info "Would run: git pull --rebase"
   else
     if (cd "${DOTFILES_DIR}" && git pull --rebase); then
       _success "Repository updated"
@@ -304,8 +301,8 @@ run_update() {
 
   _info "Updating plugins..."
   if [ "${DRY_RUN}" = true ]; then
-    _info "[DRY-RUN] Would update zsh plugins in ~/.zsh/"
-    _info "[DRY-RUN] Would update tmux plugins via TPM"
+    _info "Would update zsh plugins in ~/.zsh/"
+    _info "Would update tmux plugins via TPM"
   else
     update_zsh_plugins
     update_tmux_plugins

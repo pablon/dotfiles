@@ -9,7 +9,7 @@
 # --- 1. Environment & Variables ---
 
 # Colors
-export STRONG='\033[1;37m'
+export STRONG="$(tput bold)"
 export RED='\033[1;31m'
 export GREEN='\033[1;92m'
 export YELLOW='\033[1;93m'
@@ -35,20 +35,24 @@ divider() {
 
 _info() {
   divider
-  echo -e "${BLUE}==>  ${STRONG}${1}${NC}\n"
+  if [ "${DRY_RUN}" = true ]; then
+    echo -e "${MAGENTA}${STRONG}==> [DRY-RUN]${NC}${STRONG} ${1}${NC}\n"
+  else
+    echo -e "${BLUE}${STRONG}==>${NC}${STRONG} ${1}${NC}\n"
+  fi
 }
 
 _warning() {
   divider
-  echo -e "${YELLOW}==>  ${1}${NC}\n"
+  echo -e "${YELLOW}==> ${1}${NC}\n"
 }
 
 _success() {
-  echo -e "${GREEN}==> ✔ ${1}${NC}\n"
+  echo -e "${GREEN}==> ${1}${NC}\n"
 }
 
 _error() {
-  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NC}\n"
+  echo -e "${RED}==> ${MAGENTA}${1}${NC}\n"
 }
 
 # --- 3. OS Detection ---
