@@ -1,5 +1,13 @@
 -- https://github.com/ziontee113/icon-picker.nvim
 -- Neovim plugin that helps you pick 𝑨𝕃𝚻 Font Characters, Symbols Σ, Nerd Font Icons  & Emojis ✨
+--
+-- Default keybindings:
+-- <leader>ia - Alt font picker
+-- <leader>ic - HTML color picker
+-- <leader>ie - Emoji picker
+-- <leader>ii - Icon picker (all categories)
+-- <leader>in - Nerd font picker
+-- <leader>is - Symbol picker
 
 return {
   "ziontee113/icon-picker.nvim",

@@ -1,5 +1,8 @@
 -- https://github.com/MeanderingProgrammer/render-markdown.nvim
 -- Plugin to improve viewing Markdown files in Neovim
+--
+-- Default keybindings:
+-- <leader>mr - Toggle render-markdown
 
 return {
   "MeanderingProgrammer/render-markdown.nvim",
@@ -188,5 +191,8 @@ return {
       icon = "",
       width = 80,
     },
+  },
+  keys = {
+    { "<leader>mr", "<cmd>RenderMarkdown toggle<CR>", desc = "Toggle RenderMarkdown" },
   },
 }

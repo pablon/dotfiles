@@ -1,5 +1,9 @@
 -- https://github.com/Gentleman-Programming/veil.nvim
 -- Hide your secrets. Stream with confidence.
+--
+-- Default keybindings:
+-- <leader>sv - Toggle veil on/off
+-- <leader>sp - Peek at value on current line
 
 return {
   "Gentleman-Programming/veil.nvim",
@@ -17,5 +21,13 @@ return {
       -- *secret*key (case-insensitive)
       { pattern = "([%w_]*[Ss][Ee][Cc][Rr][Ee][Tt][%w_]*[Kk][Ee][Yy]%s*[=:]%s*[\"']?)([^\"'\n]+)", group = 2 },
     },
+    keymaps = {
+      toggle = "<leader>sv", -- Toggle veil on/off
+      peek = "<leader>sp", -- Peek at value on current line
+    },
+  },
+  keys = {
+    { "<leader>sv", "<cmd>Veil<CR>", desc = "Toggle Veil" },
+    { "<leader>sp", "<cmd>VeilPeek<CR>", desc = "Veil Peek" },
   },
 }

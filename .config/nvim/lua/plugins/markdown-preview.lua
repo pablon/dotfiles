@@ -2,6 +2,9 @@
 -- Preview Markdown in your modern browser with synchronised scrolling and flexible configuration.
 --
 -- Make sure you run first: Lazy build markdown-preview.nvim
+--
+-- Default keybindings:
+-- <leader>mp - Toggle markdown preview in browser
 
 return {
   -- Install markdown preview, use npx if available.
@@ -23,4 +26,7 @@ return {
     -- Use Zen Browser for preview
     vim.g.mkdp_browser = "Zen"
   end,
+  keys = {
+    { "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", desc = "Markdown Preview Toggle" },
+  },
 }

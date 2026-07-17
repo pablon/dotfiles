@@ -1,5 +1,21 @@
 -- https://github.com/lewis6991/gitsigns.nvim
 -- Super fast git decorations implemented purely in Lua.
+--
+-- Default keybindings (defined in on_attach below):
+-- ]h/[h           - Next/Prev Hunk
+-- ]H/[H           - Last/First Hunk
+-- <leader>ghs     - Stage Hunk
+-- <leader>ghr     - Reset Hunk
+-- <leader>ghS     - Stage Buffer
+-- <leader>ghu     - Undo Stage Hunk
+-- <leader>ghR     - Reset Buffer
+-- <leader>ghp     - Preview Hunk Inline
+-- <leader>gb      - Blame Line
+-- <leader>ghb     - Blame Buffer
+-- <leader>ghd     - Diff This
+-- <leader>ghD     - Diff This ~
+-- <leader>gH      - Toggle Line Highlight
+-- ih (o/x)        - GitSigns Select Hunk
 
 return {
   "lewis6991/gitsigns.nvim",
@@ -33,7 +49,7 @@ return {
     current_line_blame = true,
     current_line_blame_opts = {
       virt_text = true,
-      virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
+      virt_text_pos = "right_align", -- 'eol' | 'overlay' | 'right_align'
       delay = 300,
       ignore_whitespace = false,
       virt_text_priority = 100,

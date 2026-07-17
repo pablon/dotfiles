@@ -1,5 +1,10 @@
 -- https://github.com/zbirenbaum/copilot.lua
 -- pure lua replacement for https://github.com/github/copilot.vim
+--
+-- Default keybindings (from copilot.lua / copilot-cmp):
+-- Tab       - Accept next suggestion (when completion menu not visible)
+-- Ctrl+]    - Dismiss suggestion
+-- (No custom keybindings configured — auto_trigger handles display)
 
 return {
   "zbirenbaum/copilot.lua",

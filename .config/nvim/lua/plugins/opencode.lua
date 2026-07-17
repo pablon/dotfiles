@@ -3,6 +3,20 @@
 -- research, reviews, and requests.
 
 -- config.lua: https://github.com/nickjvandyke/opencode.nvim/blob/main/lua/opencode/config.lua
+--
+-- Default keybindings:
+-- <leader>aa - Toggle OpenCode terminal
+-- <leader>as - Select and send context to OpenCode
+-- <leader>ai - OpenCode ask (free-form prompt)
+-- <leader>aI - OpenCode ask with @this context
+-- <leader>ab - OpenCode ask about current buffer
+-- <leader>ap - OpenCode prompt with @this
+-- <leader>ape - OpenCode explain prompt
+-- <leader>apf - OpenCode fix prompt
+-- <leader>apd - OpenCode diagnose prompt
+-- <leader>apr - OpenCode review prompt
+-- <leader>apt - OpenCode test prompt
+-- <leader>apo - OpenCode optimize prompt
 
 local opencode_cmd = "opencode --port"
 

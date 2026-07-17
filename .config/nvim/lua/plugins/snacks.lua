@@ -1,5 +1,14 @@
 -- https://github.com/folke/snacks.nvim
 -- A collection of small QoL plugins for Neovim.
+--
+-- Default keybindings:
+-- <leader><leader> - Find files
+-- <leader>R        - Recent files
+-- <leader>fb       - Buffers picker
+-- <leader>fg       - Grep files
+-- <C-n>            - Toggle explorer
+-- <leader>gl       - Lazygit log (current file)
+-- <F12>            - Toggle zen mode
 
 return {
   "folke/snacks.nvim",
@@ -126,6 +135,13 @@ return {
         Snacks.explorer({ auto_close = true })
       end,
       desc = "Explorer",
+    },
+    {
+      "<F12>",
+      function()
+        Snacks.zen()
+      end,
+      desc = "Toggle Zen Mode",
     },
   },
 }

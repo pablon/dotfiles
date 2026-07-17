@@ -1,5 +1,21 @@
 -- https://github.com/obsidian-nvim/obsidian.nvim
 -- A Neovim plugin for writing and navigating Obsidian vaults, written in Lua.
+--
+-- Default keybindings:
+-- <leader>ob  - Show backlinks picker
+-- <leader>oc  - Cycle through checkbox options
+-- <leader>od  - Insert new daily note
+-- <leader>oe  - Extract selected text into a new note
+-- <leader>of  - Follow note reference under cursor (vsplit)
+-- <leader>ol  - Collect all links in current buffer
+-- <leader>onn - Create new note
+-- <leader>onN - Create new note from template
+-- <leader>oo  - Open note in Obsidian app
+-- <leader>op  - Insert Obsidian template
+-- <leader>oq  - Quick switch notes
+-- <leader>oss - Search Obsidian notes
+-- <leader>ost - Search Obsidian notes by tags
+-- <leader>oT  - Load table of contents into picker
 
 local function bootstrap_dir(dir)
   if vim.fn.isdirectory(dir) == 0 then
@@ -101,5 +117,21 @@ return {
         return string.format("![%s](%s)", name, encoded_name)
       end,
     },
+  },
+  keys = {
+    { "<leader>ob", "<cmd>Obsidian backlinks<CR>", desc = "Show picker list of backlinks" },
+    { "<leader>oc", "<cmd>Obsidian toggle_checkbox<CR>", desc = "Cycle through checkbox options" },
+    { "<leader>od", "<cmd>Obsidian dailies<CR>", desc = "Insert new Daily note" },
+    { "<leader>oe", "<cmd>Obsidian extract_note<CR>", desc = "Extract selected text into a new note" },
+    { "<leader>of", "<cmd>Obsidian follow_link vsplit_force<CR>", desc = "Follow a note reference under the cursor" },
+    { "<leader>ol", "<cmd>Obsidian links<CR>", desc = "Collect all links in the current buffer" },
+    { "<leader>onn", "<cmd>Obsidian new<CR>", desc = "Create new note" },
+    { "<leader>onN", "<cmd>Obsidian new_from_template<CR>", desc = "Create new note from template" },
+    { "<leader>oo", "<cmd>Obsidian open<CR>", desc = "Open in Obsidian app" },
+    { "<leader>op", "<cmd>Obsidian template<CR>", desc = "Insert Obsidian template" },
+    { "<leader>oq", "<cmd>Obsidian quick_switch<CR>", desc = "Quick switch notes" },
+    { "<leader>oss", "<cmd>Obsidian search<CR>", desc = "Search Obsidian notes" },
+    { "<leader>ost", "<cmd>Obsidian tags<CR>", desc = "Search Obsidian notes by tags" },
+    { "<leader>oT", "<cmd>Obsidian toc<CR>", desc = "Load table of contents into a picker" },
   },
 }

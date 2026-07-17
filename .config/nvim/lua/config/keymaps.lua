@@ -27,11 +27,6 @@ vim.keymap.set("n", "<F10>", function()
   vim_opt_toggle("wrap", true, false, "Line wrap")
 end)
 
--- Toggle zen mode
-vim.keymap.set("n", "<F12>", function()
-  Snacks.zen()
-end, { desc = "Toggle Zen Mode" })
-
 -- enable/disable completion (blink.cmp)
 vim.keymap.set("n", "<leader>p", function()
   vim.g.blink_cmp_enabled = true
@@ -57,9 +52,6 @@ vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Lsp Hover" })
 vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Lsp Definition" })
 vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Lsp Code Action" })
 
--- undotree
-vim.keymap.set("n", "<leader>U", vim.cmd.UndotreeToggle, { desc = "Undotree Toggle" })
-
 -- replace backward slash
 vim.keymap.set("n", "<leader>rbs", "<cmd>%s/\\//g<CR>", { desc = "Replace Backward Slash" })
 
@@ -70,61 +62,16 @@ vim.keymap.set("n", "<leader>tgc", "<cmd>Telescope git_commits<cr>", { desc = "T
 -- telescope-symbols
 vim.keymap.set("n", "<leader>fs", "<cmd>Telescope symbols<cr>", { desc = "Find Symbols" })
 
--- convert Current line to title cases
--- vim.keymap.set("n", "<leader>rlt", "<cmd>s/<./\u&/g<cr>", { desc = "Replace Line Title" })
-vim.keymap.set(
-  "n",
-  "<leader>rlt",
-  "<cmd>lua require('textcase').current_word('to_title_case')<CR>",
-  { desc = "Replace Line Title" }
-)
-
 -- these keep the cursor in the middle when scrolling with C-d and C-u
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
--- Start interactive EasyAlign
-vim.keymap.set({ "n", "x" }, "<leader>al", "<Plug>(EasyAlign)", { desc = " Start EasyAlign" })
-
 -- surround word with quotes
 vim.keymap.set("n", "<leader>aq", 'ciw""<Esc>P', { desc = "Add Surround Quotes" })
-
--- Obsidian
--- vim.keymap.set("n", "<leader>oc", "<cmd>lua require('obsidian').util.toggle_checkbox()<CR>", { desc = "Obsidian Checkbox" })
-vim.keymap.set("n", "<leader>onN", "<cmd>Obsidian new_from_template<CR>", { desc = "Create New Note From Template" })
-vim.keymap.set("n", "<leader>ob", "<cmd>Obsidian backlinks<CR>", { desc = "Show picker list of backlinks" })
-vim.keymap.set("n", "<leader>oc", "<cmd>Obsidian toggle_checkbox<CR>", { desc = "Cycle through checkbox options" })
-vim.keymap.set("n", "<leader>od", "<cmd>Obsidian dailies<CR>", { desc = "Insert new Daily note" })
-vim.keymap.set("n", "<leader>oe", "<cmd>Obsidian extract_note<CR>", { desc = "Extract selected text into a new note" })
-vim.keymap.set(
-  "n",
-  "<leader>of",
-  "<cmd>Obsidian follow_link vsplit_force<CR>",
-  { desc = "Follow a note reference under the cursor" }
-)
-vim.keymap.set("n", "<leader>ol", "<cmd>Obsidian links<CR>", { desc = "Collect all links in the current buffer" })
-vim.keymap.set("n", "<leader>onn", "<cmd>Obsidian new<CR>", { desc = "Create New Note" })
-vim.keymap.set("n", "<leader>oo", "<cmd>Obsidian open<CR>", { desc = "Open in Obsidian App" })
-vim.keymap.set("n", "<leader>op", "<cmd>Obsidian template<CR>", { desc = "Insert Obsidian Template" })
-vim.keymap.set("n", "<leader>oq", "<cmd>Obsidian quick_switch<CR>", { desc = "Quick Switch" })
-vim.keymap.set("n", "<leader>oss", "<cmd>Obsidian search<CR>", { desc = "Search Obsidian" })
-vim.keymap.set("n", "<leader>ost", "<cmd>Obsidian tags<CR>", { desc = "Search Obsidian notes by Tags" })
-vim.keymap.set("n", "<leader>oT", "<cmd>Obsidian toc<CR>", { desc = "Load the table of contents into a picker list" })
 
 -------------------------------------------------------------------------------
 -- markdown section
 -------------------------------------------------------------------------------
-
--- markdown-preview
-vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Markdown Preview" })
-
--- markdown-toc
-vim.keymap.set("n", "<leader>mti", "<cmd>Mtoc insert<cr>", { desc = "Markdown TOC Insert" })
-vim.keymap.set("n", "<leader>mtu", "<cmd>Mtoc update<cr>", { desc = "Markdown TOC Update" })
-vim.keymap.set("n", "<leader>mtr", "<cmd>Mtoc remove<cr>", { desc = "Markdown TOC Remove" })
-
--- render-markdown
-vim.keymap.set("n", "<leader>mr", "<cmd>RenderMarkdown toggle<cr>", { desc = "RenderMarkdown toggle" })
 
 -- to list
 vim.keymap.set({ "n", "v" }, "<leader>mlu", "<cmd>'<,'>s/^/- /<cr><esc>", { desc = "Markdown list bullet" })
