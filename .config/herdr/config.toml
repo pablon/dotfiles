@@ -19,6 +19,9 @@ prompt_new_tab_name = false
 [ui.toast]
 delivery = "herdr"
 
+[ui.toast.herdr]
+position = "top-right"
+
 [terminal]
 shell_mode = "auto"
 new_cwd = "follow"
@@ -38,7 +41,7 @@ reload_config = "prefix+r"
 settings = "prefix+s"
 # workspaces
 new_workspace = "prefix+c"
-next_workspace = "prefix+l"
+next_workspace = "prefix+n"
 previous_workspace = "prefix+p"
 switch_workspace = "prefix+1..9"
 workspace_picker = "prefix+w"
