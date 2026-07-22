@@ -4,6 +4,7 @@
 **/*.disabled
 **/*.log
 **/*.sock
+**/*.lock
 **/.DS_Store
 **/.aliases_custom
 **/.aliases_work
@@ -16,7 +17,7 @@
 **/.zshrc_custom
 **/lazy-lock.json
 **/release-notes.*
-**/session.json
+**/session*.json
 **/spell
 **/state.yml
 .atl/
