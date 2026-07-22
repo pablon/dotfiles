@@ -79,30 +79,48 @@ focus_agent = "prefix+ctrl+1..9"
 
 [[keys.command]]
 key = "prefix+ctrl+g"
-type = "pane"
+type = "popup"
 command = "lazygit -ucd ${XDG_CONFIG_HOME:-$HOME/.config}/lazygit"
 description = "run lazygit"
+width = "95%"
+height = "95%"
 
 [[keys.command]]
 key = "prefix+ctrl+h"
-type = "pane"
+type = "popup"
 command = "hunk diff"
 description = "run hunk diff"
+width = "95%"
+height = "95%"
 
 [[keys.command]]
 key = "prefix+ctrl+j"
-type = "pane"
+type = "popup"
 command = "hunk show"
 description = "run hunk show"
+width = "95%"
+height = "95%"
 
 [[keys.command]]
 key = "prefix+ctrl+t"
-type = "pane"
+type = "popup"
 command = "htop"
 description = "run htop"
+width = "95%"
+height = "95%"
 
 [[keys.command]]
 key = "prefix+ctrl+v"
-type = "pane"
+type = "popup"
 command = "nvim ."
 description = "edit current directory"
+width = "95%"
+height = "95%"
+
+[[keys.command]]
+key = "prefix+ctrl+p"
+type = "popup"
+command = "exec \"${SHELL:-zsh}\""
+description = "open scratch terminal"
+width = "80%"
+height = "80%"
