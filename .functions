@@ -10,19 +10,19 @@ _clipboardApp="$(if command xclip -v &>/dev/null; then echo xclip ; elif command
 #===============================================================
 # multi purpose banners
 _info() {
-  echo -e "${CYAN}==>  ${STRONG}${1}${NC}"
+  echo -e "${BLUE}${STRONG}==>${NC}${STRONG} ${1}${NC}"
 }
 
 _warning() {
-  echo -e "${YELLOW}==>  ${1}${NC}"
+  echo -e "${YELLOW}${STRONG}==>${NC}${STRONG} ${1}${NC}"
 }
 
 _success() {
-  echo -e "${GREEN}==> ✔ ${NC}${1}"
+  echo -e "${GREEN}${STRONG}==>${NC}${STRONG} ${NC}${1}"
 }
 
 _error() {
-  echo -e "${RED}==> ✘ ${MAGENTA}${1}${NC}\n"
+  echo -e "${RED}${STRONG}==>${NC}${STRONG} ${MAGENTA}${1}${NC}\n"
 }
 alias _fail='_error'
 
