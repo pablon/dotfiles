@@ -113,6 +113,7 @@ alias ga='git a'
 alias gb='git branch'
 alias gco='git checkout'
 alias gd='git diff'
+alias gdc="GIT_PAGER='' git diff --color=never" # clean diff output for piping to other commands
 alias gl="git log --color --graph --pretty='%C(red)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%ai) %C(bold blue)<%an>%C(reset)' -10"
 alias gll="git log --pretty=format:'%C(red)%h%C(reset) %C(auto)%d%C(reset) %s %Cgreen(%ai) %C(bold blue)<%an>%C(reset)' --graph --stat"
 alias gp='git pull'
