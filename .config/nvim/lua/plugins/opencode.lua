@@ -29,13 +29,6 @@ local function opencode_terminal_opts()
   }
 end
 
-local function show_opencode_terminal()
-  local win = require("snacks.terminal").get(opencode_cmd, { create = false })
-  if win then
-    win:show()
-  end
-end
-
 return {
   "nickjvandyke/opencode.nvim",
   dependencies = {
@@ -67,21 +60,27 @@ return {
     },
   },
   config = function()
-    ---@type opencode.Opts
-    vim.g.opencode_opts = vim.tbl_deep_extend("force", vim.g.opencode_opts or {}, {
-      server = {
-        start = function()
-          require("snacks.terminal").open(opencode_cmd, opencode_terminal_opts())
-        end,
-      },
-    })
+    local cfg = require("opencode.config")
+
+    cfg.opts.server.start = function()
+      require("snacks.terminal").open(opencode_cmd, opencode_terminal_opts())
+    end
+
+    cfg.opts.select.server = {
+      ["server.start"] = "Start configured server",
+    }
+
+    vim.o.autoread = true
 
     vim.api.nvim_create_autocmd("User", {
       pattern = { "OpencodeEvent:tui.command.execute" },
       callback = function(args)
         local event = args.data and args.data.event
         if event and event.properties and event.properties.command == "prompt.submit" then
-          show_opencode_terminal()
+          local win = require("snacks.terminal").get(opencode_cmd, { create = false })
+          if win then
+            win:show()
+          end
         end
       end,
     })
