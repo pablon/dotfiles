@@ -7,9 +7,9 @@ gui:
   tabWidth: 2
 git:
   overrideGpg: true
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: "delta -n --paging=never --tabs=2"
+      command: "delta -n --paging=never --tabs=2"
   commit:
     signOff: true
   # Branch name detection to automatically create commits in a standardized format
