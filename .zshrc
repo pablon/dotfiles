@@ -62,6 +62,18 @@ if [ -z "${TMUX}" ]; then
   echo
 fi
 
+# list herdr sessions if not in herdr
+if [ -z "${HERDR_ENV}" ]; then
+  herdr session list | sed '1d' 2>/dev/null | while read session; do
+    herdr_sess="$(echo "${session}" | awk '{print $1}')"
+    herdr_sock="$(echo "${session}" | awk '{print $NF}')"
+    herdr_sock_time="$(stat "${herdr_sock}" | awk -F: '/^Change/ {print $2}' | xargs)"
+    _info "herdr session:${NC} ${herdr_sess} (${herdr_sock_time})"
+  done
+  unset herdr_sess herdr_sock herdr_sock_time
+  echo
+fi
+
 # get zsh load time - END
 _zsh_end="$(date +%s%3N)"
 printf " %.3f s\\n" "$((${_zsh_end} - ${_zsh_start}))e-3"
