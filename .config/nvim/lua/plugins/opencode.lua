@@ -66,11 +66,9 @@ return {
       require("snacks.terminal").open(opencode_cmd, opencode_terminal_opts())
     end
 
-    cfg.opts.select.server = {
+    cfg.opts.select.server = vim.tbl_deep_extend("force", cfg.opts.select.server or {}, {
       ["server.start"] = "Start configured server",
-    }
-
-    vim.o.autoread = true
+    })
 
     vim.api.nvim_create_autocmd("User", {
       pattern = { "OpencodeEvent:tui.command.execute" },
