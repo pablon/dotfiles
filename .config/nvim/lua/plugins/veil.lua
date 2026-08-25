@@ -12,6 +12,8 @@ return {
   opts = {
     highlight = { fg = "#f1e89d" },
     extra_patterns = {
+      -- *AZURE* (case-sensitive): AZURE anywhere in the key name
+      { pattern = "([%w_]*AZURE[%w_]*%s*[=:]%s*[\"']?)([^\"'\n]+)", group = 2 },
       -- *TOKEN* (case-sensitive): TOKEN anywhere in the key name
       { pattern = "([%w_]*TOKEN[%w_]*%s*[=:]%s*[\"']?)([^\"'\n]+)", group = 2 },
       -- *api*key (case-insensitive)
@@ -23,7 +25,7 @@ return {
     },
     keymaps = {
       toggle = "<leader>sv", -- Toggle veil on/off
-      peek = "<leader>sp", -- Peek at value on current line
+      peek = "<leader>sp", -- Peek value on current line
     },
   },
   keys = {
