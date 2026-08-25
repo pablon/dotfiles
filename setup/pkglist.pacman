@@ -51,6 +51,7 @@ shellcheck
 sops
 stern
 stow
+stylua
 sudo
 tar
 tmux

@@ -33,6 +33,7 @@ pre-commit
 shellcheck
 sops
 stern
+stylua
 tree-sitter
 xh
 yamllint
