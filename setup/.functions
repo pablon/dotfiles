@@ -8,6 +8,8 @@
 
 # --- 1. Environment & Variables ---
 
+export DRY_RUN="${DRY_RUN:-false}"
+
 # Colors
 export STRONG="$(tput bold)"
 export RED='\033[1;31m'
