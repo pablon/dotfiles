@@ -57,13 +57,13 @@ eval "$(starship init zsh)"
 (type direnv &>/dev/null) && eval "$(direnv hook zsh)"
 
 # list tmux sessions if not in tmux
-if [ -z "${TMUX}" ]; then
+if (type tmux &>/dev/null) && [ -z "${TMUX}" ]; then
   tmux ls 2>/dev/null | while read session; do _info "tmux session:${NC} ${session}"; done
   echo
 fi
 
 # list herdr sessions if not in herdr
-if [ -z "${HERDR_ENV}" ]; then
+if (type herdr &>/dev/null) && [ -z "${HERDR_ENV}" ]; then
   herdr session list | sed '1d' 2>/dev/null | while read session; do
     herdr_sess="$(echo "${session}" | awk '{print $1}')"
     herdr_sock="$(echo "${session}" | awk '{print $NF}')"
