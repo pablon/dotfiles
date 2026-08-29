@@ -13,4 +13,8 @@ return {
     "nickjvandyke/opencode.nvim",
     enabled = true,
   },
+  {
+    "alexghergh/nvim-tmux-navigation",
+    enabled = false,
+  },
 }
