@@ -305,6 +305,9 @@ do_additional_tools() {
   if [ ! -f "${HOME}/.rustup/settings.toml" ]; then
     _info "Installing ${CYAN}rustup" &&
       curl ${GITHUB_AUTH:-} --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y
+  elif type rustup &>/dev/null; then
+    _info "Updating ${CYAN}rustup" &&
+      rustup update
   fi
 
   if [ "$(uname)" == "Linux" ]; then
@@ -447,7 +450,7 @@ do_ansible_galaxy() {
 # main
 
 echo
-_info "${YELLOW} Preparing base operating system for ${OS}\n"
+_info "Preparing base operating system for ${GREEN}${OS}\n"
 echo
 eval "set_github_token"
 eval "do_prepare_${OS}"
