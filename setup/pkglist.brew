@@ -66,6 +66,7 @@ lazyssh
 libpq
 lua
 luajit
+macmon
 mermaid-cli
 modem-dev/tap/hunk
 mtr
