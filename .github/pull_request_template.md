@@ -14,7 +14,6 @@
 
 - [ ] Tests pass locally
 - [ ] Documentation updated (if needed)
-- [ ] Follows [CONTRIBUTING.md](../CONTRIBUTING.md)
 
 ## Validation
 

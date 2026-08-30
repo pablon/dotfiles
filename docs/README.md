@@ -6,11 +6,11 @@ it installs everything: packages, dotfiles, Zsh plugins, Neovim, Docker, Kuberne
 ## Scope
 
 This page covers the repository layout, setup flow, and key configuration notes. It does **not** duplicate every detail
-from each config file — check the file itself or the [Contributing Guide](../CONTRIBUTING.md) for deeper dives.
+from each config file.
 
 ## Audience
 
-Anyone setting up these dotfiles, maintaining them, or contributing changes.
+Anyone setting up these dotfiles.
 
 ## Quick Start
 
@@ -35,7 +35,8 @@ Post-setup: open a new terminal session, then verify with
 ### How It Works
 
 The setup is **safe to re-run** (idempotent), **cross-platform**, and **hands-off**.
-It uses [GNU Stow](https://www.gnu.org/software/stow/) to symlink config files from this repo into your home directory —
+It uses [GNU Stow](https://www.gnu.org/software/stow/) to symlink config files from this repo into your home directory
+—
 no copying, no manual moves. If a target file already exists, Stow backs it up with a timestamp (`*.YYYYMMDD-HHMMSS`)
 before replacing it.
 Every script runs in Strict Mode (`set -euo pipefail`), auto-detects your OS (macOS → Homebrew, Debian → APT, Arch →
@@ -169,9 +170,7 @@ rm -rf ~/dotfiles                        # full removal
 │   ├── obsidian-sync # sync Obsidian vault
 │   └── vpn-fix       # fix VPN DNS + routes
 ├── setup/            # 0_*.sh – 9_*.sh + .functions + pkglist.*
-├── CONTRIBUTING.md
 └── docs/
-    ├── CODE_OF_CONDUCT.md
     ├── README.md
     └── docker.md
 ```
@@ -267,9 +266,3 @@ check-added-large-files · check-executables-have-shebangs · check-merge-confli
 ## Related Documentation
 
 - [Try with docker](docker.md)
-- [Contributing Guide](../CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-
-## Contributing
-
-[Contributing Guide](../CONTRIBUTING.md) • [Code of Conduct](CODE_OF_CONDUCT.md)

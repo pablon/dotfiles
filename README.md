@@ -39,7 +39,3 @@ git clone https://github.com/pablon/dotfiles.git ~/dotfiles && cd ~/dotfiles/
 # re-create all symlinks
 stow -R . -t ~
 ```
-
-## Contributing
-
-[Contributing Guide](CONTRIBUTING.md) • [Code of Conduct](docs/CODE_OF_CONDUCT.md)
