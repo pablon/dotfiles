@@ -74,11 +74,7 @@ do_apt_init() {
     # for latest neovim
     _info "Adding apt repository ppa:neovim-ppa/unstable"
     sudo add-apt-repository -y ppa:neovim-ppa/unstable 2>/dev/null
-    if [[ "${VERSION_ID%%.*}" -lt "24" ]]; then
-      # add git-core apt repo for older ubuntu versions
-      _info "Adding apt repository ppa:git-core/ppa"
-      sudo add-apt-repository -y ppa:git-core/ppa 2>/dev/null
-    fi
+
     sudo apt update ${APT_OPTS}
   fi
 }

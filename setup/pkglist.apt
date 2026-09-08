@@ -12,7 +12,7 @@ dialog
 dirmngr
 dos2unix
 eza
-fd-find
+fd
 ffmpeg
 fontconfig
 fonts-font-awesome
@@ -20,7 +20,7 @@ fonts-liberation
 fortune
 gawk
 git
-git-delta
+delta
 gpg
 gzip
 htop

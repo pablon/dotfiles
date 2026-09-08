@@ -30,7 +30,7 @@ Post-setup: open a new terminal session, then verify with
 ### Supported Platforms
 
 - **macOS** (Intel and Apple Silicon)
-- **Linux** (Debian, Ubuntu, Arch, Manjaro, Fedora, Rocky Linux, AlmaLinux)
+- **Linux** (Debian, Ubuntu 24.04+, Arch, Manjaro, Fedora, Rocky Linux, AlmaLinux)
 
 ### How It Works
 

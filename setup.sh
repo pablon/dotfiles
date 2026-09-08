@@ -31,7 +31,14 @@ else
   exit 1
 fi
 
-# 5. Verify user id
+# 5. Block Ubuntu <24.04 — not supported
+if [[ "${OS}" == "ubuntu" && "${VERSION_ID%%.*}" -lt "24" ]]; then
+  _error "Ubuntu ${VERSION_ID} is not supported. Minimum required: Ubuntu 24.04"
+  _error "Please upgrade to Ubuntu 24.04+ or use another supported distro."
+  exit 1
+fi
+
+# 6. Verify user id
 if [[ "$(id -u)" -eq "0" ]]; then
   _error "You must run this script as a non-root user. Bye"
   exit 1
