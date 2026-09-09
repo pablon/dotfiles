@@ -42,7 +42,7 @@ setopt INC_APPEND_HISTORY_TIME # append command to history file immediately afte
 setopt SHARE_HISTORY           # Share history between all sessions.
 unsetopt menu_complete         # do not autoselect the first completion entry
 unsetopt flowcontrol
-setopt auto_menu               # show completion menu on successive tab press
+setopt auto_menu # show completion menu on successive tab press
 setopt complete_in_word
 setopt always_to_end
 export ZSH_HIGHLIGHT_MAXLENGTH=300
@@ -81,6 +81,7 @@ PATH_DIRS=(
   "${HOME}/.docker/bin"
   "${HOME}/.krew/bin"
   "${HOME}/.local/bin"
+  "${HOME}/.local/share/pnpm/bin"
   "${HOME}/.opencode/bin"
   "${HOME}/bin"
   "${HOME}/go/bin"
@@ -95,6 +96,9 @@ unset PATH_DIRS
 # export CARAPACE_BRIDGES='zsh'
 # zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 # source <(carapace _carapace)
+
+# pnpm
+[ -d "${HOME}/.local/share/pnpm" ] && export PNPM_HOME="${HOME}/.local/share/pnpm"
 
 # You may need to manually set your MANPATH
 export MANPATH="/usr/local/man:${MANPATH}"
@@ -155,10 +159,10 @@ if (type fzf &>/dev/null); then
     local command="${1}"
     shift
     case "${command}" in
-      cd)           fzf --preview 'tree -C {} | head -200'   "$@" ;;
-      export|unset) fzf --preview "eval 'echo \$'{}"         "$@" ;;
-      ssh)          fzf --preview 'dig {}'                   "$@" ;;
-      *)            fzf --preview 'bat -n --color=always {}' "$@" ;;
+      cd) fzf --preview 'tree -C {} | head -200' "$@" ;;
+      export | unset) fzf --preview "eval 'echo \$'{}" "$@" ;;
+      ssh) fzf --preview 'dig {}' "$@" ;;
+      *) fzf --preview 'bat -n --color=always {}' "$@" ;;
     esac
   }
 fi
@@ -167,10 +171,10 @@ fi
 # asdf
 if (type asdf &>/dev/null); then
   case "$(uname)" in
-  Linux)
-    ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
-    [ -x "${ASDF_SCRIPT}" ] && source "${ASDF_SCRIPT}"
-    ;;
+    Linux)
+      ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
+      [ -x "${ASDF_SCRIPT}" ] && source "${ASDF_SCRIPT}"
+      ;;
   esac
 fi
 
@@ -193,6 +197,7 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 
 # zoxide init
 (type zoxide &>/dev/null) && eval "$(zoxide init zsh)"
+
 # worktrunk init
 if command -v wt &>/dev/null; then
   wt_command="$(command -v wt)"
@@ -200,7 +205,7 @@ if command -v wt &>/dev/null; then
     wt_cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh"
     wt_cache_file="${wt_cache_dir}/worktrunk-init.zsh"
     if [[ ! -r "${wt_cache_file}" || "${wt_command}" -nt "${wt_cache_file}" ]]; then
-      mkdir -p "${wt_cache_dir}" && command wt config shell init zsh >| "${wt_cache_file}"
+      mkdir -p "${wt_cache_dir}" && command wt config shell init zsh >|"${wt_cache_file}"
     fi
     [ -r "${wt_cache_file}" ] && source "${wt_cache_file}"
   fi
