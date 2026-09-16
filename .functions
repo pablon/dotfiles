@@ -935,7 +935,7 @@ aks-get-upgrades() {
 #   2. cd <your-repo-path>/.envrc && direnv allow
 
 repo_auth_check() {
-  local REMOTE_URL="$(git remote get-url origin 2>/dev/null || true)"
+  local REMOTE_URL="$(git remote get-url origin 2>/dev/null)"
   local REMOTE_HOST="${REMOTE_URL}"
   local REMOTE_HOST="${REMOTE_HOST#ssh://}"
   local REMOTE_HOST="${REMOTE_HOST#git@}"
