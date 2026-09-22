@@ -2,6 +2,10 @@
 
 return {
   {
+    "alexghergh/nvim-tmux-navigation",
+    enabled = false,
+  },
+  {
     "mfussenegger/nvim-ansible",
     enabled = false,
   },
@@ -9,12 +13,14 @@ return {
     "zbirenbaum/copilot.lua",
     enabled = true,
   },
+  -- Enable just ONE at a time 
   {
     "nickjvandyke/opencode.nvim",
-    enabled = true,
-  },
-  {
-    "alexghergh/nvim-tmux-navigation",
     enabled = false,
   },
+  {
+    "carderne/pi-nvim",
+    enabled = true,
+  },
+  -- Enable just ONE at a time 
 }
