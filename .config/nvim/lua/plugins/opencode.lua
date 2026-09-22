@@ -70,15 +70,16 @@ return {
       ["server.start"] = "Start configured server",
     })
 
+    -- Show terminal when OpenCode starts executing.
+    -- Uses the documented session.execution.started event from opencode.nvim
+    -- (the old tui.command.execute → prompt.submit pattern depended on
+    -- internal TUI event structure that can change without warning).
     vim.api.nvim_create_autocmd("User", {
-      pattern = { "OpencodeEvent:tui.command.execute" },
-      callback = function(args)
-        local event = args.data and args.data.event
-        if event and event.properties and event.properties.command == "prompt.submit" then
-          local win = require("snacks.terminal").get(opencode_cmd, { create = false })
-          if win then
-            win:show()
-          end
+      pattern = { "OpencodeEvent:session.execution.started" },
+      callback = function()
+        local win = require("snacks.terminal").get(opencode_cmd, { create = false })
+        if win then
+          win:show()
         end
       end,
     })
