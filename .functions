@@ -283,53 +283,6 @@ disappointed() { echo -n " ಠ_ಠ " | tee /dev/tty | $_clipboardApp; }
 flip() { echo -n "（╯°□°）╯ ┻━┻" | tee /dev/tty | $_clipboardApp; }
 shrug() { echo -n "¯\_(ツ)_/¯" | tee /dev/tty | $_clipboardApp; }
 
-################################################################
-# vagrant
-################################################################
-
-#===============================================================
-# List all vagrant boxes available in the system including its
-# status, and try to access the selected one via ssh
-vagrant_shell(){
-  if [ -r "${HOME}/.vagrant.d/data/machine-index/index" ] ; then
-    ( cd $(cat ${HOME}/.vagrant.d/data/machine-index/index | jq '.machines[] | {name, vagrantfile_path, state}' | jq '.name + "," + .state  + "," + .vagrantfile_path'| sed 's/^"\(.*\)"$/\1/'| column -s, -t | sort -rk 2 | fzf | awk '{print $3}'); vagrant ssh &>/dev/null )
-  fi
-}
-
-# list/save/restore vagrant snapshots
-vagrant_snapshot() {
-  local VM_NAME="$(vagrant status --machine-readable | awk -F',' '/metadata/ {print $2}')"
-  case "${1}" in
-    list)
-      vagrant snapshot ${1}
-      ;;
-    save)
-      # normalize vm name for the snapshot
-      local VM_NAME="$(vagrant status --machine-readable | awk -F',' '/metadata/ {print $2}' | sed -e 's/[^A-Za-z0-9._-]/_/g')"
-      local VM_SNAPSHOT_NAME="${VM_NAME}-snapshot-$(date +%Y%m%d-%H%M%S)"
-      vagrant snapshot ${1} --no-tty "${VM_NAME}" "${VM_SNAPSHOT_NAME}"
-      ;;
-    restore)
-      if [[ "$(vagrant snapshot list | sed 1d | wc -l)" -gt "0" ]] ; then
-        local SNAPSHOT="$(vagrant snapshot list | sed 1d | fzf --header='^-- Select snapshot to restore')"
-        vagrant snapshot ${1}  --no-tty --no-start "${VM_NAME}" "${SNAPSHOT}" 2>/dev/null
-      else
-        _info "[${VM_NAME}] no snapshots to ${1}"
-      fi
-      ;;
-    delete)
-      if [[ "$(vagrant snapshot list | sed 1d | wc -l)" -gt "0" ]] ; then
-        for i in $(vagrant snapshot list | sed 1d | fzf -m --header='^-- Select snapshot(s) to delete - use TAB for multiple selection' | xargs) ; do vagrant snapshot ${1} --no-tty  "${i}" ; done
-      else
-        _info "[${VM_NAME}] no snapshots to ${1}"
-      fi
-      ;;
-    *)
-      echo -e "Manage vagrant snapshots.\nUsage:\n $(basename ${0}) {list,save,restore,delete}\n"
-      ;;
-  esac
-}
-
 #===============================================================
 # docker
 #===============================================================
