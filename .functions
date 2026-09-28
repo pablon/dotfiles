@@ -926,19 +926,19 @@ repo_auth_check() {
   fi
 
   if [ "${REMOTE_CLI}" = "glab" ] && glab auth status --hostname "${REMOTE_HOST}" >/dev/null 2>&1; then
-    _success "Authenticated to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+    _success "[${REMOTE_PROVIDER}] ${REMOTE_HOST} Authenticated ✅"
   elif [ "${REMOTE_CLI}" = "gh" ] && gh auth status --hostname "${REMOTE_HOST}" >/dev/null 2>&1; then
-    _success "Authenticated to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+    _success "[${REMOTE_PROVIDER}] ${REMOTE_HOST} Authenticated ✅"
   else
-    _error "Not authenticated to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+    _error "[${REMOTE_PROVIDER}] ${REMOTE_HOST} Not authenticated ❌"
   fi
 
   if [ "${REMOTE_CLI}" = "glab" ] && glab api --hostname "${REMOTE_HOST}" user >/dev/null 2>&1; then
-    _success "API access to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+    _success "[${REMOTE_PROVIDER}] ${REMOTE_HOST} API access ✅"
   elif [ "${REMOTE_CLI}" = "gh" ] && gh api --hostname "${REMOTE_HOST}" user >/dev/null 2>&1; then
-    _success "API access to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+    _success "[${REMOTE_PROVIDER}] ${REMOTE_HOST} API access ✅"
   else
-    _error "API access to ${REMOTE_PROVIDER} at ${REMOTE_HOST}"
+    _success "[${REMOTE_PROVIDER}] ${REMOTE_HOST} no API access ❌"
   fi
   unset REMOTE_URL REMOTE_HOST REMOTE_PROVIDER REMOTE_CLI
 }
