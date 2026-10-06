@@ -47,11 +47,11 @@ unset ZSH_PLUGINS_SKIP
 
 # load atuin
 [ -x "${HOME}/.atuin/bin/env" ] && source "${HOME}/.atuin/bin/env" &>/dev/null
-eval "$(atuin init --disable-up-arrow zsh)"
+(type atuin &>/dev/null) && eval "$(atuin init --disable-up-arrow zsh)"
 
 # load starship
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
-eval "$(starship init zsh)"
+(type starship &>/dev/null) && eval "$(starship init zsh)"
 
 # load direnv hook
 (type direnv &>/dev/null) && eval "$(direnv hook zsh)"
