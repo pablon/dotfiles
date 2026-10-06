@@ -78,7 +78,7 @@ fi
 
 # get zsh load time - END
 _zsh_end="$(date +%s%3N)"
-printf " %.3f s\\n" "$((${_zsh_end} - ${_zsh_start}))e-3"
+printf " %.3f s\\n" "$((_zsh_end - _zsh_start))e-3"
 unset _zsh_start _zsh_end
 
 # unload zsh profiler
