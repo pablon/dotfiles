@@ -65,7 +65,6 @@ vim-gtk3
 wget
 wl-clipboard
 xclip
-xh
 yamllint
 yq
 zoxide
