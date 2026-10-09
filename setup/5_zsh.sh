@@ -40,5 +40,5 @@ for plugin in "${ZSH_PLUGINS[@]}"; do
   unset plugin plugin_name
 done
 
-# sanitize permissions
-(zsh -i -c 'compaudit | sed 1d | xargs chmod 750 &>/dev/null') || true
+# sanitize permissions (ZSH_DISABLE_COMPFIX prevents zsh-newuser-install on first run)
+ZSH_DISABLE_COMPFIX=true zsh -i -c 'compaudit | sed 1d | xargs chmod 750 &>/dev/null' || true
