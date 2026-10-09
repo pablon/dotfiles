@@ -15,6 +15,7 @@
 **/.tmux_custom.conf
 **/.tool-versions
 **/.zshrc_custom
+**/asdf-*
 **/herdr/plugins.json
 **/herdr/plugins/*
 **/lazy-lock.json
