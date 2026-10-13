@@ -34,7 +34,7 @@ divider() {
 #===============================================================
 # Create a new directory and enter it
 md() {
-  mkdir -vp "${1}" && cd "${1}" && _info "cd ${CYAN}$(pwd)/"
+  mkdir -vp "${1}" && cd "${1}" && _info "cd ${CYAN}${PWD/#${HOME}/~}"
 }
 #===============================================================
 # find shorthand
