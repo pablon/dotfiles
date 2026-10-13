@@ -37,7 +37,16 @@ options:
   end_slide_shorthand: false
 
   auto_render_languages:
+    - Bash
+    - CMake
+    - Diff
+    - Docker
+    - Go
     - Mermaid
+    - Python
+    - Shell
+    - Terraform
+    - Toml
     - Yaml
 
 snippet:
@@ -116,4 +125,5 @@ transition:
   frames: 45
   # the animation to use
   animation:
+    # fade, slide_horizontal, collapse_horizontal
     style: slide_horizontal
