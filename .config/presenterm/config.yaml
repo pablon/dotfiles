@@ -6,7 +6,8 @@ defaults:
   # the theme to use by default in every presentation unless overridden.
   theme: dark
 
-  # the image protocol to use.
+  # the image protocol to use: kitty-local, kitty-remote, iterm2, sixel, or none.
+  # If set to none, images will not be displayed.
   image_protocol: kitty-local
 
 typst:
@@ -35,19 +36,6 @@ options:
 
   # whether to treat a thematic break as a slide end.
   end_slide_shorthand: false
-
-  auto_render_languages:
-    - Bash
-    - CMake
-    - Diff
-    - Docker
-    - Go
-    - Mermaid
-    - Python
-    - Shell
-    - Terraform
-    - Toml
-    - Yaml
 
 snippet:
   exec:
