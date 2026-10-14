@@ -1,10 +1,10 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/mfontanini/presenterm/master/config-file-schema.json
 defaults:
   # override the terminal font size when in windows or when using sixel.
-  terminal_font_size: 16
+  terminal_font_size: 24
 
   # the theme to use by default in every presentation unless overridden.
-  theme: dark
+  theme: catppuccin-mocha
 
   # the image protocol to use: kitty-local, kitty-remote, iterm2, sixel, or none.
   # If set to none, images will not be displayed.
@@ -58,7 +58,7 @@ speaker_notes:
   publish_address: "127.0.0.1:59418"
 
   # Whether to always publish speaker notes even when `--publish-speaker-notes` is not set.
-  always_publish: false
+  always_publish: true
 
 bindings:
   # the keys that cause the presentation to move forwards.
