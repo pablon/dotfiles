@@ -18,7 +18,7 @@ export YELLOW="\033[1;93m"
 
 ######################################################################
 # clipboard tool
-_clipboardApp="$(if (command xclip -v &>/dev/null); then echo xclip; elif (type pbcopy &>/dev/null); then echo pbcopy; fi)"
+_clipboardApp="$(if command xclip -v &>/dev/null; then echo xclip; elif type pbcopy &>/dev/null; then echo pbcopy; fi)"
 
 ######################################################################
 # zsh
@@ -111,7 +111,7 @@ export EDITOR='nvim'
 export VISUAL="${EDITOR}"
 
 # homebrew stuff
-if (type brew &>/dev/null); then
+if type brew &>/dev/null; then
   export HOMEBREW_NO_ANALYTICS=1
   export HOMEBREW_NO_ASK=1
   export HOMEBREW_NO_ENV_HINTS=1
@@ -129,9 +129,9 @@ export BUILDKIT_COLORS="run=light-blue:error=light-red:cancel=light-magenta:warn
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # GIT_PAGER
-if (type delta &>/dev/null); then
+if type delta &>/dev/null; then
   export GIT_PAGER='delta'
-elif (type diff-so-fancy &>/dev/null); then
+elif type diff-so-fancy &>/dev/null; then
   export GIT_PAGER='diff-so-fancy'
 else
   export GIT_PAGER='less --tabs=2 -RFX'
@@ -139,7 +139,7 @@ fi
 
 # fzf (Tab coexists with zsh-autocomplete: ** triggers fzf, otherwise falls through to autocomplete)
 # https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh
-if (type fzf &>/dev/null); then
+if type fzf &>/dev/null; then
   source <(fzf --zsh 2>/dev/null)
 
   export FZF_DEFAULT_COMMAND="fd --type f --strip-cwd-prefix --hidden --follow --exclude '.git' --exclude 'node_modules' --one-file-system"
@@ -178,7 +178,7 @@ fi
 
 ######################################################################
 # asdf
-if (type asdf &>/dev/null); then
+if type asdf &>/dev/null; then
   case "$(uname)" in
     Linux)
       ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
@@ -205,7 +205,7 @@ export LESS_TERMCAP_us=$'\E[04;38;5;111m' # begin underline
 # auto completion
 
 # zoxide init
-(type zoxide &>/dev/null) && eval "$(zoxide init zsh)"
+type zoxide &>/dev/null && eval "$(zoxide init zsh)"
 
 # worktrunk init
 if command -v wt &>/dev/null; then

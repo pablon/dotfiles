@@ -10,7 +10,7 @@
 
 # get zsh load time - START
 # prefer gnu-date
-[[ "$(uname)" == "Darwin" ]] && (type gdate &>/dev/null) && alias date='gdate'
+[[ "$(uname)" == "Darwin" ]] && type gdate &>/dev/null && alias date='gdate'
 _zsh_start="$(date +%s%3N)"
 
 # Export core paths before plugins: zsh-autocomplete runs compinit during plugin load.
@@ -26,7 +26,7 @@ FPATH_DIRS=(
 for i in "${FPATH_DIRS[@]}"; do
   [ -d "${i}" ] && FPATH+=":${i}"
 done
-(type brew &>/dev/null) && [ -n "${HOMEBREW_PREFIX:-}" ] && FPATH+=":${HOMEBREW_PREFIX}/share/zsh/site-functions"
+type brew &>/dev/null && [ -n "${HOMEBREW_PREFIX:-}" ] && FPATH+=":${HOMEBREW_PREFIX}/share/zsh/site-functions"
 export FPATH="${FPATH}"
 unset FPATH_DIRS
 
@@ -46,23 +46,23 @@ unset ZSH_PLUGINS_SKIP
 
 # load atuin
 [ -x "${HOME}/.atuin/bin/env" ] && source "${HOME}/.atuin/bin/env" &>/dev/null
-(type atuin &>/dev/null) && eval "$(atuin init --disable-up-arrow zsh)"
+type atuin &>/dev/null && eval "$(atuin init --disable-up-arrow zsh)"
 
 # load starship
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
-(type starship &>/dev/null) && eval "$(starship init zsh)"
+type starship &>/dev/null && eval "$(starship init zsh)"
 
 # load direnv hook
-(type direnv &>/dev/null) && eval "$(direnv hook zsh)"
+type direnv &>/dev/null && eval "$(direnv hook zsh)"
 
 # list tmux sessions if not in tmux
-if (type tmux &>/dev/null) && [ -z "${TMUX}" ]; then
+if type tmux &>/dev/null && [ -z "${TMUX}" ]; then
   tmux ls 2>/dev/null | while read session; do _info "tmux session:${NC} ${session}"; done
   echo
 fi
 
 # list herdr sessions if not in herdr
-if (type herdr &>/dev/null) && [ -z "${HERDR_ENV}" ]; then
+if type herdr &>/dev/null && [ -z "${HERDR_ENV}" ]; then
   herdr session list | sed '1d' 2>/dev/null | while read session; do
     herdr_sess="$(echo "${session}" | awk '{print $1}')"
     herdr_sock="$(echo "${session}" | awk '{print $NF}')"
