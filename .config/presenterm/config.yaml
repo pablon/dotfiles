@@ -1,14 +1,17 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/mfontanini/presenterm/master/config-file-schema.json
 defaults:
   # override the terminal font size when in windows or when using sixel.
-  terminal_font_size: 24
+  terminal_font_size: 16
 
   # the theme to use by default in every presentation unless overridden.
-  theme: catppuccin-mocha
+  theme: terminal-dark
+  # export:
+  # presenterm --theme=dark --export-pdf <deck>.md && open <deck>.pdf
+  # presenterm --theme=catppuccin-latte --export-pdf <deck>.md && open <deck>.pdf
 
   # the image protocol to use: kitty-local, kitty-remote, iterm2, sixel, or none.
-  # If set to none, images will not be displayed.
   image_protocol: kitty-local
+  # If set to none, images will NOT be displayed.
 
 typst:
   # the pixels per inch when rendering latex/typst formulas.
@@ -19,7 +22,9 @@ mermaid:
   scale: 2
 
 options:
+  # first h1 heading in a slide will automatically become the slide title.
   h1_slide_titles: true
+
   # whether slides are automatically terminated when a slide title is found.
   implicit_slide_ends: false
 
@@ -35,7 +40,12 @@ options:
   strict_front_matter_parsing: true
 
   # whether to treat a thematic break as a slide end.
-  end_slide_shorthand: false
+  end_slide_shorthand: true
+
+  # remove image prefix
+  #  󰄬  ![width:50%](path.png)
+  #    ![image:width:50%](path.png))
+  image_attributes_prefix: ""
 
 snippet:
   exec:
@@ -108,7 +118,7 @@ bindings:
 
 transition:
   # how long the transition should last.
-  duration_millis: 750
+  duration_millis: 450
   # how many frames should be rendered during the transition
   frames: 45
   # the animation to use
