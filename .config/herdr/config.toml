@@ -9,17 +9,25 @@ auto_switch = false
 [theme.custom]
 surface_dim = "#3b4261"
 overlay0 = "#565f89"
-accent = "#9ece6a"
+accent = "#a6e3a1"
 
 [ui]
+accent = "#a6e3a1"
+agent_panel_sort = "spaces"
 mouse_capture = true
 pane_borders = "auto"
 pane_gaps = true
-prompt_new_tab_name = false
+prompt_new_tab_name = true
 right_click_passthrough_modifier = "ctrl"
 show_agent_labels_on_pane_borders = true
 status_indicators = "symbols"
 window_title = "{terminal_title}"
+
+[ui.sidebar.agents]
+rows = [["state_icon", "machine", "workspace", "tab"], ["agent"]]
+
+[ui.sidebar.spaces]
+rows = [["state_icon", "workspace", "branch", "git_status"]]
 
 [ui.toast.clipboard]
 position = "top-right"
@@ -57,7 +65,7 @@ new_tab = "prefix+t"
 rename_tab = "prefix+shift+r"
 switch_tab = "prefix+shift+1..9"
 # splits
-split_vertical = "prefix+v"
+split_vertical = "prefix+|"
 split_horizontal = "prefix+minus"
 # panes
 close_pane = "prefix+x"
@@ -127,16 +135,6 @@ height = "95%"
 
 [[keys.command]]
 key = "prefix+ctrl+p"
-type = "popup"
+type = "pane"
 command = "exec \"${SHELL:-zsh}\""
 description = "open scratch terminal"
-width = "95%"
-height = "95%"
-
-[[keys.command]]
-key = "prefix+ctrl+m"
-type = "popup"
-command = "macmon"
-description = "open macmon"
-width = "95%"
-height = "95%"
