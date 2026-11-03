@@ -21,13 +21,25 @@ prompt_new_tab_name = true
 right_click_passthrough_modifier = "ctrl"
 show_agent_labels_on_pane_borders = true
 status_indicators = "symbols"
-window_title = "{terminal_title}"
-
-[ui.sidebar.agents]
-rows = [["state_icon", "machine", "workspace", "tab"], ["agent"]]
+window_title = "{workspace} {terminal_title}"
+tab_bar_right = [{ type = "zoom" }]
 
 [ui.sidebar.spaces]
-rows = [["state_icon", "workspace", "branch", "git_status"]]
+rows = [["state_icon", "workspace"], ["branch", "git_status"]]
+
+[ui.sidebar.agents]
+rows = [
+  [
+    "state_icon",
+    "machine",
+    "workspace",
+  ],
+  [
+    "agent",
+    "state_text",
+    "terminal_title_stripped",
+  ],
+]
 
 [ui.toast.clipboard]
 position = "top-right"
