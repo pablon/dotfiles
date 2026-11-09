@@ -380,11 +380,6 @@ do_darwin() {
   # Expand the print dialog by default
   defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
   defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool true
-  ###############################################################################
-  # SizeUp.app                                                                  #
-  ###############################################################################
-  # Start SizeUp at login
-  defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true
   # Don't show the preferences window on next start
   defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false
   ###############################################################################
