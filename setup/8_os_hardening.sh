@@ -18,6 +18,10 @@ do_darwin() {
   osascript -e 'tell application "System Preferences" to quit'
   # Disable the sound effects on boot
   sudo nvram SystemAudioVolume=" "
+  # Disable disable incoming SMB connections
+  sudo launchctl bootout system/com.apple.smbd
+  # Disable incoming SSH connections
+  sudo launchctl unload /System/Library/LaunchDaemons/ssh.plist
   # Set sidebar icon size to medium
   defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2
   # Always show scrollbars
