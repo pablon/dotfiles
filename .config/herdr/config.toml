@@ -10,6 +10,9 @@ auto_switch = false
 surface_dim = "#3b4261"
 overlay0 = "#565f89"
 accent = "#a6e3a1"
+sidebar_bg = "#1a1b26"
+active_row_bg = "#323951"
+selection_bg = "#33467c"
 
 [ui]
 accent = "#a6e3a1"
@@ -35,9 +38,20 @@ rows = [
     "workspace",
   ],
   [
+    { token = "$summary", fg = "#89b4fa", bold = true, dim = false },
+  ],
+  [
+    "terminal_title_stripped",
+  ],
+  [
+    { token = "$load", fg = "#fff", rules = [
+      { gt = 80, fg = "#f55", bold = true },
+      { gt = 50, fg = "#fc0" },
+    ] },
+  ],
+  [
     "agent",
     "state_text",
-    "terminal_title_stripped",
   ],
 ]
 
