@@ -38,12 +38,6 @@ rows = [
     "workspace",
   ],
   [
-    { token = "$summary", fg = "#89b4fa", bold = true, dim = false },
-  ],
-  [
-    "terminal_title_stripped",
-  ],
-  [
     { token = "$load", fg = "#fff", rules = [
       { gt = 80, fg = "#f55", bold = true },
       { gt = 50, fg = "#fc0" },
@@ -52,6 +46,12 @@ rows = [
   [
     "agent",
     "state_text",
+  ],
+  [
+    { token = "$summary", fg = "#89b4fa", bold = true, dim = false },
+  ],
+  [
+    "terminal_title_stripped",
   ],
 ]
 
